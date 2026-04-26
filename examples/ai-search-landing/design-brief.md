@@ -1,39 +1,39 @@
-# BriefSearch AI 搜索产品官网 Design Brief
+# BriefSearch AI 搜索产品官网设计 Brief
 
-## Project Overview
+## 项目概览
 
 为 BriefSearch 创建一个产品驱动的 SaaS 官网，帮助知识工作者和小团队理解：这个 AI 搜索产品可以跨分散的工作文档、聊天、工单和网盘找到可信答案。
 
 内容语言：面向用户的 UI 文案使用简体中文 (`zh-CN`)；技术标识、文件名、工具名和 design token keys 保持英文。
 
-## Brief Diagnosis
+## 需求诊断
 
-- Raw request: `帮我做一个 AI 搜索产品官网`
-- Initial score: 42/100
-- Main gaps: 原始需求没有说明受众、CTA、产品证明、品牌方向和响应式约束。
-- Recommended mode: 黄金样例使用 quick mode，并把关键假设明确写出来。
+- 原始需求：`帮我做一个 AI 搜索产品官网`
+- 初始分数：42/100
+- 主要缺口：原始需求没有说明受众、CTA、产品证明、品牌方向和响应式约束。
+- 推荐模式：黄金样例使用 quick mode，并把关键假设明确写出来。
 
-## Target Audience
+## 目标受众
 
-- Primary: 需要跨工作资料查找答案的知识工作者和小团队
-- Secondary: 为高速协作团队评估效率工具的团队负责人
-- Context: 访问者需要快速判断产品是否能低门槛连接常用工作工具，并给出可核查答案
+- 主要受众：需要跨工作资料查找答案的知识工作者和小团队
+- 次要受众：为高速协作团队评估效率工具的团队负责人
+- 使用场景：访问者需要快速判断产品是否能低门槛连接常用工作工具，并给出可核查答案
 
-## Business Goal
+## 业务目标
 
 推动试用注册，演示预约作为次要转化路径。
 
-## Design Goal
+## 设计目标
 
 在首屏讲清跨工作空间 AI 搜索的价值，同时建立企业级信任感。
 
-## Core Message
+## 核心信息
 
 几秒内，从所有工作资料里找到可信答案。
 
-## Required Structure
+## 必要结构
 
-| Section | Purpose | Required content | Visual anchor |
+| 区块 | 目的 | 必要内容 | 视觉锚点 |
 |---|---|---|---|
 | 首屏 | 立刻说明产品承诺 | 标题、简短说明、主 CTA、次 CTA、产品界面示意 | 带来源文档链接的搜索答案面板 |
 | 痛点 | 说明工作知识分散造成的成本 | 三个痛点和一句影响说明 | 文档、聊天、工单和网盘分散来源示意 |
@@ -43,14 +43,14 @@
 | 安全信任 | 在最终 CTA 前建立信任 | 按权限搜索、管理员控制、来源可见 | 克制的信任说明面板 |
 | 最终 CTA | 给合格访问者明确下一步 | 试用 CTA、演示 CTA、简短放心提示 | 简单直接的转化区 |
 
-## Visual Direction
+## 视觉方向
 
-- Strategy: 企业信任型
-- Tone: 克制、可信、产品驱动、清楚、安全
-- References: 现代企业 SaaS 官网、带来源答案的产品界面、清晰信任结构
-- Differentiators: 首屏真实产品界面、来源归因 UI、最终 CTA 前的安全证明
+- 策略：企业信任型
+- 语气：克制、可信、产品驱动、清楚、安全
+- 参考：现代企业 SaaS 官网、带来源答案的产品界面、清晰信任结构
+- 差异点：首屏真实产品界面、来源归因 UI、最终 CTA 前的安全证明
 
-## Strategy Options
+## 策略选项
 
 ### 企业信任型
 
@@ -64,23 +64,23 @@
 
 适合早期产品需要更强问题叙事时使用。先讲工作知识分散的痛点，再介绍产品作为聚焦解法。风险是企业买家可能觉得证明和安全感不足。
 
-## Brand Context
+## 品牌上下文
 
 品牌名是 BriefSearch。只使用文字标识占位。没有真实 Logo、客户指标或客户 Logo。
 
-## DESIGN.md Reference
+## DESIGN.md 参考
 
 DESIGN.md
 
-Reference direction: `ai_product_landing_page` - 只借鉴产品证明、转化清晰度和信任层级这些机制。
+参考方向：`ai_product_landing_page` - 只借鉴产品证明、转化清晰度和信任层级这些机制。
 
-## Asset List
+## 资产
 
-- Available: 产品界面示意占位、集成图标占位
-- Missing: 真实截图、客户 Logo、真实指标、认证徽章
-- Placeholders allowed: 可信的产品 UI 占位和通用集成图标占位
+- 可用：产品界面示意占位、集成图标占位
+- 缺失：真实截图、客户 Logo、真实指标、认证徽章
+- 允许占位：可信的产品 UI 占位和通用集成图标占位
 
-## Interaction Requirements
+## 交互要求
 
 - 需要表现桌面端和移动端官网。
 - 主 CTA 打开试用注册表单或跳转到 `/signup`，实现时包含 default、hover、focus、disabled、loading、success 和 error 状态。
@@ -91,7 +91,7 @@ Reference direction: `ai_product_landing_page` - 只借鉴产品证明、转化�
 - 注册失败或演示不可用时，访问者留在当前页面，并看到清楚的重试路径。
 - 展示从首屏价值到工作流证明再到试用注册的简单访问者路径。
 
-## Responsive and Accessibility Requirements
+## 响应式与可访问性要求
 
 - 使用桌面端 >= 1024px、平板 768-1023px、移动端 <= 767px 作为布局断点。
 - 移动端按标题、说明、CTA 和产品界面的顺序堆叠。
@@ -101,24 +101,24 @@ Reference direction: `ai_product_landing_page` - 只借鉴产品证明、转化�
 - 每个交互元素都有可见 focus，移动端触控目标至少 44px。
 - 使用语义化标题顺序，并为产品示意、来源图标和集成占位提供描述性 alt 文本。
 
-## Constraints
+## 约束
 
 响应式 Web 官网。可交付 HTML 原型、兼容 React 或 Next.js 的结构，并使用兼容 Tailwind 的 tokens。保持对比度可读，focus 状态清楚。
 
-## Forbidden Directions
+## 禁止方向
 
 避免泛泛 AI 话术、过量发光、抽象渐变色块、虚构 Logo、无依据指标和过度圆角的新奇风格。
 
-## Success Criteria
+## 成功标准
 
 首屏价值清楚、CTA 明确、产品界面真实可信、没有泛泛 AI 话术、移动端 CTA 可见。
 
-## Open Questions
+## 待确认问题
 
 - 哪些集成已经确认可以发布展示？
 - 是否已有真实截图或客户证明材料？
 
-## Assumptions
+## 假设
 
 - 产品仍处早期，但可信到可以展示真实感产品界面。
 - 第一转化目标是试用注册，演示预约为次要路径。

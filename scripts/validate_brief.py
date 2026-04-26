@@ -3,6 +3,8 @@ import json
 import sys
 from pathlib import Path
 
+import language_checks
+
 
 REQUIRED_FIELDS = [
     "meta.version",
@@ -92,6 +94,11 @@ def main(argv):
     if not resolve_existing_path(design_md_path, path):
         print("invalid references:")
         print(f"- design_system.design_md_path does not exist: {design_md_path}")
+        return 1
+
+    if content_language == "zh-CN" and not language_checks.is_chinese_first_brief(data):
+        print("invalid content:")
+        print("- design-brief.json declares zh-CN but brief values are not Chinese-first")
         return 1
 
     print(f"valid: {path}")

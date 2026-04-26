@@ -32,6 +32,12 @@ PROMPTS = [
 DEFAULT_CONTENT_LANGUAGE = "zh-CN"
 OUTPUT_LANGUAGE_PHRASE = "Use Simplified Chinese for all user-visible UI copy."
 OUTPUT_LANGUAGE_CHINESE_PHRASE = "用户可见 UI 文案必须使用简体中文"
+DIAGNOSIS_SECTIONS = [
+    ("需求评分", "Brief Score"),
+    ("主要缺口", "Main Gaps"),
+    ("策略选项", "Strategy Options"),
+    ("最终选择", "Final Choice"),
+]
 
 
 def has_text(text, needle):
@@ -85,10 +91,9 @@ def check_diagnosis(example_dir, raw_input, strategy_names, findings):
     if not path.exists():
         return
     text = path.read_text(encoding="utf-8")
-    required_phrases = ["Brief Score", "Main Gaps", "Strategy Options", "Final Choice"]
-    for phrase in required_phrases:
-        if not has_text(text, phrase):
-            findings.append(f"diagnosis missing section: {phrase}")
+    for primary, legacy in DIAGNOSIS_SECTIONS:
+        if not has_text(text, primary) and not has_text(text, legacy):
+            findings.append(f"diagnosis missing section: {primary}")
     if raw_input and raw_input not in text:
         findings.append("diagnosis does not include the raw input")
     for name in strategy_names:
@@ -175,7 +180,7 @@ def check_brief_links(example_dir, brief, findings):
         text = markdown_brief.read_text(encoding="utf-8")
         if "DESIGN.md" not in text:
             findings.append("design-brief.md does not reference DESIGN.md")
-        if "Strategy Options" not in text:
+        if "策略选项" not in text and "Strategy Options" not in text:
             findings.append("design-brief.md does not include strategy options")
 
 

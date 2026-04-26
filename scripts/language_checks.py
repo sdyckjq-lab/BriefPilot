@@ -4,6 +4,8 @@ MIN_BRIEF_CHINESE_CHARS = 500
 MIN_BRIEF_CHINESE_RATIO = 0.25
 MIN_PROMPT_CHINESE_CHARS = 500
 MIN_PROMPT_CHINESE_RATIO = 0.12
+MIN_REVIEW_CHINESE_CHARS = 120
+MIN_REVIEW_CHINESE_RATIO = 0.25
 
 
 def chinese_char_count(text):
@@ -51,3 +53,41 @@ def is_chinese_first_brief(brief):
 
 def is_chinese_first_prompt(text):
     return is_chinese_first_text(text, MIN_PROMPT_CHINESE_CHARS, MIN_PROMPT_CHINESE_RATIO)
+
+
+def collect_review_text_values(review):
+    values = []
+    evidence = review.get("evidence") if isinstance(review.get("evidence"), dict) else {}
+    if isinstance(evidence.get("summary"), str):
+        values.append(evidence["summary"])
+
+    values.extend(collect_string_values(review.get("strengths", [])))
+    if isinstance(review.get("strategy_change_reason"), str):
+        values.append(review["strategy_change_reason"])
+
+    findings = review.get("findings", [])
+    if isinstance(findings, list):
+        for item in findings:
+            if not isinstance(item, dict):
+                continue
+            for field in ["brief_reference", "issue", "evidence", "recommended_change"]:
+                if isinstance(item.get(field), str):
+                    values.append(item[field])
+
+    visual = review.get("visual_review") if isinstance(review.get("visual_review"), dict) else {}
+    if isinstance(visual.get("notes"), str):
+        values.append(visual["notes"])
+
+    prompt = review.get("prompt") if isinstance(review.get("prompt"), dict) else {}
+    for field in ["keep", "change", "do_not_change", "acceptance_checks"]:
+        values.extend(collect_string_values(prompt.get(field, [])))
+
+    return values
+
+
+def is_chinese_first_review(review):
+    return is_chinese_first_text(
+        "\n".join(collect_review_text_values(review)),
+        MIN_REVIEW_CHINESE_CHARS,
+        MIN_REVIEW_CHINESE_RATIO,
+    )

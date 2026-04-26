@@ -2,7 +2,7 @@
 
 BriefPilot 把模糊的产品页、官网或应用页面需求，整理成可复用的设计 brief、`DESIGN.md` 视觉系统、面向 huashu-design / Claude Design / v0 的提示词，以及生成结果后的评审和修改提示。
 
-BriefPilot is a Chinese-first design brief compiler. Technical file names, commands, JSON keys, and tool names stay in English.
+BriefPilot 默认中文优先。技术文件名、命令、JSON keys 和工具名保留英文。
 
 ## 为什么需要它
 

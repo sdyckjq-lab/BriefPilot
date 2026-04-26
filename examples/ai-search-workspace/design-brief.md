@@ -1,6 +1,6 @@
 # BriefSearch AI 搜索研究工作台答案详情
 
-## Project Overview
+## 项目概览
 
 创建一个 AI 搜索产品的应用页面工作流：用户提出问题、查看带来源答案、核查引用、打开来源详情，并把结果保存或分享给团队。
 
@@ -8,9 +8,9 @@
 
 内容语言：面向用户的 UI 文案使用简体中文 (`zh-CN`)；技术标识、文件名、工具名和 design token keys 保持英文。
 
-## Brief Diagnosis
+## 需求诊断
 
-Initial score: 58.
+初始分数：58。
 
 通过假设补齐了以下缺口：
 
@@ -20,25 +20,25 @@ Initial score: 58.
 - 保存/分享行为没有定义。
 - 移动端顺序和键盘行为没有定义。
 
-## Target Audience
+## 目标受众
 
-Primary user: 需要在使用 AI 搜索答案前先核查来源的知识工作者和分析人员。
+主要用户：需要在使用 AI 搜索答案前先核查来源的知识工作者和分析人员。
 
-Secondary user: 查看队友保存研究结果的团队负责人。
+次要用户：查看队友保存研究结果的团队负责人。
 
-## Business Goal
+## 业务目标
 
 提升用户对带来源 AI 答案的信任和重复使用率。
 
-## Design Goal
+## 设计目标
 
 让查询、答案可信度、答案正文和来源出处在首屏就清楚可见。
 
-## Core Message
+## 核心信息
 
 用可见来源、可信度和恢复路径审查每一个 AI 答案。
 
-## Required Structure
+## 必要结构
 
 - 顶部搜索区
 - 答案状态条
@@ -49,33 +49,33 @@ Secondary user: 查看队友保存研究结果的团队负责人。
 
 桌面端展示顶部搜索区、主答案与引用区域，以及右侧来源详情面板。平板端可以把来源详情折叠到来源列表下方。移动端内容顺序是搜索、答案状态、答案正文、来源、来源详情，然后是保存/分享操作。
 
-## Visual Direction
+## 视觉方向
 
-Selected strategy: 密集研究工作台。
+已选策略：密集研究工作台。
 
-Tone: 密集、可信、冷静、产品驱动、来源优先。
+视觉语气：密集、可信、冷静、产品驱动、来源优先。
 
 这个界面应该像严肃的研究工作台。它需要展示答案出处、可信度、来源引用和来源详情交互，但不能显得杂乱。
 
-## Strategy Options
+## 策略选项
 
 1. 密集研究工作台：已选，适合分析人员快速核查带来源 AI 答案。
 2. 证据优先答案详情：来源优先，适合必须先证明可信度再强调速度的产品。
 3. 轻量团队笔记：组织清楚、偏协作，适合保存后的团队研究资料。
 
-## Brand Context
+## 品牌上下文
 
 品牌：BriefSearch。
 
 使用深色正文、灰蓝、克制蓝、柔和成功绿和琥珀色警示。不要虚构真实客户数据或专有来源名称。
 
-## DESIGN.md Reference
+## DESIGN.md 参考
 
 本包内的 `DESIGN.md` 是颜色、字体、间距、圆角、面板、来源卡片和禁止视觉方向的事实来源。
 
-Reference direction: `enterprise_data_workspace` - 只借鉴数据密度、来源层级、权限状态和高频使用的人机工效。
+参考方向：`enterprise_data_workspace` - 只借鉴数据密度、来源层级、权限状态和高频使用的人机工效。
 
-## Asset List
+## 资产
 
 - `input.txt`
 - `diagnosis-and-strategies.md`
@@ -88,7 +88,7 @@ Reference direction: `enterprise_data_workspace` - 只借鉴数据密度、来�
 - `prompts/claude-design.txt`
 - `prompts/v0.txt`
 
-## Interaction Requirements
+## 交互要求
 
 - 搜索输入状态：empty、input、submitting、failed、retry。
 - 答案区域状态：empty、generating、success、partial、low-confidence、failed。
@@ -98,14 +98,14 @@ Reference direction: `enterprise_data_workspace` - 只借鉴数据密度、来�
 - 答案中的引用标记应该聚焦到匹配的来源卡片。
 - 选择来源时，来源详情要更新，同时不丢失答案上下文。
 
-## Constraints
+## 约束
 
 - 响应式应用页面 UI。
 - HTML 原型或兼容 React/Next.js 的结构。
 - 可以使用兼容 Tailwind 的 tokens。
 - 使用可信占位，不虚构客户证明。
 
-## Forbidden Directions
+## 禁止方向
 
 - 营销优先构图。
 - 隐藏或低对比来源。
@@ -114,7 +114,7 @@ Reference direction: `enterprise_data_workspace` - 只借鉴数据密度、来�
 - 看不出差异的状态变化。
 - 虚构来源或客户证明。
 
-## Success Criteria
+## 成功标准
 
 - 首屏展示查询、可信度和来源出处。
 - 答案和来源有清楚层级。
@@ -123,12 +123,12 @@ Reference direction: `enterprise_data_workspace` - 只借鉴数据密度、来�
 - 移动端顺序保持答案和来源上下文。
 - 遵循 `DESIGN.md` 视觉规则。
 
-## Open Questions
+## 待确认问题
 
 - 发布时有哪些真实来源系统？
 - 产品内应该如何路由权限申请？
 
-## Assumptions
+## 假设
 
 - 应用用户已经登录。
 - 产品具备按权限访问来源的能力。

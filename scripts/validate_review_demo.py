@@ -123,6 +123,9 @@ def check_design_review_report(example_dir, brief, findings):
 def check_review(review_path, findings):
     review, context, errors = validate_result_review.validate_review(review_path)
     findings.extend(errors)
+    language = validate_brief.value_at(context.get("brief", {}), "meta.content_language")
+    if not errors and language == DEFAULT_CONTENT_LANGUAGE and not language_checks.is_chinese_first_review(review):
+        findings.append(f"{review_path.relative_to(review_path.parents[1])} review guidance is not Chinese-first")
     return review, context
 
 

@@ -24,4 +24,4 @@
 
 ## 重生成说明
 
-用这份说明创建下一轮生成提示。除非已经实际保存更新后的 brief 文件，否则不要暗示完整 brief 已经被重写。Do not imply that the full brief has been rewritten unless the updated brief files are actually saved.
+用这份说明创建下一轮生成提示。除非已经实际保存更新后的 brief 文件，否则不要暗示完整 brief 已经被重写。
