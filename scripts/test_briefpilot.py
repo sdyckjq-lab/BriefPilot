@@ -1379,6 +1379,33 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertIn("refusing unsafe staging dir", result.stdout)
             self.assertTrue((ROOT / ".git").exists())
 
+    def test_skill_command_packager_rejects_project_internal_staging_dir_without_creating(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "source"
+            root.mkdir()
+            write_minimal_command_package(root)
+            staging_dir = root / "examples" / "staging"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(PACKAGE_BRIEFPILOT_SKILLS),
+                    "--root",
+                    str(root),
+                    "--dry-run",
+                    "--staging-dir",
+                    str(staging_dir),
+                    "--out-dir",
+                    str(Path(tmp) / "dist"),
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("refusing unsafe staging dir inside project root", result.stdout)
+            self.assertFalse(staging_dir.exists())
+
     def test_skill_command_packager_rejects_invalid_source_before_packaging(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -1478,6 +1505,58 @@ class BriefPilotScriptTests(unittest.TestCase):
         self.assertIn("source_remote", upgrade_skill)
         self.assertIn("完整源码", upgrade_skill)
         self.assertIn("不要把已安装的 `brief" + "pilot` 目录直接当作源码", upgrade_skill)
+
+    def test_skill_command_packager_manifest_uses_public_source_remote(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repo"
+            shutil.copytree(
+                ROOT,
+                root,
+                ignore=shutil.ignore_patterns(".git", "dist", "__pycache__", "AGENTS.md", "docs"),
+            )
+            subprocess.run(["git", "-C", str(root), "init"], text=True, capture_output=True, check=True)
+            fake_secret = "SE" + "CRET"
+            subprocess.run(
+                ["git", "-C", str(root), "remote", "add", "origin", f"https://user:{fake_secret}@example.com/private/repo.git"],
+                text=True,
+                capture_output=True,
+                check=True,
+            )
+            out_dir = Path(tmp) / "dist"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(root / "scripts" / "package_briefpilot_skills.py"),
+                    "--root",
+                    str(root),
+                    "--out-dir",
+                    str(out_dir),
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            with zipfile.ZipFile(out_dir / "briefpilot.skill") as archive:
+                manifest = json.loads(archive.read(("brief" + "pilot") + "/install-manifest.json"))
+            self.assertEqual(manifest["source_remote"], "https://github.com/sdyckjq-lab/BriefPilot.git")
+            self.assertNotIn(fake_secret, json.dumps(manifest))
+
+    def test_skill_command_validator_rejects_incomplete_dist_artifacts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dist = Path(tmp) / "dist"
+            dist.mkdir()
+            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+                with zipfile.ZipFile(dist / f"{command}.skill", "w") as archive:
+                    archive.writestr(
+                        f"{command}/SKILL.md",
+                        f"---\nname: {command}\ndescription: placeholder for /{command}\n---\n\n# {command}\n",
+                    )
+
+            result = run_skill_command_validator("--dist-dir", dist)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("installed briefpilot missing required part: references", result.stdout)
 
     def test_public_package_validator_allows_ignored_local_docs(self):
         with tempfile.TemporaryDirectory() as tmp:

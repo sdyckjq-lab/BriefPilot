@@ -3,8 +3,9 @@ import argparse
 import json
 import re
 import sys
+import tempfile
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
@@ -217,32 +218,66 @@ def validate_installed(install_dir):
     return findings
 
 
+def validate_archive_member_names(archive_name, command, names):
+    findings = []
+    for name in names:
+        if not name or name.endswith("/"):
+            continue
+        if name.startswith("/"):
+            findings.append(f"{archive_name} contains unsafe absolute path: {name}")
+            continue
+        parts = PurePosixPath(name).parts
+        if not parts or parts[0] != command:
+            findings.append(f"{archive_name} contains unexpected path: {name}")
+            continue
+        if any(part in {"", ".", ".."} for part in parts):
+            findings.append(f"{archive_name} contains unsafe relative path: {name}")
+    return findings
+
+
 def validate_dist(dist_dir):
     dist_dir = Path(dist_dir).resolve()
     findings = []
-    for command in COMMANDS:
-        archive = dist_dir / f"{command}.skill"
-        if not archive.exists():
-            findings.append(f"missing package artifact: {archive.name}")
-            continue
-        try:
-            with zipfile.ZipFile(archive) as zip_file:
-                names = zip_file.namelist()
-        except zipfile.BadZipFile:
-            findings.append(f"{archive.name} is not a valid zip archive")
-            continue
-        if not any(name == f"{command}/SKILL.md" for name in names):
-            findings.append(f"{archive.name} must contain {command}/SKILL.md")
-        wrong_roots = {name.split("/", 1)[0] for name in names if name and not name.startswith(f"{command}/")}
-        if wrong_roots:
-            findings.append(f"{archive.name} contains unexpected top-level roots: {', '.join(sorted(wrong_roots))}")
-        forbidden_hits = []
-        for name in names:
-            parts = Path(name).parts
-            if any(part in FORBIDDEN_PACKAGE_PARTS for part in parts[1:]):
-                forbidden_hits.append(name)
-        if forbidden_hits:
-            findings.append(f"{archive.name} contains forbidden package paths: {', '.join(forbidden_hits[:5])}")
+    with tempfile.TemporaryDirectory(prefix="briefpilot-skill-validate-") as tmp:
+        extracted_root = Path(tmp)
+        can_validate_installed = True
+        for command in COMMANDS:
+            archive = dist_dir / f"{command}.skill"
+            if not archive.exists():
+                findings.append(f"missing package artifact: {archive.name}")
+                can_validate_installed = False
+                continue
+            try:
+                with zipfile.ZipFile(archive) as zip_file:
+                    names = zip_file.namelist()
+                    path_findings = validate_archive_member_names(archive.name, command, names)
+                    if path_findings:
+                        findings.extend(path_findings)
+                        can_validate_installed = False
+                        continue
+                    if not any(name == f"{command}/SKILL.md" for name in names):
+                        findings.append(f"{archive.name} must contain {command}/SKILL.md")
+                        can_validate_installed = False
+                    wrong_roots = {name.split("/", 1)[0] for name in names if name and not name.startswith(f"{command}/")}
+                    if wrong_roots:
+                        findings.append(f"{archive.name} contains unexpected top-level roots: {', '.join(sorted(wrong_roots))}")
+                        can_validate_installed = False
+                    forbidden_hits = []
+                    for name in names:
+                        parts = PurePosixPath(name).parts
+                        if any(part in FORBIDDEN_PACKAGE_PARTS for part in parts[1:]):
+                            forbidden_hits.append(name)
+                    if forbidden_hits:
+                        findings.append(f"{archive.name} contains forbidden package paths: {', '.join(forbidden_hits[:5])}")
+                        can_validate_installed = False
+                    if can_validate_installed:
+                        zip_file.extractall(extracted_root)
+            except zipfile.BadZipFile:
+                findings.append(f"{archive.name} is not a valid zip archive")
+                can_validate_installed = False
+                continue
+        if can_validate_installed:
+            findings.extend(validate_installed(extracted_root))
     return findings
 
 

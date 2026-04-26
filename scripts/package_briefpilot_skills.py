@@ -15,6 +15,7 @@ import validate_skill_commands
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 COMMANDS = ("briefpilot", "bp", "briefpilot-upgrade")
+OFFICIAL_SOURCE_REMOTE = "https://github.com/sdyckjq-lab/BriefPilot.git"
 MAIN_FILES = ("SKILL.md", "LICENSE")
 MAIN_DIRS = ("agents", "references", "templates", "scripts", "examples")
 EXCLUDED_NAMES = {
@@ -66,7 +67,7 @@ def build_manifest(root):
         "schema_version": "1.0",
         "package": "BriefPilot",
         "commands": list(COMMANDS),
-        "source_remote": git_value(root, "config", "--get", "remote.origin.url"),
+        "source_remote": OFFICIAL_SOURCE_REMOTE,
         "source_commit": git_value(root, "rev-parse", "--short", "HEAD"),
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
     }
@@ -100,8 +101,11 @@ def stage_companion(root, staging_root, command):
 
 
 def ensure_safe_staging_dir(root, staging_root):
+    root = Path(root).resolve()
     staging_root = Path(staging_root).resolve()
-    unsafe_paths = {Path(root).resolve(), Path(root).resolve().parent, Path.home().resolve()}
+    unsafe_paths = {root.parent, Path.home().resolve()}
+    if staging_root == root or root in staging_root.parents:
+        raise ValueError(f"refusing unsafe staging dir inside project root: {staging_root}")
     if staging_root in unsafe_paths or staging_root == staging_root.parent:
         raise ValueError(f"refusing unsafe staging dir: {staging_root}")
     if staging_root.exists():
