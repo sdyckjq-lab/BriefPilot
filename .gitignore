@@ -7,3 +7,6 @@ __pycache__/
 /AGENTS.md
 /docs/
 /需求文档/
+/dist/
+/briefpilot-skill-workspace/
+/.briefpilot-skill-build/

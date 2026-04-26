@@ -9,7 +9,7 @@ from pathlib import Path
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 
 ALLOWED_TOP_LEVEL_FILES = {".gitignore", "LICENSE", "README.md", "SKILL.md"}
-ALLOWED_TOP_LEVEL_DIRS = {"agents", "examples", "references", "scripts", "templates"}
+ALLOWED_TOP_LEVEL_DIRS = {"agents", "companions", "evals", "examples", "references", "scripts", "templates"}
 LOCAL_ONLY_TOP_LEVEL = ("AGENTS.md", "docs", "需求文档")
 LOCAL_ONLY_IGNORE_CHECKS = (
     ("AGENTS.md", "AGENTS.md"),

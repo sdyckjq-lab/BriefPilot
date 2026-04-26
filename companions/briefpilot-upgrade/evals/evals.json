@@ -1,0 +1,29 @@
+{
+  "skill_name": "briefpilot-upgrade",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "/briefpilot-upgrade 我装完以后只有 /briefpilot，没有 /bp，帮我修复",
+      "expected_output": "The agent treats this as an incomplete BriefPilot command bundle and repairs or regenerates all three Skill artifacts safely.",
+      "files": [],
+      "expectations": [
+        "The response identifies that the installed command bundle is incomplete.",
+        "The response validates the BriefPilot source before replacing installed files.",
+        "The response includes /briefpilot, /bp, and /briefpilot-upgrade as the expected final command set.",
+        "The response avoids deleting user .briefpilot output assets."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "/briefpilot-upgrade 这个环境不能直接写 Skill 目录，帮我生成可安装文件",
+      "expected_output": "The agent falls back to producing .skill artifacts instead of trying unsafe direct writes.",
+      "files": [],
+      "expectations": [
+        "The response says direct install is not safe or not available.",
+        "The response generates or points to briefpilot.skill, bp.skill, and briefpilot-upgrade.skill.",
+        "The response validates package contents before reporting success.",
+        "The response is concise and Chinese-first."
+      ]
+    }
+  ]
+}

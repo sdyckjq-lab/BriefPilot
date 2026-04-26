@@ -1,3 +1,4 @@
-display_name: BriefPilot
-short_description: 把模糊设计需求整理成中文优先的 brief、DESIGN.md、提示词和生成后评审提示。
-default_prompt: 将这个产品或页面需求整理成可复用设计 brief、DESIGN.md 视觉系统、目标工具提示词、评审清单；如果已有生成结果，也生成评审和修改提示。用户可见内容默认使用简体中文，技术标识保持英文。
+interface:
+  display_name: "BriefPilot"
+  short_description: "中文优先的设计 brief、DESIGN.md、提示词和结果评审"
+  default_prompt: "Use $briefpilot to turn this product/page request into a reusable Chinese-first design brief, DESIGN.md visual system, target-tool prompts, review checklist, and, when generated output exists, a result review plus modification prompts."
