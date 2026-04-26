@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "source_path": "DESIGN.md",
+  "source_sha256": "",
+  "mode": "briefpilot_fallback",
+  "official_tool": {
+    "available": false,
+    "command": null,
+    "version": null,
+    "exit_status": null,
+    "merged": false,
+    "error": null
+  },
+  "reference_direction": {
+    "id": "",
+    "name": ""
+  },
+  "summary": {
+    "blocking": 0,
+    "warning": 0,
+    "info": 0
+  },
+  "blocking": false,
+  "next_action": "continue",
+  "findings": [],
+  "generated_at": "deterministic"
+}

@@ -1,0 +1,3 @@
+display_name: BriefPilot
+short_description: Compile reusable briefs, DESIGN.md, prompts, and post-generation review prompts.
+default_prompt: Turn this product or page request into a reusable design brief, DESIGN.md visual system, target-specific prompts, a review checklist, and review-loop assets when generated results are available.

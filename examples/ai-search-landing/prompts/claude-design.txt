@@ -1,0 +1,286 @@
+Task
+Create AI Search Landing.
+Task type: saas_website.
+
+Context
+A product-led SaaS landing page for an AI search product that helps knowledge workers and small teams find answers across scattered work documents.
+Stage: golden_demo
+Pain points:
+- Important answers are buried across documents, chats, tickets, and shared drives.
+- Teams waste time asking repeat questions because source material is hard to find.
+- Generic AI search claims do not prove whether the product fits real workflows.
+Jobs to be done:
+- Understand what the product searches and how answers are grounded.
+- Decide whether to start a trial or request a demo.
+- Trust that the product is secure enough for work knowledge.
+
+Audience
+Primary: knowledge workers and small teams that search across scattered work documents
+Secondary: team leads evaluating productivity tools for fast-moving internal teams
+Context: Visitors arrive after hearing about the product and need to understand whether it can search across their work tools without setup friction.
+
+Goal
+Business goal: drive trial signup
+Design goal: make the value of cross-workspace AI search clear in the first screen while building enterprise trust
+Conversion goal: convert qualified visitors into trial signups or demo requests
+Primary CTA: Start free trial
+Secondary CTA: Watch product demo
+
+Visual Strategy
+Strategy: Enterprise Trust
+Strategy options:
+- Enterprise Trust (selected): best use: Best when the product must feel credible for teams evaluating work knowledge and security.; tone: Restrained, product-led, sharp typography, neutral surfaces, restrained blue accents.; structure: Lead with value, prove with sourced-answer product UI, then address workflow, integrations, and security.; risk: Can feel too reserved if the product needs a more consumer-facing launch tone.; tools: huashu-design, claude-design, v0
+- Search Copilot Demo: best use: Best when the page should quickly demonstrate the search interaction.; tone: Interactive, product-forward, slightly more energetic, with a larger live-search mock.; structure: Lead with an example question and answer, then explain why the answer is trustworthy.; risk: May over-index on the demo and under-explain business trust.; tools: huashu-design, v0
+- Founder-Led Launch: best use: Best when the product is early and needs a sharper narrative around the problem.; tone: Editorial, direct, sparse, with strong copy and fewer interface panels.; structure: Lead with the pain of scattered knowledge, then introduce the product as a focused answer.; risk: Can feel less mature for enterprise buyers if proof and security are too light.; tools: claude-design, huashu-design
+Tone keywords:
+- restrained
+- credible
+- product-led
+- clear
+- secure
+References:
+- modern enterprise SaaS landing pages
+- product screenshots with sourced answers
+- clean documentation-style trust patterns
+Differentiators:
+- real product surface in the hero
+- clear source attribution UI
+- security proof before final CTA
+
+DESIGN.md Visual System
+---
+version: alpha
+name: BriefSearch
+description: Restrained, enterprise-trustworthy, product-led visual system for an AI search landing page.
+colors:
+  background: "#F8FAFC"
+  surface: "#FFFFFF"
+  text: "#111827"
+  muted_text: "#475569"
+  border: "#D8DEE8"
+  primary_action: "#2563EB"
+  success: "#0F766E"
+  warning: "#B45309"
+  danger: "#B91C1C"
+  info: "#0E7490"
+typography:
+  display:
+    fontFamily: Inter
+    fontSize: 48px
+    fontWeight: 650
+    lineHeight: 1.1
+  title:
+    fontFamily: Inter
+    fontSize: 32px
+    fontWeight: 650
+    lineHeight: 1.2
+  heading:
+    fontFamily: Inter
+    fontSize: 24px
+    fontWeight: 650
+    lineHeight: 1.25
+  body:
+    fontFamily: Inter
+    fontSize: 16px
+    fontWeight: 400
+    lineHeight: 1.6
+  caption:
+    fontFamily: Inter
+    fontSize: 13px
+    fontWeight: 400
+    lineHeight: 1.45
+  label:
+    fontFamily: Inter
+    fontSize: 14px
+    fontWeight: 600
+    lineHeight: 1.3
+rounded:
+  sm: 4px
+  md: 8px
+  lg: 12px
+spacing:
+  xs: 4px
+  sm: 8px
+  md: 16px
+  lg: 24px
+  xl: 40px
+components:
+  button_primary:
+    backgroundColor: "{colors.primary_action}"
+    textColor: "#FFFFFF"
+    borderColor: "{colors.primary_action}"
+    rounded: "{rounded.md}"
+  button_secondary:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    borderColor: "{colors.border}"
+    rounded: "{rounded.md}"
+  product_card:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    borderColor: "{colors.border}"
+    rounded: "{rounded.lg}"
+  source_chip:
+    backgroundColor: "#EFF6FF"
+    textColor: "{colors.primary_action}"
+    borderColor: "#BFDBFE"
+    rounded: "{rounded.md}"
+---
+
+# BriefSearch DESIGN.md
+
+## Overview
+
+BriefSearch should feel restrained, enterprise-trustworthy, and product-led. The page must explain cross-workspace AI search quickly, then prove the claim with a realistic sourced-answer product surface.
+
+## Visual Theme
+
+The theme is a calm enterprise SaaS launch page: light neutral background, deep ink text, restrained blue action color, realistic answer panels, and compact trust proof. The design should feel useful before it feels decorative.
+
+## Colors
+
+Use role-based color, not decorative labels. `background` carries the page, `surface` carries cards and product mock panels, `text` and `muted_text` define hierarchy, `border` separates low-depth surfaces, and `primary_action` is reserved for CTA, source links, and visible focus. Use `success` only for verified or secure states, `warning` for caution, `danger` for failed signup or unavailable demo, and `info` for neutral guidance.
+
+## Typography
+
+Use `display` only for the main headline. Use `title` for major sections, `heading` for capability blocks, `body` for explanations, `caption` for metadata and source labels, and `label` for buttons, badges, and form labels. Keep line lengths readable and avoid dramatic display typography that makes the product feel speculative.
+
+## Layout
+
+Desktop uses a product-led landing rhythm: hero with claim, CTA pair, and sourced-answer mock; then pain, solution, workflow, integrations, security, and final CTA. Use consistent spacing and keep the first screen focused on value, product proof, and conversion. Mobile stacks headline, copy, CTAs, and product surface in that order without horizontal scrolling.
+
+## Elevation & Depth
+
+Use subtle shadows only to lift the product mock and key panels from the neutral background. Prefer borders for most section separation. Avoid floating decorative panels that do not carry product, source, integration, or trust content.
+
+## Shapes
+
+Use 8px radius as the default. Use 12px for the main product mock and large proof panels. Avoid over-rounded novelty shapes, decorative blobs, and pill-heavy compositions.
+
+## Components
+
+Primary CTA states: default blue, hover darker blue, pressed compact shadow, disabled muted border, loading spinner with unchanged width, success confirmation, error retry message, and visible focus ring. Secondary CTA stays text-forward with default, hover, pressed, disabled, loading, and focus states. Product cards show empty, loading, success, and error states. Source chips show default, hover, pressed, focus, unavailable, and selected states.
+
+## Responsive Behavior
+
+Use desktop >= 1024px, tablet 768-1023px, and mobile <= 767px. The hero product mock must resize without clipping answer text or source chips. Keep the primary CTA above the fold on mobile or repeat it immediately after the product proof. Maintain at least 44px touch targets and preserve visible keyboard focus.
+
+## Motion & Feedback
+
+Motion should be restrained and purposeful: quick hover transitions, loading shimmer inside the product mock, CTA loading feedback, and success/error state changes that do not move surrounding layout. Respect reduced motion settings by replacing animation with static state changes.
+
+## Content Voice
+
+Voice is direct, trustworthy, concrete, and product-led. Prefer "Find trusted answers across every work document" over vague AI claims. Do not invent customer metrics, certifications, integration partnerships, or brand claims.
+
+## Do's and Don'ts
+
+Do show real product surfaces, source links, integrations, specific workflow steps, security proof, keyboard focus, readable contrast, and mobile CTA visibility. Don't use generic AI slogans, excessive glow, abstract gradients, fake customer logos, unsupported metrics, hidden source links, or unreadable text in images.
+
+## Reference Direction
+
+Reference direction: `ai_product_landing_page` - AI product landing page.
+
+Use this direction for product proof, conversion clarity, trust hierarchy, and source-backed visual evidence. It is an inspiration boundary only: do not copy third-party brand assets, logos, proprietary fonts, screenshots, full color systems, or complete `DESIGN.md` files.
+
+## Agent Guidance
+
+Treat front matter tokens as normative. If a needed token is missing, derive from the closest role token and record the assumption. Preserve the selected Enterprise Trust strategy, product-led hero, source-backed mock, restrained blue action color, visible focus states, and no-fake-proof boundary.
+
+Required Content
+Core claim: Find trusted answers across every work document in seconds.
+Supporting points:
+- Connect common work tools and search across them from one place.
+- Show answer sources so teams can verify results.
+- Help small teams reduce repeat questions and knowledge bottlenecks.
+Proof points:
+- Product surface showing a question, sourced answer, and linked documents.
+- Integration row for docs, chat, tickets, and drives.
+- Security section covering permissions-aware search and admin controls.
+Sections:
+- hero
+- pain
+- solution
+- workflow
+- integrations
+- security
+- CTA
+Section details:
+- hero: purpose: Explain the product promise immediately and show a realistic sourced-answer product surface.; content: headline, short supporting copy, primary CTA, secondary CTA, product surface mock; visual anchor: Search answer panel with linked source documents
+- pain: purpose: Name the cost of scattered work knowledge without overexplaining.; content: three pain points, plain-language impact statement; visual anchor: Lightweight split showing docs, chats, tickets, and drives
+- solution: purpose: Connect the AI search value to concrete user actions.; content: cross-tool search, source-backed answers, team knowledge reuse; visual anchor: Three compact product capability blocks
+- workflow: purpose: Show the path from question to trusted answer.; content: ask a question, review sourced answer, open source document; visual anchor: Three-step product flow
+- integrations: purpose: Make the search coverage feel practical while avoiding fake partner claims.; content: docs, chat, tickets, drives; visual anchor: Generic integration placeholders with labels
+- security: purpose: Build trust before the final CTA.; content: permissions-aware search, admin controls, source visibility; visual anchor: Calm trust panel with clear copy
+- CTA: purpose: Give qualified visitors a clear next step.; content: trial CTA, demo CTA, short reassurance line; visual anchor: Simple conversion band
+Screens:
+- desktop landing page
+- mobile landing page
+Flows:
+- visitor reads hero
+- visitor reviews product workflow
+- visitor clicks trial signup
+Interaction states:
+- Primary CTA has default, hover, focus, and mobile-visible states.
+- Secondary demo CTA remains available but visually secondary.
+- Product mock shows a typed question, answer, source chips, and linked documents.
+- Mobile layout keeps headline, product surface, and CTA readable without overlap.
+Interaction contract:
+- Primary CTA opens a trial signup form or navigates to /signup. It must show default, hover, focus, disabled, loading, success, and error states when implemented.
+- Secondary CTA opens or scrolls to a product demo section. It must remain visually secondary and have default, hover, focus, and loading states when implemented.
+- Source chips and linked documents in the product mock are clickable when the target tool supports interactions; otherwise label them as visual-only proof elements.
+- Integration items are non-clickable placeholders in the golden demo unless real integration URLs are provided.
+- Failed signup or unavailable demo states should keep the visitor on the page with a clear retry path.
+
+Constraints
+Platform: responsive web landing page
+Responsive: True
+Tech stack:
+- HTML prototype
+- React or Next.js compatible structure
+- Tailwind-compatible tokens
+Accessibility:
+- clear focus states
+- readable contrast
+- CTA visible on mobile
+- no text embedded in unreadable imagery
+Responsive and accessibility requirements:
+- Use desktop >= 1024px, tablet 768-1023px, and mobile <= 767px as target layout bands.
+- On mobile, stack headline, copy, CTAs, and product surface in that order; keep the primary CTA visible above the fold or repeated after the product proof.
+- Product mock must resize without horizontal scrolling and keep answer text, source chips, and linked documents readable.
+- Keyboard tab order follows navigation, primary CTA, secondary CTA, product source links, integrations, security proof, final CTA.
+- Every interactive element has a visible focus state and at least a 44px touch target on mobile.
+- Use semantic heading order and descriptive alt text for product mock, source icons, and integration placeholders.
+Deadline: golden demo MVP
+
+Do Not Do
+Forbidden visual directions:
+- generic AI futurism
+- excessive glow
+- abstract gradient blobs
+- fake customer logos
+- over-rounded novelty
+Must avoid:
+- generic AI wording
+- decorative glow as the main visual idea
+- fake logos or unsupported metrics
+Content warnings:
+- Avoid vague AI slogans without concrete product behavior.
+- Do not imply customer logos, metrics, or certifications that are not provided.
+
+Deliverable
+Create a visual artifact with clear variants and leave room for iterative visual tweaks.
+
+Review Criteria
+Must have:
+- first-screen clarity
+- clear CTA
+- real product surface
+- security trust section
+- mobile CTA visibility
+Review criteria:
+- first-screen clarity
+- clear CTA
+- real product surface
+- no generic AI wording
+- mobile CTA visibility

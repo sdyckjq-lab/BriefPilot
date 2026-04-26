@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "source_path": "examples/ai-search-workspace/DESIGN.md",
+  "source_sha256": "8e390ee70bb79cff995c6b6e8aced2e8d0dfb86e5712ab8fe3cf2a8fb0ee1302",
+  "mode": "briefpilot_fallback",
+  "official_tool": {
+    "available": false,
+    "command": null,
+    "version": null,
+    "exit_status": null,
+    "merged": false,
+    "error": null,
+    "raw_output": ""
+  },
+  "reference_direction": {
+    "id": "enterprise_data_workspace",
+    "name": "Enterprise data workspace"
+  },
+  "summary": {
+    "blocking": 0,
+    "warning": 0,
+    "info": 1
+  },
+  "blocking": false,
+  "next_action": "continue",
+  "findings": [
+    {
+      "severity": "info",
+      "rule_id": "optional_official_check",
+      "location": "official_tool",
+      "message": "Google official DESIGN.md lint was not run; fallback checks were used.",
+      "suggested_fix": "For stricter checks, provide a safe absolute --official-command path or run the official tool manually.",
+      "source": "briefpilot_fallback"
+    }
+  ],
+  "generated_at": "deterministic"
+}

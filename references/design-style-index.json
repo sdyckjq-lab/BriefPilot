@@ -1,0 +1,1018 @@
+{
+  "schema_version": "1.0",
+  "directions": [
+    {
+      "id": "ai_product_landing_page",
+      "name": "AI product landing page",
+      "suitable_task_types": [
+        "saas_website",
+        "product_landing",
+        "ai_tool_launch"
+      ],
+      "unsuitable_task_types": [
+        "dense_admin_console",
+        "legal_document",
+        "raw_data_table"
+      ],
+      "primary_matching_signals": [
+        "AI product",
+        "landing page",
+        "trial signup",
+        "demo CTA",
+        "product surface proof"
+      ],
+      "secondary_matching_signals": [
+        "source-backed answers",
+        "integration row",
+        "security trust",
+        "founder launch"
+      ],
+      "conflict_resolution": "Prefer this direction when the first screen must explain a product and convert visitors. If the brief is about signed-in work, prefer enterprise_data_workspace.",
+      "visual_principles": [
+        "show real product behavior early",
+        "pair conversion copy with proof UI",
+        "make trust claims concrete"
+      ],
+      "color_tendencies": [
+        "neutral backgrounds",
+        "high-contrast ink text",
+        "one restrained action accent",
+        "muted trust colors"
+      ],
+      "typography_density_guidance": "Use clear marketing hierarchy with readable body text; avoid oversized editorial display type unless the brief asks for a launch manifesto.",
+      "component_priorities": [
+        "hero CTA",
+        "product mock",
+        "source/proof chips",
+        "integration row",
+        "security panel"
+      ],
+      "common_mistakes": [
+        "generic AI glow",
+        "fake customer logos",
+        "unsupported metrics",
+        "decorative hero with no product surface"
+      ],
+      "source_links": [
+        {
+          "label": "Material Design",
+          "url": "https://m3.material.io/",
+          "source_license": "Linked sources keep their own licenses; this index stores BriefPilot-authored summaries only.",
+          "attribution": "Inspired by public product and design-system documentation; no copied assets or full third-party DESIGN.md files are embedded.",
+          "usage_boundary": "Use the mechanisms: product proof, trust hierarchy, and conversion clarity. Do not copy logos, names, screenshots, or brand systems."
+        },
+        {
+          "label": "SaaS-style DESIGN.md examples",
+          "url": "https://github.com/VoltAgent/awesome-design-md",
+          "source_license": "Linked sources keep their own licenses; this index stores BriefPilot-authored summaries only.",
+          "attribution": "Inspired by public product and design-system documentation; no copied assets or full third-party DESIGN.md files are embedded.",
+          "usage_boundary": "Use the mechanisms: product proof, trust hierarchy, and conversion clarity. Do not copy logos, names, screenshots, or brand systems."
+        }
+      ],
+      "source_license": "Linked sources keep their own licenses; this index stores BriefPilot-authored summaries only.",
+      "attribution": "Inspired by public product and design-system documentation; no copied assets or full third-party DESIGN.md files are embedded.",
+      "usage_boundary": "Use the mechanisms: product proof, trust hierarchy, and conversion clarity. Do not copy logos, names, screenshots, or brand systems.",
+      "brand_copy_boundary": "Never ask a generator to clone a named AI brand, logo, proprietary typeface, customer list, or exact landing page.",
+      "drift_checks": [
+        {
+          "id": "product_proof",
+          "warning": "Landing direction should mention product surface proof, screenshot, mock, or demo.",
+          "blocking_conflict": "A landing page described only as abstract atmosphere or decorative art conflicts with this direction."
+        },
+        {
+          "id": "conversion_path",
+          "warning": "Landing direction should include primary and secondary conversion behavior.",
+          "blocking_conflict": "A page that omits CTA behavior while claiming to be conversion-ready conflicts with this direction."
+        }
+      ]
+    },
+    {
+      "id": "developer_tool",
+      "name": "Developer tool",
+      "suitable_task_types": [
+        "developer_tool",
+        "api_docs",
+        "cli_product",
+        "infra_dashboard"
+      ],
+      "unsuitable_task_types": [
+        "luxury_brand",
+        "consumer_social_app",
+        "editorial_magazine"
+      ],
+      "primary_matching_signals": [
+        "API",
+        "SDK",
+        "CLI",
+        "repository",
+        "terminal",
+        "developer onboarding"
+      ],
+      "secondary_matching_signals": [
+        "code snippets",
+        "docs navigation",
+        "copy install command",
+        "status badge"
+      ],
+      "conflict_resolution": "Prefer this direction when the primary user evaluates implementation effort. If the surface is mostly docs, compare with documentation_knowledge_base.",
+      "visual_principles": [
+        "make technical proof scannable",
+        "prioritize code and command clarity",
+        "treat reliability states as first-class"
+      ],
+      "color_tendencies": [
+        "dark or light neutral code surfaces",
+        "reserved accent for action and active nav",
+        "status colors with labels"
+      ],
+      "typography_density_guidance": "Use compact sans text with clear monospace examples; do not let code blocks dominate every section.",
+      "component_priorities": [
+        "code block",
+        "copy button",
+        "tabs",
+        "status badge",
+        "quickstart card",
+        "API table"
+      ],
+      "common_mistakes": [
+        "marketing copy without examples",
+        "unlabeled icons",
+        "low-contrast code",
+        "decorative terminal noise"
+      ],
+      "source_links": [
+        {
+          "label": "GitHub Primer",
+          "url": "https://primer.style/",
+          "source_license": "Source sites have their own licenses and terms; BriefPilot only links and summarizes patterns.",
+          "attribution": "Inspired by mature developer documentation and component systems.",
+          "usage_boundary": "Use ideas such as code clarity, install flow, and status visibility without copying exact docs layouts or brand marks."
+        },
+        {
+          "label": "Stripe Docs",
+          "url": "https://docs.stripe.com/",
+          "source_license": "Source sites have their own licenses and terms; BriefPilot only links and summarizes patterns.",
+          "attribution": "Inspired by mature developer documentation and component systems.",
+          "usage_boundary": "Use ideas such as code clarity, install flow, and status visibility without copying exact docs layouts or brand marks."
+        }
+      ],
+      "source_license": "Source sites have their own licenses and terms; BriefPilot only links and summarizes patterns.",
+      "attribution": "Inspired by mature developer documentation and component systems.",
+      "usage_boundary": "Use ideas such as code clarity, install flow, and status visibility without copying exact docs layouts or brand marks.",
+      "brand_copy_boundary": "Do not request an exact GitHub, Stripe, Vercel, Linear, or similar branded clone.",
+      "drift_checks": [
+        {
+          "id": "technical_artifact",
+          "warning": "Developer direction should include code, commands, API objects, or implementation steps.",
+          "blocking_conflict": "A developer tool described as pure lifestyle marketing conflicts with this direction."
+        },
+        {
+          "id": "copyable_flow",
+          "warning": "Developer direction should mention copy, install, quickstart, or docs navigation.",
+          "blocking_conflict": "A developer onboarding surface with no practical next action conflicts with this direction."
+        }
+      ]
+    },
+    {
+      "id": "enterprise_data_workspace",
+      "name": "Enterprise data workspace",
+      "suitable_task_types": [
+        "app_page",
+        "dashboard",
+        "admin_console",
+        "research_workspace",
+        "analytics"
+      ],
+      "unsuitable_task_types": [
+        "marketing_hero",
+        "portfolio",
+        "social_campaign"
+      ],
+      "primary_matching_signals": [
+        "workspace",
+        "dashboard",
+        "table",
+        "source detail",
+        "status",
+        "filters"
+      ],
+      "secondary_matching_signals": [
+        "permissions",
+        "audit",
+        "confidence",
+        "empty state",
+        "data density"
+      ],
+      "conflict_resolution": "Prefer this direction for signed-in operational tools. If the brief mainly sells the product to visitors, prefer ai_product_landing_page.",
+      "visual_principles": [
+        "optimize for scanning and repeated use",
+        "separate state from decoration",
+        "make source and permission status visible"
+      ],
+      "color_tendencies": [
+        "light neutral canvases",
+        "subtle borders",
+        "restrained blue action",
+        "semantic success/warning/danger"
+      ],
+      "typography_density_guidance": "Use compact interface type, stable row heights, and clear metadata hierarchy.",
+      "component_priorities": [
+        "search input",
+        "table/list",
+        "detail panel",
+        "status badge",
+        "filter controls",
+        "empty/loading/error states"
+      ],
+      "common_mistakes": [
+        "marketing hero layout",
+        "cards with no data role",
+        "hidden sources",
+        "state changes that look identical"
+      ],
+      "source_links": [
+        {
+          "label": "IBM Carbon",
+          "url": "https://carbondesignsystem.com/",
+          "source_license": "Linked systems retain their own licenses. This entry is a BriefPilot-authored checklist, not copied documentation.",
+          "attribution": "Inspired by enterprise product systems with dense, stateful interfaces.",
+          "usage_boundary": "Use density, hierarchy, state, and permission patterns. Do not copy vendor colors, icons, or proprietary product layouts."
+        },
+        {
+          "label": "Atlassian Design System",
+          "url": "https://atlassian.design/",
+          "source_license": "Linked systems retain their own licenses. This entry is a BriefPilot-authored checklist, not copied documentation.",
+          "attribution": "Inspired by enterprise product systems with dense, stateful interfaces.",
+          "usage_boundary": "Use density, hierarchy, state, and permission patterns. Do not copy vendor colors, icons, or proprietary product layouts."
+        }
+      ],
+      "source_license": "Linked systems retain their own licenses. This entry is a BriefPilot-authored checklist, not copied documentation.",
+      "attribution": "Inspired by enterprise product systems with dense, stateful interfaces.",
+      "usage_boundary": "Use density, hierarchy, state, and permission patterns. Do not copy vendor colors, icons, or proprietary product layouts.",
+      "brand_copy_boundary": "Never ask for an exact clone of Salesforce, Atlassian, Linear, Notion, or another named workspace.",
+      "drift_checks": [
+        {
+          "id": "stateful_surface",
+          "warning": "Workspace direction should include loading, empty, success, error, and permission or unavailable states.",
+          "blocking_conflict": "A signed-in data workspace with only a decorative hero section conflicts with this direction."
+        },
+        {
+          "id": "data_density",
+          "warning": "Workspace direction should define scan density, panels, rows, or metadata hierarchy.",
+          "blocking_conflict": "A data workspace with no data-bearing components conflicts with this direction."
+        }
+      ]
+    },
+    {
+      "id": "documentation_knowledge_base",
+      "name": "Documentation or knowledge base",
+      "suitable_task_types": [
+        "documentation",
+        "knowledge_base",
+        "help_center",
+        "guide_site"
+      ],
+      "unsuitable_task_types": [
+        "checkout_flow",
+        "luxury_campaign",
+        "media_homepage"
+      ],
+      "primary_matching_signals": [
+        "docs",
+        "guide",
+        "help center",
+        "knowledge base",
+        "article"
+      ],
+      "secondary_matching_signals": [
+        "search docs",
+        "sidebar nav",
+        "breadcrumbs",
+        "versioning"
+      ],
+      "conflict_resolution": "Prefer this direction when comprehension and retrieval matter more than conversion. If code examples dominate, compare with developer_tool.",
+      "visual_principles": [
+        "reduce reading friction",
+        "keep navigation predictable",
+        "make search and article hierarchy obvious"
+      ],
+      "color_tendencies": [
+        "quiet surfaces",
+        "high-contrast text",
+        "semantic callouts",
+        "limited decorative color"
+      ],
+      "typography_density_guidance": "Use readable article text, compact navigation, and clear heading rhythm.",
+      "component_priorities": [
+        "sidebar nav",
+        "search",
+        "breadcrumbs",
+        "callout",
+        "code or example block",
+        "next/previous links"
+      ],
+      "common_mistakes": [
+        "marketing cards instead of navigation",
+        "weak search affordance",
+        "long lines",
+        "unlabeled callouts"
+      ],
+      "source_links": [
+        {
+          "label": "GOV.UK Design System",
+          "url": "https://design-system.service.gov.uk/",
+          "source_license": "Linked sources have their own licenses. BriefPilot stores only original summaries.",
+          "attribution": "Inspired by public service and product documentation systems.",
+          "usage_boundary": "Borrow structure patterns like predictable navigation and callouts; do not reuse official marks or wording."
+        },
+        {
+          "label": "Material Design",
+          "url": "https://m3.material.io/",
+          "source_license": "Linked sources have their own licenses. BriefPilot stores only original summaries.",
+          "attribution": "Inspired by public service and product documentation systems.",
+          "usage_boundary": "Borrow structure patterns like predictable navigation and callouts; do not reuse official marks or wording."
+        }
+      ],
+      "source_license": "Linked sources have their own licenses. BriefPilot stores only original summaries.",
+      "attribution": "Inspired by public service and product documentation systems.",
+      "usage_boundary": "Borrow structure patterns like predictable navigation and callouts; do not reuse official marks or wording.",
+      "brand_copy_boundary": "Do not imitate a named docs site exactly or copy its iconography, examples, or tone wholesale.",
+      "drift_checks": [
+        {
+          "id": "navigation_model",
+          "warning": "Documentation direction should define search, nav, breadcrumbs, or article hierarchy.",
+          "blocking_conflict": "A knowledge base with no retrieval or navigation model conflicts with this direction."
+        }
+      ]
+    },
+    {
+      "id": "finance_payments",
+      "name": "Finance or payments",
+      "suitable_task_types": [
+        "finance_app",
+        "payments",
+        "billing",
+        "banking",
+        "pricing"
+      ],
+      "unsuitable_task_types": [
+        "playful_game",
+        "fashion_campaign",
+        "music_editorial"
+      ],
+      "primary_matching_signals": [
+        "payment",
+        "billing",
+        "invoice",
+        "card",
+        "balance",
+        "transaction"
+      ],
+      "secondary_matching_signals": [
+        "trust",
+        "compliance",
+        "receipt",
+        "risk",
+        "money movement"
+      ],
+      "conflict_resolution": "Prefer this direction when money movement, account trust, or financial clarity is core.",
+      "visual_principles": [
+        "prioritize clarity and trust",
+        "make amounts and states unambiguous",
+        "treat errors and confirmations carefully"
+      ],
+      "color_tendencies": [
+        "neutral base",
+        "strong readable text",
+        "conservative action accent",
+        "clear danger/warning/success"
+      ],
+      "typography_density_guidance": "Use tabular-friendly values and strong labels; avoid decorative numeral treatments.",
+      "component_priorities": [
+        "amount display",
+        "transaction row",
+        "confirmation state",
+        "risk alert",
+        "form validation",
+        "receipt"
+      ],
+      "common_mistakes": [
+        "ambiguous money states",
+        "green overload",
+        "decorative trust badges",
+        "hidden error recovery"
+      ],
+      "source_links": [
+        {
+          "label": "Shopify Polaris",
+          "url": "https://polaris.shopify.com/",
+          "source_license": "Sources retain their own licenses and terms.",
+          "attribution": "Inspired by mature commerce and enterprise interface systems.",
+          "usage_boundary": "Use trust and transaction clarity mechanisms only; do not imply certifications, bank partnerships, or real payment brands."
+        },
+        {
+          "label": "Fluent Design",
+          "url": "https://fluent2.microsoft.design/",
+          "source_license": "Sources retain their own licenses and terms.",
+          "attribution": "Inspired by mature commerce and enterprise interface systems.",
+          "usage_boundary": "Use trust and transaction clarity mechanisms only; do not imply certifications, bank partnerships, or real payment brands."
+        }
+      ],
+      "source_license": "Sources retain their own licenses and terms.",
+      "attribution": "Inspired by mature commerce and enterprise interface systems.",
+      "usage_boundary": "Use trust and transaction clarity mechanisms only; do not imply certifications, bank partnerships, or real payment brands.",
+      "brand_copy_boundary": "Do not copy Stripe, Wise, Apple Pay, bank marks, card network marks, or exact checkout flows.",
+      "drift_checks": [
+        {
+          "id": "money_state",
+          "warning": "Finance direction should include confirmation, failure, pending, or risk states.",
+          "blocking_conflict": "A payment flow without error or confirmation states conflicts with this direction."
+        }
+      ]
+    },
+    {
+      "id": "creation_tool",
+      "name": "Creation tool",
+      "suitable_task_types": [
+        "editor",
+        "canvas_tool",
+        "creative_app",
+        "generation_tool"
+      ],
+      "unsuitable_task_types": [
+        "static_docs",
+        "checkout",
+        "legal_notice"
+      ],
+      "primary_matching_signals": [
+        "create",
+        "canvas",
+        "editor",
+        "generate",
+        "template",
+        "export"
+      ],
+      "secondary_matching_signals": [
+        "toolbar",
+        "layers",
+        "preview",
+        "asset library",
+        "undo"
+      ],
+      "conflict_resolution": "Prefer this direction when the user manipulates content or visual assets directly.",
+      "visual_principles": [
+        "make tools discoverable",
+        "reserve canvas attention for the work",
+        "support iteration and recovery"
+      ],
+      "color_tendencies": [
+        "neutral chrome",
+        "clear selected state",
+        "restrained creative accent",
+        "semantic feedback"
+      ],
+      "typography_density_guidance": "Use compact controls and readable labels; avoid hero-scale text inside tool panels.",
+      "component_priorities": [
+        "toolbar",
+        "canvas",
+        "inspector",
+        "asset panel",
+        "history",
+        "export controls"
+      ],
+      "common_mistakes": [
+        "marketing layout instead of tool surface",
+        "unlabeled icons",
+        "overdecorated canvas frame",
+        "missing undo/error states"
+      ],
+      "source_links": [
+        {
+          "label": "Adobe Spectrum",
+          "url": "https://spectrum.adobe.com/",
+          "source_license": "Source documentation keeps its own terms; this entry is original BriefPilot guidance.",
+          "attribution": "Inspired by professional creative tooling patterns.",
+          "usage_boundary": "Use control and canvas patterns without copying a named product's visual identity or icon set."
+        },
+        {
+          "label": "Figma plugin UI inspiration",
+          "url": "https://www.figma.com/plugin-docs/",
+          "source_license": "Source documentation keeps its own terms; this entry is original BriefPilot guidance.",
+          "attribution": "Inspired by professional creative tooling patterns.",
+          "usage_boundary": "Use control and canvas patterns without copying a named product's visual identity or icon set."
+        }
+      ],
+      "source_license": "Source documentation keeps its own terms; this entry is original BriefPilot guidance.",
+      "attribution": "Inspired by professional creative tooling patterns.",
+      "usage_boundary": "Use control and canvas patterns without copying a named product's visual identity or icon set.",
+      "brand_copy_boundary": "Do not clone Figma, Canva, Adobe, or other creation-tool brands.",
+      "drift_checks": [
+        {
+          "id": "editing_controls",
+          "warning": "Creation direction should include tool controls, selection, preview, undo, or export.",
+          "blocking_conflict": "A creation app with no editing surface conflicts with this direction."
+        }
+      ]
+    },
+    {
+      "id": "consumer_app",
+      "name": "Consumer application",
+      "suitable_task_types": [
+        "consumer_app",
+        "mobile_app",
+        "onboarding",
+        "personal_utility"
+      ],
+      "unsuitable_task_types": [
+        "enterprise_admin",
+        "developer_cli",
+        "regulated_payment_flow"
+      ],
+      "primary_matching_signals": [
+        "mobile app",
+        "personal",
+        "daily",
+        "onboarding",
+        "profile"
+      ],
+      "secondary_matching_signals": [
+        "habit",
+        "notification",
+        "simple setup",
+        "friendly tone"
+      ],
+      "conflict_resolution": "Prefer this direction when ease, emotion, and repeated personal use matter more than dense data.",
+      "visual_principles": [
+        "lower the first-use burden",
+        "make actions obvious",
+        "use warm guidance without clutter"
+      ],
+      "color_tendencies": [
+        "accessible light/dark surfaces",
+        "friendly accent",
+        "clear state colors",
+        "limited novelty gradients"
+      ],
+      "typography_density_guidance": "Use approachable hierarchy with generous spacing; keep labels short and direct.",
+      "component_priorities": [
+        "onboarding step",
+        "primary action",
+        "empty state",
+        "notification",
+        "profile/settings"
+      ],
+      "common_mistakes": [
+        "enterprise density",
+        "too many panels",
+        "unclear touch targets",
+        "cutesy copy over clarity"
+      ],
+      "source_links": [
+        {
+          "label": "Material Design",
+          "url": "https://m3.material.io/",
+          "source_license": "Linked sources retain their own terms. BriefPilot summarizes usage mechanisms only.",
+          "attribution": "Inspired by mainstream mobile and consumer product guidance.",
+          "usage_boundary": "Use onboarding, touch, and feedback mechanisms; do not copy app brands, illustrations, or icons."
+        },
+        {
+          "label": "Human Interface Guidelines",
+          "url": "https://developer.apple.com/design/human-interface-guidelines/",
+          "source_license": "Linked sources retain their own terms. BriefPilot summarizes usage mechanisms only.",
+          "attribution": "Inspired by mainstream mobile and consumer product guidance.",
+          "usage_boundary": "Use onboarding, touch, and feedback mechanisms; do not copy app brands, illustrations, or icons."
+        }
+      ],
+      "source_license": "Linked sources retain their own terms. BriefPilot summarizes usage mechanisms only.",
+      "attribution": "Inspired by mainstream mobile and consumer product guidance.",
+      "usage_boundary": "Use onboarding, touch, and feedback mechanisms; do not copy app brands, illustrations, or icons.",
+      "brand_copy_boundary": "Do not clone Duolingo, Spotify, Apple, or any named consumer app identity.",
+      "drift_checks": [
+        {
+          "id": "touch_first",
+          "warning": "Consumer direction should mention touch targets, onboarding, feedback, or mobile behavior.",
+          "blocking_conflict": "A consumer mobile app with desktop-only dense controls conflicts with this direction."
+        }
+      ]
+    },
+    {
+      "id": "commerce_brand_retail",
+      "name": "Commerce or brand retail",
+      "suitable_task_types": [
+        "commerce",
+        "retail",
+        "product_detail",
+        "checkout",
+        "brand_shop"
+      ],
+      "unsuitable_task_types": [
+        "developer_docs",
+        "internal_dashboard",
+        "knowledge_base"
+      ],
+      "primary_matching_signals": [
+        "shop",
+        "product detail",
+        "cart",
+        "checkout",
+        "collection"
+      ],
+      "secondary_matching_signals": [
+        "price",
+        "variants",
+        "inventory",
+        "reviews",
+        "promotion"
+      ],
+      "conflict_resolution": "Prefer this direction when product inspection and purchase confidence are central.",
+      "visual_principles": [
+        "show the product clearly",
+        "make price and purchase path obvious",
+        "avoid hiding constraints"
+      ],
+      "color_tendencies": [
+        "brand accent with neutral product canvas",
+        "clear promotion and warning colors",
+        "readable price contrast"
+      ],
+      "typography_density_guidance": "Use clear product names, price hierarchy, and concise labels; avoid editorial clutter in purchase paths.",
+      "component_priorities": [
+        "product image",
+        "variant picker",
+        "price block",
+        "add to cart",
+        "review summary",
+        "checkout state"
+      ],
+      "common_mistakes": [
+        "stock-like atmosphere without product detail",
+        "unclear variant state",
+        "hidden fees",
+        "brand mimicry"
+      ],
+      "source_links": [
+        {
+          "label": "Shopify Polaris",
+          "url": "https://polaris.shopify.com/",
+          "source_license": "Source licenses and terms remain with source owners.",
+          "attribution": "Inspired by commerce UX guidance and retail design systems.",
+          "usage_boundary": "Use purchase clarity and product inspection patterns; do not copy a retailer's brand assets."
+        },
+        {
+          "label": "Baymard public UX research",
+          "url": "https://baymard.com/blog",
+          "source_license": "Source licenses and terms remain with source owners.",
+          "attribution": "Inspired by commerce UX guidance and retail design systems.",
+          "usage_boundary": "Use purchase clarity and product inspection patterns; do not copy a retailer's brand assets."
+        }
+      ],
+      "source_license": "Source licenses and terms remain with source owners.",
+      "attribution": "Inspired by commerce UX guidance and retail design systems.",
+      "usage_boundary": "Use purchase clarity and product inspection patterns; do not copy a retailer's brand assets.",
+      "brand_copy_boundary": "Do not clone Apple, Nike, Shopify storefronts, marketplaces, logos, product photos, or campaigns.",
+      "drift_checks": [
+        {
+          "id": "purchase_path",
+          "warning": "Commerce direction should include price, variant, cart, checkout, or product proof states.",
+          "blocking_conflict": "A retail page with no product inspection or purchase action conflicts with this direction."
+        }
+      ]
+    },
+    {
+      "id": "media_editorial",
+      "name": "Media or editorial content",
+      "suitable_task_types": [
+        "editorial",
+        "publication",
+        "article",
+        "media_homepage",
+        "newsletter"
+      ],
+      "unsuitable_task_types": [
+        "checkout",
+        "admin_console",
+        "api_reference"
+      ],
+      "primary_matching_signals": [
+        "article",
+        "story",
+        "publication",
+        "news",
+        "essay",
+        "magazine"
+      ],
+      "secondary_matching_signals": [
+        "author",
+        "reading",
+        "issue",
+        "feature story",
+        "newsletter"
+      ],
+      "conflict_resolution": "Prefer this direction when reading experience and editorial hierarchy are primary.",
+      "visual_principles": [
+        "make content the visual asset",
+        "use hierarchy for reading paths",
+        "handle media captions and credits clearly"
+      ],
+      "color_tendencies": [
+        "high-contrast text",
+        "quiet backgrounds",
+        "limited section accents",
+        "clear link color"
+      ],
+      "typography_density_guidance": "Use article-friendly line length and heading scale; avoid interface density unless it supports navigation.",
+      "component_priorities": [
+        "article header",
+        "byline",
+        "media block",
+        "caption",
+        "pull quote",
+        "related content"
+      ],
+      "common_mistakes": [
+        "card-heavy marketing page",
+        "unreadable line length",
+        "image without credits",
+        "weak article hierarchy"
+      ],
+      "source_links": [
+        {
+          "label": "Nielsen Norman Group article UX",
+          "url": "https://www.nngroup.com/articles/",
+          "source_license": "Source owners retain their own terms; this entry summarizes patterns.",
+          "attribution": "Inspired by public editorial and content design guidance.",
+          "usage_boundary": "Use reading hierarchy and media treatment patterns, not article text, imagery, or publication branding."
+        },
+        {
+          "label": "GOV.UK content design guidance",
+          "url": "https://www.gov.uk/guidance/content-design",
+          "source_license": "Source owners retain their own terms; this entry summarizes patterns.",
+          "attribution": "Inspired by public editorial and content design guidance.",
+          "usage_boundary": "Use reading hierarchy and media treatment patterns, not article text, imagery, or publication branding."
+        }
+      ],
+      "source_license": "Source owners retain their own terms; this entry summarizes patterns.",
+      "attribution": "Inspired by public editorial and content design guidance.",
+      "usage_boundary": "Use reading hierarchy and media treatment patterns, not article text, imagery, or publication branding.",
+      "brand_copy_boundary": "Do not clone The New York Times, The Verge, Bloomberg, or any named publication identity.",
+      "drift_checks": [
+        {
+          "id": "reading_path",
+          "warning": "Editorial direction should include reading hierarchy, line length, byline, media, or related content guidance.",
+          "blocking_conflict": "An editorial page with no readable content hierarchy conflicts with this direction."
+        }
+      ]
+    },
+    {
+      "id": "productivity_tool",
+      "name": "Productivity tool",
+      "suitable_task_types": [
+        "productivity_app",
+        "task_manager",
+        "calendar",
+        "notes",
+        "personal_dashboard"
+      ],
+      "unsuitable_task_types": [
+        "luxury_campaign",
+        "media_article",
+        "checkout"
+      ],
+      "primary_matching_signals": [
+        "task",
+        "calendar",
+        "note",
+        "inbox",
+        "personal workflow",
+        "organize"
+      ],
+      "secondary_matching_signals": [
+        "quick capture",
+        "keyboard shortcut",
+        "saved view",
+        "reminder"
+      ],
+      "conflict_resolution": "Prefer this direction for personal or team task completion surfaces that need speed and calm.",
+      "visual_principles": [
+        "reduce friction",
+        "keep hierarchy calm",
+        "make completion and next action clear"
+      ],
+      "color_tendencies": [
+        "quiet neutral canvas",
+        "clear active accent",
+        "subtle status color",
+        "minimal decoration"
+      ],
+      "typography_density_guidance": "Use compact lists, clear labels, and strong affordances for keyboard and touch.",
+      "component_priorities": [
+        "quick-add input",
+        "task row",
+        "filter",
+        "saved view",
+        "calendar block",
+        "completion state"
+      ],
+      "common_mistakes": [
+        "dashboard sprawl",
+        "decorative empty states",
+        "weak keyboard focus",
+        "unclear completed/overdue states"
+      ],
+      "source_links": [
+        {
+          "label": "Atlassian Design System",
+          "url": "https://atlassian.design/",
+          "source_license": "Linked systems keep their own licenses; BriefPilot stores original summaries only.",
+          "attribution": "Inspired by workflow and productivity interface systems.",
+          "usage_boundary": "Use patterns for quick capture, lists, and status; do not copy product identities."
+        },
+        {
+          "label": "Fluent Design",
+          "url": "https://fluent2.microsoft.design/",
+          "source_license": "Linked systems keep their own licenses; BriefPilot stores original summaries only.",
+          "attribution": "Inspired by workflow and productivity interface systems.",
+          "usage_boundary": "Use patterns for quick capture, lists, and status; do not copy product identities."
+        }
+      ],
+      "source_license": "Linked systems keep their own licenses; BriefPilot stores original summaries only.",
+      "attribution": "Inspired by workflow and productivity interface systems.",
+      "usage_boundary": "Use patterns for quick capture, lists, and status; do not copy product identities.",
+      "brand_copy_boundary": "Do not clone Todoist, Notion, Things, Asana, or any named productivity brand.",
+      "drift_checks": [
+        {
+          "id": "task_completion",
+          "warning": "Productivity direction should include capture, completion, reminder, or saved-view behavior.",
+          "blocking_conflict": "A productivity tool with no primary action or completion state conflicts with this direction."
+        }
+      ]
+    },
+    {
+      "id": "collaboration_workflow",
+      "name": "Collaboration or workflow",
+      "suitable_task_types": [
+        "collaboration",
+        "workflow",
+        "review_queue",
+        "approval_flow",
+        "team_workspace"
+      ],
+      "unsuitable_task_types": [
+        "single_article",
+        "static_brand_showcase",
+        "personal_game"
+      ],
+      "primary_matching_signals": [
+        "team",
+        "approval",
+        "comments",
+        "handoff",
+        "review",
+        "workflow"
+      ],
+      "secondary_matching_signals": [
+        "assignee",
+        "activity",
+        "version",
+        "mentions",
+        "status change"
+      ],
+      "conflict_resolution": "Prefer this direction when multiple people act on shared work. If data inspection dominates, compare with enterprise_data_workspace.",
+      "visual_principles": [
+        "show ownership and state",
+        "make handoffs visible",
+        "separate conversation from canonical content"
+      ],
+      "color_tendencies": [
+        "neutral shared workspace",
+        "status colors",
+        "subtle presence accents",
+        "clear destructive action color"
+      ],
+      "typography_density_guidance": "Use compact activity and comment text with clear authorship and timestamps.",
+      "component_priorities": [
+        "comment thread",
+        "assignee control",
+        "status picker",
+        "activity log",
+        "approval action",
+        "notification state"
+      ],
+      "common_mistakes": [
+        "chat noise without workflow state",
+        "hidden ownership",
+        "ambiguous approval state",
+        "missing conflict handling"
+      ],
+      "source_links": [
+        {
+          "label": "Atlassian Design System",
+          "url": "https://atlassian.design/",
+          "source_license": "Source owners retain their own licenses and terms.",
+          "attribution": "Inspired by public collaborative work and code-review systems.",
+          "usage_boundary": "Use ownership, comments, and state patterns. Do not copy vendor UI, icons, or exact flows."
+        },
+        {
+          "label": "GitHub Primer",
+          "url": "https://primer.style/",
+          "source_license": "Source owners retain their own licenses and terms.",
+          "attribution": "Inspired by public collaborative work and code-review systems.",
+          "usage_boundary": "Use ownership, comments, and state patterns. Do not copy vendor UI, icons, or exact flows."
+        }
+      ],
+      "source_license": "Source owners retain their own licenses and terms.",
+      "attribution": "Inspired by public collaborative work and code-review systems.",
+      "usage_boundary": "Use ownership, comments, and state patterns. Do not copy vendor UI, icons, or exact flows.",
+      "brand_copy_boundary": "Do not clone Slack, GitHub, Jira, Linear, Figma, or named collaboration product identities.",
+      "drift_checks": [
+        {
+          "id": "shared_state",
+          "warning": "Collaboration direction should include ownership, comments, status, approval, or activity history.",
+          "blocking_conflict": "A collaboration workflow with no shared state or handoff model conflicts with this direction."
+        }
+      ]
+    },
+    {
+      "id": "premium_visual_showcase",
+      "name": "Premium visual showcase",
+      "suitable_task_types": [
+        "premium_brand",
+        "portfolio",
+        "launch_showcase",
+        "visual_campaign"
+      ],
+      "unsuitable_task_types": [
+        "dense_dashboard",
+        "regulated_payment",
+        "developer_api_reference"
+      ],
+      "primary_matching_signals": [
+        "premium",
+        "showcase",
+        "portfolio",
+        "launch",
+        "visual campaign",
+        "high-end"
+      ],
+      "secondary_matching_signals": [
+        "art direction",
+        "immersive media",
+        "brand story",
+        "gallery"
+      ],
+      "conflict_resolution": "Prefer this direction when the product or object itself is the primary visual signal. Avoid it for operational tools.",
+      "visual_principles": [
+        "make the subject inspectable",
+        "use restraint around premium media",
+        "keep copy sparse and confident"
+      ],
+      "color_tendencies": [
+        "subject-led palette",
+        "high contrast",
+        "limited accent",
+        "avoid one-note gradient themes"
+      ],
+      "typography_density_guidance": "Use refined hierarchy with enough whitespace; do not scale text with viewport width.",
+      "component_priorities": [
+        "hero media",
+        "gallery",
+        "spec list",
+        "story section",
+        "purchase or inquiry CTA"
+      ],
+      "common_mistakes": [
+        "atmosphere without product detail",
+        "dark blurred media",
+        "brand mimicry",
+        "overuse of gradients"
+      ],
+      "source_links": [
+        {
+          "label": "Adobe Spectrum",
+          "url": "https://spectrum.adobe.com/",
+          "source_license": "Linked sources retain their own terms and licenses.",
+          "attribution": "Inspired by public visual-system guidance and premium product presentation patterns.",
+          "usage_boundary": "Use media hierarchy and restraint mechanisms. Do not copy luxury brands, campaigns, photography, typefaces, or logos."
+        },
+        {
+          "label": "Material Design",
+          "url": "https://m3.material.io/",
+          "source_license": "Linked sources retain their own terms and licenses.",
+          "attribution": "Inspired by public visual-system guidance and premium product presentation patterns.",
+          "usage_boundary": "Use media hierarchy and restraint mechanisms. Do not copy luxury brands, campaigns, photography, typefaces, or logos."
+        }
+      ],
+      "source_license": "Linked sources retain their own terms and licenses.",
+      "attribution": "Inspired by public visual-system guidance and premium product presentation patterns.",
+      "usage_boundary": "Use media hierarchy and restraint mechanisms. Do not copy luxury brands, campaigns, photography, typefaces, or logos.",
+      "brand_copy_boundary": "Do not clone Apple, Nike, Aesop, Bang & Olufsen, or other premium brand identities.",
+      "drift_checks": [
+        {
+          "id": "subject_visibility",
+          "warning": "Showcase direction should make the product, person, place, or object inspectable in the first screen.",
+          "blocking_conflict": "A premium showcase with only abstract gradients or atmosphere conflicts with this direction."
+        }
+      ]
+    }
+  ]
+}

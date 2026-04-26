@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "source": {
+    "brief_path": "",
+    "design_md_path": ""
+  },
+  "target_tool": "generic",
+  "evidence": {
+    "kind": "pasted_summary",
+    "summary": "",
+    "path": ""
+  },
+  "decision": "tweak",
+  "selected_strategy": "",
+  "strategy_preserved": true,
+  "strategy_change_reason": "",
+  "strengths": [],
+  "findings": [
+    {
+      "severity": "medium",
+      "brief_reference": "",
+      "issue": "",
+      "evidence": "",
+      "recommended_change": ""
+    }
+  ],
+  "visual_review": {
+    "status": "not_provided",
+    "source": "",
+    "notes": ""
+  },
+  "brief_revision_path": "",
+  "prompt_intent": "targeted_modification",
+  "prompt": {
+    "keep": [],
+    "change": [],
+    "do_not_change": [],
+    "acceptance_checks": []
+  }
+}

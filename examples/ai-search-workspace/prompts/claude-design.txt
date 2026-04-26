@@ -1,0 +1,301 @@
+Task
+Create AI Search Workspace Answer Detail.
+Task type: app_page.
+
+Context
+An app-page workflow for an AI search product where a user asks a question, reviews a sourced answer, inspects citations, and saves or shares the result.
+Stage: phase_2_review_demo
+Pain points:
+- AI answers are hard to trust when sources are buried.
+- Users need to inspect source details without losing the answer context.
+- Failed, partial, or low-confidence answers need clear recovery paths.
+Jobs to be done:
+- Ask a work question and understand the answer state.
+- Verify which sources support the answer.
+- Open source details, recover from unavailable sources, and save or share useful answers.
+
+Audience
+Primary: knowledge workers and analysts who need to verify AI search answers before using them
+Secondary: team leads reviewing saved research artifacts from teammates
+Context: The user is inside the product, comparing an AI answer with source documents under time pressure.
+
+Goal
+Business goal: increase trust and repeat use of sourced AI answers
+Design goal: make the query, answer confidence, answer body, and source origin clear in the first screen
+Conversion goal: move users from one-off search to saved and shared research workflows
+Primary CTA: Save answer
+Secondary CTA: Share with team
+
+Visual Strategy
+Strategy: Dense Research Workspace
+Strategy options:
+- Dense Research Workspace (selected): best use: Best when analysts need to inspect a sourced AI answer quickly.; tone: Calm, dense, product-led, high-trust.; structure: Search input, answer status, answer body, source list, and source detail panel all visible on desktop.; risk: Can feel too busy if hierarchy is weak.; tools: huashu-design, claude-design, v0
+- Evidence-First Answer Detail: best use: Best when the product must prove trust and citation quality before speed.; tone: Source-forward, slightly more editorial, with evidence confidence in the first screen.; structure: Show answer provenance before secondary actions.; risk: May make the answer feel less fast or less conversational.; tools: claude-design, v0
+- Lightweight Team Notebook: best use: Best when the page should feel like a saved research artifact for teams.; tone: Workspace-like, organized, collaborative.; structure: Saved answer, notes, share action, and source detail.; risk: May underplay the live search interaction.; tools: huashu-design, v0
+Tone keywords:
+- dense
+- trustworthy
+- calm
+- product-led
+- source-forward
+References:
+- enterprise research tools
+- documentation-style source panels
+- structured answer review surfaces
+Differentiators:
+- query, confidence, answer, and source origin visible together
+- source detail panel with unavailable and permission-blocked states
+- clear save/share workflow for useful answers
+
+DESIGN.md Visual System
+---
+version: alpha
+name: BriefSearch Workspace
+description: Dense, trustworthy product workspace visual system for AI search answer review.
+colors:
+  background: "#F8FAFC"
+  surface: "#FFFFFF"
+  text: "#111827"
+  muted_text: "#475569"
+  border: "#D8DEE8"
+  primary_action: "#2563EB"
+  success: "#0F766E"
+  warning: "#B45309"
+  danger: "#B91C1C"
+  info: "#0E7490"
+typography:
+  display:
+    fontFamily: Inter
+    fontSize: 32px
+    fontWeight: 650
+    lineHeight: 1.15
+  title:
+    fontFamily: Inter
+    fontSize: 24px
+    fontWeight: 650
+    lineHeight: 1.2
+  heading:
+    fontFamily: Inter
+    fontSize: 18px
+    fontWeight: 650
+    lineHeight: 1.25
+  body:
+    fontFamily: Inter
+    fontSize: 15px
+    fontWeight: 400
+    lineHeight: 1.55
+  caption:
+    fontFamily: Inter
+    fontSize: 12px
+    fontWeight: 400
+    lineHeight: 1.4
+  label:
+    fontFamily: Inter
+    fontSize: 13px
+    fontWeight: 600
+    lineHeight: 1.3
+rounded:
+  sm: 4px
+  md: 8px
+  lg: 10px
+spacing:
+  xs: 4px
+  sm: 8px
+  md: 16px
+  lg: 24px
+  xl: 32px
+components:
+  answer_panel:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    borderColor: "{colors.border}"
+    rounded: "{rounded.md}"
+  source_card:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
+    borderColor: "{colors.border}"
+    rounded: "{rounded.md}"
+  confidence_badge:
+    backgroundColor: "#ECFDF5"
+    textColor: "{colors.success}"
+    borderColor: "#A7F3D0"
+    rounded: "{rounded.sm}"
+  caution_badge:
+    backgroundColor: "#FEF3C7"
+    textColor: "{colors.warning}"
+    borderColor: "#FCD34D"
+    rounded: "{rounded.sm}"
+---
+
+# BriefSearch Workspace DESIGN.md
+
+## Overview
+
+BriefSearch Workspace should feel like a serious research surface, not a marketing page. It must help users understand the query, answer status, confidence, source origin, and recovery path at a glance.
+
+## Visual Theme
+
+The theme is a dense but calm enterprise data workspace: compact panels, visible status, strong source hierarchy, restrained blue interactions, semantic state color, and minimal decoration. Every visual choice should help users verify an AI answer.
+
+## Colors
+
+Use `background` for the app canvas, `surface` for answer and source panels, `text` for primary content, `muted_text` for metadata, and `border` for structure. Use `primary_action` for active links, citations, selected source cards, and focus. Use `success` for verified sources, `warning` for low-confidence or partial answers, `danger` for failed answer or permission errors, and `info` for neutral guidance.
+
+## Typography
+
+Use compact interface typography. `display` is reserved for the query or page title, `title` for answer section headers, `heading` for panel titles, `body` for answer text, `caption` for source metadata, and `label` for badges and controls. Source metadata must remain legible even when dense.
+
+## Layout
+
+Desktop uses a top search area, main answer column, cited source list, and right source-detail panel. Tablet collapses source detail below the source list. Mobile order is search, answer status, answer body, sources, source detail, then save/share actions. Keep query, confidence, answer, and source origin visible in the first screen on desktop.
+
+## Elevation & Depth
+
+Use subtle borders more than shadows. Panels should feel stable and workspace-like, with no floating decorative cards. Use elevation only for active overlays, menus, or selected-source detail.
+
+## Shapes
+
+Use 8px radius as the default and 10px for larger panels. Keep badges compact. Avoid pill-heavy layouts, novelty shapes, decorative blobs, and over-rounded panels.
+
+## Components
+
+Search input states: empty, input, submitting, failed, retry, disabled, and focus. Answer panel states: empty, generating, success, partial, low-confidence, failed, and unavailable. Source cards show default, hover, pressed, selected, focus, loading, unavailable, permission-blocked, and error states. Save/share controls show idle, working, success, failed, disabled, and focus states.
+
+## Responsive Behavior
+
+Use desktop >= 1024px, tablet 768-1023px, and mobile <= 767px. No horizontal scrolling on mobile. Source cards, citation markers, and save/share controls wrap cleanly. Keyboard order follows search input, submit, answer citations, source cards, source detail actions, then save/share controls. Touch targets are at least 44px on mobile.
+
+## Motion & Feedback
+
+Use restrained feedback: answer generation skeleton, source-card loading row, selected-source highlight, save/share progress, and retry feedback. Respect reduced motion by replacing animated loading with static progress labels. State changes must not jump the layout.
+
+## Content Voice
+
+Voice is clear, trustworthy, source-forward, and operational. Labels should say what happened and what to do next: "Low confidence, check sources" is better than "AI is thinking." Do not invent customer data, proprietary source names, accuracy metrics, or unsupported claims.
+
+## Do's and Don'ts
+
+Do show answer provenance, confidence, source citations, selected source detail, keyboard focus, touch-safe controls, low-confidence states, unavailable source states, and permission-blocked recovery. Don't use marketing-first composition, generic AI glow, abstract gradients, hidden sources, identical-looking states, fake source data, or decorative panels that compete with the answer.
+
+## Reference Direction
+
+Reference direction: `enterprise_data_workspace` - Enterprise data workspace.
+
+Use this direction for data density, source hierarchy, permission states, and repeated-use ergonomics. It is an inspiration boundary only: do not copy third-party brand assets, logos, proprietary fonts, screenshots, full color systems, or complete `DESIGN.md` files.
+
+## Agent Guidance
+
+Treat front matter tokens as normative. If a needed token is missing, derive from the closest semantic role and record the assumption. Preserve the Dense Research Workspace strategy, source-forward hierarchy, visible low-confidence and permission states, restrained blue interactions, and no-fake-source-data boundary.
+
+Required Content
+Core claim: Review every AI answer with visible sources, confidence, and recovery paths.
+Supporting points:
+- Keep the query, answer status, and confidence visible.
+- Show source titles, excerpts, link status, date, and owner or system.
+- Let users inspect source detail without losing the answer context.
+- Handle empty, loading, partial, low-confidence, failed, and source-unavailable states.
+Proof points:
+- Answer panel with confidence and citation markers.
+- Source list with excerpts and status labels.
+- Source detail panel with selected source metadata.
+- Save/share controls with success and failed states.
+Sections:
+- top search area
+- answer status strip
+- answer body
+- cited source list
+- source detail panel
+- save/share controls
+Section details:
+- top search area: purpose: Keep the user's query visible and editable.; content: query input, submit control, recent query context; visual anchor: Full-width search bar with compact metadata
+- answer status strip: purpose: Answer what the user asked, how trustworthy it is, and where it comes from.; content: answer state, confidence badge, source count, last updated metadata; visual anchor: Compact status row above the answer
+- answer body: purpose: Present the sourced answer in a readable structure.; content: summary, key points, citation markers, follow-up prompt affordance; visual anchor: Main answer panel
+- cited source list: purpose: Make source origin discoverable and scannable.; content: source title, excerpt, system or owner, date, link status, relevance; visual anchor: Stacked source cards with active and unavailable states
+- source detail panel: purpose: Show selected source details without hiding the answer.; content: selected source title, longer excerpt, metadata, open source action, permission state; visual anchor: Right panel on desktop and expandable panel on tablet/mobile
+- save/share controls: purpose: Turn useful answers into team artifacts.; content: save answer, share with team, copy link, status feedback; visual anchor: Compact action row tied to answer state
+Screens:
+- desktop research workspace
+- tablet answer detail with collapsible source detail
+- mobile answer detail stack
+Flows:
+- user enters a query and submits search
+- answer generates with visible loading state
+- user reviews confidence and cited source markers
+- user selects a source and opens source detail
+- user saves or shares the answer
+- user retries when answer generation or source loading fails
+Interaction states:
+- Search input states: empty, input, submitting, failed, retry.
+- Answer area states: empty, generating, success, partial, low-confidence, failed.
+- Source list states: empty, loading, available, source-unavailable.
+- Source detail states: unselected, loading, success, permission-blocked.
+- Save/share states: idle, working, success, failed.
+Interaction contract:
+- Submitting a query shows a generating state in the answer area and loading state in the source list.
+- Citation markers in the answer scroll or focus the matching source card.
+- Selecting a source card updates the source detail panel without losing the answer context.
+- Unavailable sources show a reason and a retry or request-access path.
+- Low-confidence answers show a caution state and suggest checking sources before sharing.
+- Save and share controls show working, success, and failed feedback without changing the selected strategy.
+
+Constraints
+Platform: responsive app-page UI
+Responsive: True
+Tech stack:
+- HTML prototype
+- React or Next.js compatible structure
+- Tailwind-compatible tokens
+Accessibility:
+- visible focus
+- semantic sections
+- readable contrast
+- 44px mobile touch targets
+- clear state labels
+Responsive and accessibility requirements:
+- Desktop >= 1024px uses a top search area, main answer-and-citations area, and right source detail panel.
+- Tablet 768-1023px collapses source detail into an expandable panel below the source list.
+- Mobile <= 767px orders content as search, answer status, answer body, sources, source detail, then save/share actions.
+- The first screen must answer: what did the user ask, how trustworthy is the answer, and where does the answer come from.
+- No horizontal scrolling on mobile; source cards, citation markers, and save/share controls must wrap cleanly.
+- Keyboard order follows search input, submit, answer citations, source cards, source detail actions, save/share controls.
+- Every interactive element has visible focus and at least a 44px mobile touch target.
+- Use semantic headings and descriptive labels for confidence, source status, and permission-blocked states.
+Deadline: Phase 2 result review demo
+
+Do Not Do
+Forbidden visual directions:
+- marketing hero layout
+- generic AI glow
+- abstract gradients
+- fake source data
+- decorative panels without function
+Must avoid:
+- marketing-first composition
+- hidden or low-contrast sources
+- generic AI wording
+- state changes that look identical
+- fake source or customer proof
+Content warnings:
+- Do not invent customer data, proprietary source names, or unsupported accuracy claims.
+- Avoid vague AI assistant copy that does not explain source trust.
+
+Deliverable
+Create a visual artifact with clear variants and leave room for iterative visual tweaks.
+
+Review Criteria
+Must have:
+- query visibility
+- answer confidence
+- source citation list
+- source detail panel
+- empty/loading/success/partial/low-confidence/failed states
+- source-unavailable and permission-blocked states
+- save/share feedback
+- mobile content order
+Review criteria:
+- first screen shows query, trust, and source origin
+- answer and sources have clear hierarchy
+- source detail is discoverable
+- all required states are represented
+- mobile order keeps answer and source context intact
+- DESIGN.md visual rules are followed

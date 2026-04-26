@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "source_path": "examples/ai-search-landing/DESIGN.md",
+  "source_sha256": "869dea3e071aba1a62394264e831d8f44c750e61ab1a0c8382adb77d5d74f044",
+  "mode": "briefpilot_fallback",
+  "official_tool": {
+    "available": false,
+    "command": null,
+    "version": null,
+    "exit_status": null,
+    "merged": false,
+    "error": null,
+    "raw_output": ""
+  },
+  "reference_direction": {
+    "id": "ai_product_landing_page",
+    "name": "AI product landing page"
+  },
+  "summary": {
+    "blocking": 0,
+    "warning": 0,
+    "info": 1
+  },
+  "blocking": false,
+  "next_action": "continue",
+  "findings": [
+    {
+      "severity": "info",
+      "rule_id": "optional_official_check",
+      "location": "official_tool",
+      "message": "Google official DESIGN.md lint was not run; fallback checks were used.",
+      "suggested_fix": "For stricter checks, provide a safe absolute --official-command path or run the official tool manually.",
+      "source": "briefpilot_fallback"
+    }
+  ],
+  "generated_at": "deterministic"
+}

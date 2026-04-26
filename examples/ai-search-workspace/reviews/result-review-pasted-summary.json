@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "source": {
+    "brief_path": "design-brief.json",
+    "design_md_path": "DESIGN.md"
+  },
+  "target_tool": "generic",
+  "evidence": {
+    "kind": "pasted_summary",
+    "summary": "The generated answer-detail page has the right search input, answer panel, confidence badge, and save/share actions. However, the source cards are visually quiet, citation markers are hard to connect to the source list, and the source detail panel does not clearly show active selection."
+  },
+  "decision": "tweak",
+  "selected_strategy": "Dense Research Workspace",
+  "strategy_preserved": true,
+  "strategy_change_reason": "",
+  "strengths": [
+    "The generated result keeps the research workspace direction.",
+    "The answer panel, confidence badge, and save/share controls are present."
+  ],
+  "findings": [
+    {
+      "severity": "medium",
+      "brief_reference": "quality_bar.review_criteria: answer and sources have clear hierarchy",
+      "issue": "Source cards are too low-contrast compared with the answer body.",
+      "evidence": "The pasted summary says source cards are visually quiet and hard to notice.",
+      "recommended_change": "Increase source card hierarchy with clearer title weight, excerpt contrast, active source state, and visible source count."
+    },
+    {
+      "severity": "medium",
+      "brief_reference": "structure.interaction_contract: Citation markers in the answer scroll or focus the matching source card.",
+      "issue": "Citation markers do not clearly connect to source cards.",
+      "evidence": "The pasted summary says citation markers are hard to connect to the source list.",
+      "recommended_change": "Make citation markers and matching source cards share an active state and visible focus treatment."
+    },
+    {
+      "severity": "low",
+      "brief_reference": "DESIGN.md Components: source cards should reveal title, excerpt, date, owner or system, and link status.",
+      "issue": "The selected source detail panel does not clearly show active selection.",
+      "evidence": "The pasted summary says the source detail panel lacks clear active selection.",
+      "recommended_change": "Add selected-source label, active card highlight, and source metadata in the detail panel."
+    }
+  ],
+  "visual_review": {
+    "status": "unavailable",
+    "source": "",
+    "notes": "No inspectable screenshot was available in this run, so the review used the pasted summary and saved brief package as fallback evidence."
+  },
+  "brief_revision_path": "",
+  "prompt_intent": "targeted_modification",
+  "prompt": {
+    "keep": [
+      "Keep the Dense Research Workspace strategy.",
+      "Keep the top search area, answer panel, confidence badge, and save/share controls.",
+      "Keep the restrained BriefSearch Workspace visual system from DESIGN.md."
+    ],
+    "change": [
+      "Make source cards more visible without overpowering the answer body.",
+      "Add a clear active state linking citation markers, source cards, and source detail.",
+      "Show source title, excerpt, date, owner or system, link status, and relevance more clearly.",
+      "Improve source detail selection feedback on desktop, tablet, and mobile."
+    ],
+    "do_not_change": [
+      "Do not switch to a marketing-first composition.",
+      "Do not replace the dense research workspace with a generic dashboard.",
+      "Do not remove answer confidence, save/share feedback, or required answer states."
+    ],
+    "acceptance_checks": [
+      "The first screen still shows query, answer confidence, answer body, and source origin.",
+      "Citation markers visibly connect to matching source cards.",
+      "The selected source detail panel has an obvious active state.",
+      "All changes continue to follow DESIGN.md colors, spacing, radius, and source-card rules."
+    ]
+  }
+}

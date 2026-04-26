@@ -1,0 +1,237 @@
+{
+  "meta": {
+    "version": "0.1",
+    "created_by": "BriefPilot",
+    "target_tools": ["huashu-design", "claude-design", "v0"]
+  },
+  "project": {
+    "name": "AI Search Landing",
+    "summary": "A product-led SaaS landing page for an AI search product that helps knowledge workers and small teams find answers across scattered work documents.",
+    "task_type": "saas_website",
+    "stage": "golden_demo"
+  },
+  "diagnosis": {
+    "raw_request": "帮我做一个 AI 搜索产品官网",
+    "initial_score": 42,
+    "level": "can_generate_unstable",
+    "main_gaps": [
+      "No target audience was named.",
+      "No conversion goal or CTA was specified.",
+      "No product proof, screenshots, metrics, or integration list was provided.",
+      "No brand voice, visual tone, or design system was provided.",
+      "No responsive, accessibility, or content constraints were provided."
+    ],
+    "recommended_mode": "quick",
+    "risk": [
+      "Without assumptions, a generator may produce a generic AI landing page.",
+      "Unsupported logos, metrics, or certifications must not be invented."
+    ]
+  },
+  "audience": {
+    "primary_user": "knowledge workers and small teams that search across scattered work documents",
+    "secondary_user": "team leads evaluating productivity tools for fast-moving internal teams",
+    "context_of_use": "Visitors arrive after hearing about the product and need to understand whether it can search across their work tools without setup friction.",
+    "pain_points": [
+      "Important answers are buried across documents, chats, tickets, and shared drives.",
+      "Teams waste time asking repeat questions because source material is hard to find.",
+      "Generic AI search claims do not prove whether the product fits real workflows."
+    ],
+    "jobs_to_be_done": [
+      "Understand what the product searches and how answers are grounded.",
+      "Decide whether to start a trial or request a demo.",
+      "Trust that the product is secure enough for work knowledge."
+    ]
+  },
+  "goals": {
+    "business_goal": "drive trial signup",
+    "design_goal": "make the value of cross-workspace AI search clear in the first screen while building enterprise trust",
+    "conversion_goal": "convert qualified visitors into trial signups or demo requests",
+    "primary_cta": "Start free trial",
+    "secondary_cta": "Watch product demo"
+  },
+  "message": {
+    "core_claim": "Find trusted answers across every work document in seconds.",
+    "supporting_points": [
+      "Connect common work tools and search across them from one place.",
+      "Show answer sources so teams can verify results.",
+      "Help small teams reduce repeat questions and knowledge bottlenecks."
+    ],
+    "proof_points": [
+      "Product surface showing a question, sourced answer, and linked documents.",
+      "Integration row for docs, chat, tickets, and drives.",
+      "Security section covering permissions-aware search and admin controls."
+    ],
+    "content_warnings": [
+      "Avoid vague AI slogans without concrete product behavior.",
+      "Do not imply customer logos, metrics, or certifications that are not provided."
+    ]
+  },
+  "structure": {
+    "sections": ["hero", "pain", "solution", "workflow", "integrations", "security", "CTA"],
+    "screens": ["desktop landing page", "mobile landing page"],
+    "flows": ["visitor reads hero", "visitor reviews product workflow", "visitor clicks trial signup"],
+    "section_details": [
+      {
+        "section": "hero",
+        "purpose": "Explain the product promise immediately and show a realistic sourced-answer product surface.",
+        "content": ["headline", "short supporting copy", "primary CTA", "secondary CTA", "product surface mock"],
+        "visual_anchor": "Search answer panel with linked source documents"
+      },
+      {
+        "section": "pain",
+        "purpose": "Name the cost of scattered work knowledge without overexplaining.",
+        "content": ["three pain points", "plain-language impact statement"],
+        "visual_anchor": "Lightweight split showing docs, chats, tickets, and drives"
+      },
+      {
+        "section": "solution",
+        "purpose": "Connect the AI search value to concrete user actions.",
+        "content": ["cross-tool search", "source-backed answers", "team knowledge reuse"],
+        "visual_anchor": "Three compact product capability blocks"
+      },
+      {
+        "section": "workflow",
+        "purpose": "Show the path from question to trusted answer.",
+        "content": ["ask a question", "review sourced answer", "open source document"],
+        "visual_anchor": "Three-step product flow"
+      },
+      {
+        "section": "integrations",
+        "purpose": "Make the search coverage feel practical while avoiding fake partner claims.",
+        "content": ["docs", "chat", "tickets", "drives"],
+        "visual_anchor": "Generic integration placeholders with labels"
+      },
+      {
+        "section": "security",
+        "purpose": "Build trust before the final CTA.",
+        "content": ["permissions-aware search", "admin controls", "source visibility"],
+        "visual_anchor": "Calm trust panel with clear copy"
+      },
+      {
+        "section": "CTA",
+        "purpose": "Give qualified visitors a clear next step.",
+        "content": ["trial CTA", "demo CTA", "short reassurance line"],
+        "visual_anchor": "Simple conversion band"
+      }
+    ],
+    "interaction_states": [
+      "Primary CTA has default, hover, focus, and mobile-visible states.",
+      "Secondary demo CTA remains available but visually secondary.",
+      "Product mock shows a typed question, answer, source chips, and linked documents.",
+      "Mobile layout keeps headline, product surface, and CTA readable without overlap."
+    ],
+    "interaction_contract": [
+      "Primary CTA opens a trial signup form or navigates to /signup. It must show default, hover, focus, disabled, loading, success, and error states when implemented.",
+      "Secondary CTA opens or scrolls to a product demo section. It must remain visually secondary and have default, hover, focus, and loading states when implemented.",
+      "Source chips and linked documents in the product mock are clickable when the target tool supports interactions; otherwise label them as visual-only proof elements.",
+      "Integration items are non-clickable placeholders in the golden demo unless real integration URLs are provided.",
+      "Failed signup or unavailable demo states should keep the visitor on the page with a clear retry path."
+    ],
+    "responsive_accessibility": [
+      "Use desktop >= 1024px, tablet 768-1023px, and mobile <= 767px as target layout bands.",
+      "On mobile, stack headline, copy, CTAs, and product surface in that order; keep the primary CTA visible above the fold or repeated after the product proof.",
+      "Product mock must resize without horizontal scrolling and keep answer text, source chips, and linked documents readable.",
+      "Keyboard tab order follows navigation, primary CTA, secondary CTA, product source links, integrations, security proof, final CTA.",
+      "Every interactive element has a visible focus state and at least a 44px touch target on mobile.",
+      "Use semantic heading order and descriptive alt text for product mock, source icons, and integration placeholders."
+    ]
+  },
+  "visual": {
+    "strategy_name": "Enterprise Trust",
+    "tone_keywords": ["restrained", "credible", "product-led", "clear", "secure"],
+    "references": ["modern enterprise SaaS landing pages", "product screenshots with sourced answers", "clean documentation-style trust patterns"],
+    "differentiators": ["real product surface in the hero", "clear source attribution UI", "security proof before final CTA"],
+    "avoid": ["generic AI futurism", "excessive glow", "abstract gradient blobs", "fake customer logos", "over-rounded novelty"]
+  },
+  "strategy_options": [
+    {
+      "name": "Enterprise Trust",
+      "selected": true,
+      "best_use_case": "Best when the product must feel credible for teams evaluating work knowledge and security.",
+      "visual_tone": "Restrained, product-led, sharp typography, neutral surfaces, restrained blue accents.",
+      "information_structure_focus": "Lead with value, prove with sourced-answer product UI, then address workflow, integrations, and security.",
+      "risk": "Can feel too reserved if the product needs a more consumer-facing launch tone.",
+      "best_target_tools": ["huashu-design", "claude-design", "v0"]
+    },
+    {
+      "name": "Search Copilot Demo",
+      "selected": false,
+      "best_use_case": "Best when the page should quickly demonstrate the search interaction.",
+      "visual_tone": "Interactive, product-forward, slightly more energetic, with a larger live-search mock.",
+      "information_structure_focus": "Lead with an example question and answer, then explain why the answer is trustworthy.",
+      "risk": "May over-index on the demo and under-explain business trust.",
+      "best_target_tools": ["huashu-design", "v0"]
+    },
+    {
+      "name": "Founder-Led Launch",
+      "selected": false,
+      "best_use_case": "Best when the product is early and needs a sharper narrative around the problem.",
+      "visual_tone": "Editorial, direct, sparse, with strong copy and fewer interface panels.",
+      "information_structure_focus": "Lead with the pain of scattered knowledge, then introduce the product as a focused answer.",
+      "risk": "Can feel less mature for enterprise buyers if proof and security are too light.",
+      "best_target_tools": ["claude-design", "huashu-design"]
+    }
+  ],
+  "brand": {
+    "brand_name": "BriefSearch",
+    "logo": "wordmark placeholder only",
+    "colors": ["deep ink primary", "slate secondary", "restrained blue accent", "light neutral surface"],
+    "typography": ["clear headline sans", "readable body sans"],
+    "voice": "direct, trustworthy, concrete, product-led",
+    "existing_assets": ["product surface mock placeholder", "integration icon placeholders"]
+  },
+  "design_system": {
+    "design_md_path": "DESIGN.md",
+    "reference_direction": {
+      "id": "ai_product_landing_page",
+      "name": "AI product landing page",
+      "source_boundary": "Use product proof, conversion clarity, and trust hierarchy as mechanisms; do not copy third-party brand assets or full DESIGN.md files."
+    },
+    "token_summary": [
+      "Deep ink primary for text and high-trust surfaces.",
+      "Restrained blue accent for links, focus, and primary action.",
+      "Light neutral backgrounds with low-contrast borders.",
+      "8px default radius and restrained card depth."
+    ],
+    "assumptions": [
+      "No real logo, customer metrics, or screenshots were provided.",
+      "Use realistic product placeholders rather than invented proprietary assets."
+    ]
+  },
+  "constraints": {
+    "platform": "responsive web landing page",
+    "responsive": true,
+    "tech_stack": ["HTML prototype", "React or Next.js compatible structure", "Tailwind-compatible tokens"],
+    "accessibility": ["clear focus states", "readable contrast", "CTA visible on mobile", "no text embedded in unreadable imagery"],
+    "deadline": "golden demo MVP"
+  },
+  "quality_bar": {
+    "must_have": [
+      "first-screen clarity",
+      "clear CTA",
+      "real product surface",
+      "security trust section",
+      "mobile CTA visibility"
+    ],
+    "must_avoid": [
+      "generic AI wording",
+      "decorative glow as the main visual idea",
+      "fake logos or unsupported metrics"
+    ],
+    "review_criteria": [
+      "first-screen clarity",
+      "clear CTA",
+      "real product surface",
+      "no generic AI wording",
+      "mobile CTA visibility"
+    ]
+  },
+  "assumptions": [
+    "The product is early but credible enough to show a realistic product surface.",
+    "The first conversion target is trial signup, with demo as secondary."
+  ],
+  "open_questions": [
+    "Which integrations are confirmed for launch?",
+    "Are there real screenshots or customer proof points available?"
+  ]
+}

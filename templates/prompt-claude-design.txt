@@ -1,0 +1,32 @@
+Task
+{{task}}
+
+Context
+{{context}}
+
+Audience
+{{audience}}
+
+Goal
+{{goal}}
+
+Visual Strategy
+{{visual_strategy}}
+
+DESIGN.md Visual System
+{{design_md}}
+
+Required Content
+{{required_content}}
+
+Constraints
+{{constraints}}
+
+Do Not Do
+{{avoid}}
+
+Deliverable
+{{deliverable}}
+
+Review Criteria
+{{review_criteria}}

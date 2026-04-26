@@ -1,0 +1,265 @@
+{
+  "meta": {
+    "version": "0.1",
+    "created_by": "BriefPilot",
+    "target_tools": ["huashu-design", "claude-design", "v0"]
+  },
+  "project": {
+    "name": "AI Search Workspace Answer Detail",
+    "summary": "An app-page workflow for an AI search product where a user asks a question, reviews a sourced answer, inspects citations, and saves or shares the result.",
+    "task_type": "app_page",
+    "stage": "phase_2_review_demo"
+  },
+  "diagnosis": {
+    "raw_request": "帮我做一个 AI 搜索产品的研究工作台页面",
+    "initial_score": 58,
+    "level": "can_generate_with_assumptions",
+    "main_gaps": [
+      "The request does not define answer states.",
+      "The request does not define source citation behavior.",
+      "The request does not define the source detail panel or mobile ordering.",
+      "The request does not define save/share behavior."
+    ],
+    "recommended_mode": "quick",
+    "risk": [
+      "A generator may create a generic dashboard without answer trust hierarchy.",
+      "A generator may hide source citations or omit failed and low-confidence states."
+    ]
+  },
+  "audience": {
+    "primary_user": "knowledge workers and analysts who need to verify AI search answers before using them",
+    "secondary_user": "team leads reviewing saved research artifacts from teammates",
+    "context_of_use": "The user is inside the product, comparing an AI answer with source documents under time pressure.",
+    "pain_points": [
+      "AI answers are hard to trust when sources are buried.",
+      "Users need to inspect source details without losing the answer context.",
+      "Failed, partial, or low-confidence answers need clear recovery paths."
+    ],
+    "jobs_to_be_done": [
+      "Ask a work question and understand the answer state.",
+      "Verify which sources support the answer.",
+      "Open source details, recover from unavailable sources, and save or share useful answers."
+    ]
+  },
+  "goals": {
+    "business_goal": "increase trust and repeat use of sourced AI answers",
+    "design_goal": "make the query, answer confidence, answer body, and source origin clear in the first screen",
+    "conversion_goal": "move users from one-off search to saved and shared research workflows",
+    "primary_cta": "Save answer",
+    "secondary_cta": "Share with team"
+  },
+  "message": {
+    "core_claim": "Review every AI answer with visible sources, confidence, and recovery paths.",
+    "supporting_points": [
+      "Keep the query, answer status, and confidence visible.",
+      "Show source titles, excerpts, link status, date, and owner or system.",
+      "Let users inspect source detail without losing the answer context.",
+      "Handle empty, loading, partial, low-confidence, failed, and source-unavailable states."
+    ],
+    "proof_points": [
+      "Answer panel with confidence and citation markers.",
+      "Source list with excerpts and status labels.",
+      "Source detail panel with selected source metadata.",
+      "Save/share controls with success and failed states."
+    ],
+    "content_warnings": [
+      "Do not invent customer data, proprietary source names, or unsupported accuracy claims.",
+      "Avoid vague AI assistant copy that does not explain source trust."
+    ]
+  },
+  "structure": {
+    "sections": [
+      "top search area",
+      "answer status strip",
+      "answer body",
+      "cited source list",
+      "source detail panel",
+      "save/share controls"
+    ],
+    "screens": [
+      "desktop research workspace",
+      "tablet answer detail with collapsible source detail",
+      "mobile answer detail stack"
+    ],
+    "flows": [
+      "user enters a query and submits search",
+      "answer generates with visible loading state",
+      "user reviews confidence and cited source markers",
+      "user selects a source and opens source detail",
+      "user saves or shares the answer",
+      "user retries when answer generation or source loading fails"
+    ],
+    "section_details": [
+      {
+        "section": "top search area",
+        "purpose": "Keep the user's query visible and editable.",
+        "content": ["query input", "submit control", "recent query context"],
+        "visual_anchor": "Full-width search bar with compact metadata"
+      },
+      {
+        "section": "answer status strip",
+        "purpose": "Answer what the user asked, how trustworthy it is, and where it comes from.",
+        "content": ["answer state", "confidence badge", "source count", "last updated metadata"],
+        "visual_anchor": "Compact status row above the answer"
+      },
+      {
+        "section": "answer body",
+        "purpose": "Present the sourced answer in a readable structure.",
+        "content": ["summary", "key points", "citation markers", "follow-up prompt affordance"],
+        "visual_anchor": "Main answer panel"
+      },
+      {
+        "section": "cited source list",
+        "purpose": "Make source origin discoverable and scannable.",
+        "content": ["source title", "excerpt", "system or owner", "date", "link status", "relevance"],
+        "visual_anchor": "Stacked source cards with active and unavailable states"
+      },
+      {
+        "section": "source detail panel",
+        "purpose": "Show selected source details without hiding the answer.",
+        "content": ["selected source title", "longer excerpt", "metadata", "open source action", "permission state"],
+        "visual_anchor": "Right panel on desktop and expandable panel on tablet/mobile"
+      },
+      {
+        "section": "save/share controls",
+        "purpose": "Turn useful answers into team artifacts.",
+        "content": ["save answer", "share with team", "copy link", "status feedback"],
+        "visual_anchor": "Compact action row tied to answer state"
+      }
+    ],
+    "interaction_states": [
+      "Search input states: empty, input, submitting, failed, retry.",
+      "Answer area states: empty, generating, success, partial, low-confidence, failed.",
+      "Source list states: empty, loading, available, source-unavailable.",
+      "Source detail states: unselected, loading, success, permission-blocked.",
+      "Save/share states: idle, working, success, failed."
+    ],
+    "interaction_contract": [
+      "Submitting a query shows a generating state in the answer area and loading state in the source list.",
+      "Citation markers in the answer scroll or focus the matching source card.",
+      "Selecting a source card updates the source detail panel without losing the answer context.",
+      "Unavailable sources show a reason and a retry or request-access path.",
+      "Low-confidence answers show a caution state and suggest checking sources before sharing.",
+      "Save and share controls show working, success, and failed feedback without changing the selected strategy."
+    ],
+    "responsive_accessibility": [
+      "Desktop >= 1024px uses a top search area, main answer-and-citations area, and right source detail panel.",
+      "Tablet 768-1023px collapses source detail into an expandable panel below the source list.",
+      "Mobile <= 767px orders content as search, answer status, answer body, sources, source detail, then save/share actions.",
+      "The first screen must answer: what did the user ask, how trustworthy is the answer, and where does the answer come from.",
+      "No horizontal scrolling on mobile; source cards, citation markers, and save/share controls must wrap cleanly.",
+      "Keyboard order follows search input, submit, answer citations, source cards, source detail actions, save/share controls.",
+      "Every interactive element has visible focus and at least a 44px mobile touch target.",
+      "Use semantic headings and descriptive labels for confidence, source status, and permission-blocked states."
+    ]
+  },
+  "visual": {
+    "strategy_name": "Dense Research Workspace",
+    "tone_keywords": ["dense", "trustworthy", "calm", "product-led", "source-forward"],
+    "references": ["enterprise research tools", "documentation-style source panels", "structured answer review surfaces"],
+    "differentiators": [
+      "query, confidence, answer, and source origin visible together",
+      "source detail panel with unavailable and permission-blocked states",
+      "clear save/share workflow for useful answers"
+    ],
+    "avoid": ["marketing hero layout", "generic AI glow", "abstract gradients", "fake source data", "decorative panels without function"]
+  },
+  "strategy_options": [
+    {
+      "name": "Dense Research Workspace",
+      "selected": true,
+      "best_use_case": "Best when analysts need to inspect a sourced AI answer quickly.",
+      "visual_tone": "Calm, dense, product-led, high-trust.",
+      "information_structure_focus": "Search input, answer status, answer body, source list, and source detail panel all visible on desktop.",
+      "risk": "Can feel too busy if hierarchy is weak.",
+      "best_target_tools": ["huashu-design", "claude-design", "v0"]
+    },
+    {
+      "name": "Evidence-First Answer Detail",
+      "selected": false,
+      "best_use_case": "Best when the product must prove trust and citation quality before speed.",
+      "visual_tone": "Source-forward, slightly more editorial, with evidence confidence in the first screen.",
+      "information_structure_focus": "Show answer provenance before secondary actions.",
+      "risk": "May make the answer feel less fast or less conversational.",
+      "best_target_tools": ["claude-design", "v0"]
+    },
+    {
+      "name": "Lightweight Team Notebook",
+      "selected": false,
+      "best_use_case": "Best when the page should feel like a saved research artifact for teams.",
+      "visual_tone": "Workspace-like, organized, collaborative.",
+      "information_structure_focus": "Saved answer, notes, share action, and source detail.",
+      "risk": "May underplay the live search interaction.",
+      "best_target_tools": ["huashu-design", "v0"]
+    }
+  ],
+  "brand": {
+    "brand_name": "BriefSearch",
+    "logo": "wordmark placeholder only",
+    "colors": ["deep ink primary", "slate secondary", "restrained blue accent", "muted success green", "amber caution"],
+    "typography": ["compact interface sans", "readable answer body sans"],
+    "voice": "clear, trustworthy, source-forward, operational",
+    "existing_assets": ["answer placeholder", "source excerpt placeholders", "confidence status labels"]
+  },
+  "design_system": {
+    "design_md_path": "DESIGN.md",
+    "reference_direction": {
+      "id": "enterprise_data_workspace",
+      "name": "Enterprise data workspace",
+      "source_boundary": "Use data density, source hierarchy, permission states, and repeated-use ergonomics as mechanisms; do not copy third-party brand assets or full DESIGN.md files."
+    },
+    "token_summary": [
+      "Deep ink text and light neutral workspace surfaces.",
+      "Restrained blue accent for active links, citations, focus, and primary action.",
+      "Muted green for verified states and amber for low-confidence states.",
+      "8px default radius, subtle borders, and minimal shadow."
+    ],
+    "assumptions": [
+      "No real product screenshot or source dataset was provided.",
+      "Use realistic placeholder source metadata without inventing customer details."
+    ]
+  },
+  "constraints": {
+    "platform": "responsive app-page UI",
+    "responsive": true,
+    "tech_stack": ["HTML prototype", "React or Next.js compatible structure", "Tailwind-compatible tokens"],
+    "accessibility": ["visible focus", "semantic sections", "readable contrast", "44px mobile touch targets", "clear state labels"],
+    "deadline": "Phase 2 result review demo"
+  },
+  "quality_bar": {
+    "must_have": [
+      "query visibility",
+      "answer confidence",
+      "source citation list",
+      "source detail panel",
+      "empty/loading/success/partial/low-confidence/failed states",
+      "source-unavailable and permission-blocked states",
+      "save/share feedback",
+      "mobile content order"
+    ],
+    "must_avoid": [
+      "marketing-first composition",
+      "hidden or low-contrast sources",
+      "generic AI wording",
+      "state changes that look identical",
+      "fake source or customer proof"
+    ],
+    "review_criteria": [
+      "first screen shows query, trust, and source origin",
+      "answer and sources have clear hierarchy",
+      "source detail is discoverable",
+      "all required states are represented",
+      "mobile order keeps answer and source context intact",
+      "DESIGN.md visual rules are followed"
+    ]
+  },
+  "assumptions": [
+    "The app user is already signed in.",
+    "The product has permission-aware source access.",
+    "The answer may be generated from multiple internal sources."
+  ],
+  "open_questions": [
+    "Which source systems are real at launch?",
+    "How should permission requests be routed inside the product?"
+  ]
+}

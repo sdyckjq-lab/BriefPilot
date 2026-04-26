@@ -1,0 +1,45 @@
+Task
+{{task}}
+
+Target Tool
+{{target_tool}}
+
+Decision
+{{decision}}
+
+Original Strategy
+{{selected_strategy}}
+
+Strategy Preservation
+{{strategy_preservation}}
+
+Source Package
+Brief: {{brief_path}}
+DESIGN.md: {{design_md_path}}
+
+Source Brief Context
+{{brief_context}}
+
+DESIGN.md Visual Rules To Preserve
+{{design_md}}
+
+Review Summary
+{{review_summary}}
+
+What To Keep
+{{keep}}
+
+What To Change
+{{change}}
+
+What Not To Change
+{{do_not_change}}
+
+Findings To Address
+{{findings}}
+
+Brief Revision
+{{brief_revision}}
+
+Acceptance Checks
+{{acceptance_checks}}
