@@ -49,6 +49,12 @@ Google's official `diff`, `export`, and `spec` commands are useful manual follow
 
 Current verified scope: the AI search SaaS landing page golden demo, plus the AI search research workspace / answer detail review loop. Other app prototypes and complex product pages remain adjacent trial scope.
 
+## Comparison Demo
+
+Open `examples/comparison-demo/index.html` to see the same vague request compared two ways: a controlled direct-generation baseline and a BriefPilot-enhanced result grounded in the verified AI search landing package.
+
+The baseline is authored for this first demo. It is not claimed as output from a named downstream tool.
+
 ## Quick Example
 
 Input:
