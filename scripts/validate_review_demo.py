@@ -42,6 +42,38 @@ REVIEW_FILES = [
 DEFAULT_CONTENT_LANGUAGE = "zh-CN"
 OUTPUT_LANGUAGE_PHRASE = "Use Simplified Chinese for all user-visible UI copy."
 OUTPUT_LANGUAGE_CHINESE_PHRASE = "用户可见 UI 文案必须使用简体中文"
+REVIEW_MARKDOWN_CHINESE_SECTIONS = [
+    "# 结果评审",
+    "## 来源包",
+    "## 评审证据",
+    "## 保留点",
+    "## 问题",
+    "## 视觉评审",
+    "## 决定",
+    "## 下一轮提示摘要",
+]
+REVIEW_MARKDOWN_ENGLISH_LABELS = [
+    "# Result Review",
+    "## Source Package",
+    "## Reviewed Evidence",
+    "## Strengths",
+    "## Mismatches",
+    "## Visual Review",
+    "## Decision",
+    "## Next Prompt Summary",
+    "| Severity | Brief reference | Issue | Evidence | Recommended change |",
+    "- Selected strategy:",
+    "- Target tool:",
+    "- Evidence kind:",
+    "- Evidence path:",
+    "- Summary:",
+    "- Status:",
+    "- Notes:",
+    "- Decision:",
+    "- Strategy preserved:",
+    "- Prompt intent:",
+    "- Brief revision:",
+]
 
 
 def has_text_value(value):
@@ -129,11 +161,18 @@ def check_review(review_path, findings):
     return review, context
 
 
-def check_review_markdown(markdown_path, review, findings):
+def check_review_markdown(markdown_path, review, context, findings):
     text = markdown_path.read_text(encoding="utf-8")
     text_lower = text.lower()
     relative = markdown_path.relative_to(markdown_path.parents[1])
     evidence = review.get("evidence") if isinstance(review.get("evidence"), dict) else {}
+    language = validate_brief.value_at(context.get("brief", {}), "meta.content_language")
+
+    if language == DEFAULT_CONTENT_LANGUAGE:
+        missing_sections = [phrase for phrase in REVIEW_MARKDOWN_CHINESE_SECTIONS if phrase not in text]
+        english_labels = [phrase for phrase in REVIEW_MARKDOWN_ENGLISH_LABELS if phrase in text]
+        if missing_sections or english_labels:
+            findings.append(f"{relative} review markdown is not Chinese-first")
 
     expected_values = [
         ("decision", review.get("decision")),
@@ -226,10 +265,10 @@ def main(argv):
 
     pasted_review_path = example_dir / "reviews" / "result-review-pasted-summary.json"
     revision_review_path = example_dir / "reviews" / "result-review-brief-revision.json"
-    pasted_review, _ = check_review(pasted_review_path, findings)
-    revision_review, _ = check_review(revision_review_path, findings)
-    check_review_markdown(example_dir / "reviews" / "result-review-pasted-summary.md", pasted_review, findings)
-    check_review_markdown(example_dir / "reviews" / "result-review-brief-revision.md", revision_review, findings)
+    pasted_review, pasted_context = check_review(pasted_review_path, findings)
+    revision_review, revision_context = check_review(revision_review_path, findings)
+    check_review_markdown(example_dir / "reviews" / "result-review-pasted-summary.md", pasted_review, pasted_context, findings)
+    check_review_markdown(example_dir / "reviews" / "result-review-brief-revision.md", revision_review, revision_context, findings)
 
     if pasted_review.get("evidence", {}).get("kind") != "pasted_summary":
         findings.append("pasted summary review must use evidence.kind pasted_summary")

@@ -48,7 +48,7 @@
 
 {{brand_context}}
 
-## DESIGN.md Reference
+## DESIGN.md 参考
 
 {{design_md_path}}
 

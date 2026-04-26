@@ -1,41 +1,41 @@
-# Result Review: Pasted Summary
+# 结果评审：粘贴摘要
 
-## Source Package
+## 来源包
 
-- Brief: `design-brief.json`
-- DESIGN.md: `DESIGN.md`
-- Selected strategy: 密集研究工作台
-- Target tool: generic
+- Brief：`design-brief.json`
+- DESIGN.md：`DESIGN.md`
+- 已选策略：密集研究工作台
+- 目标工具：generic
 
-## Reviewed Evidence
+## 评审证据
 
-- Evidence kind: pasted_summary
-- Summary: 生成的答案详情页已经包含搜索输入、答案面板、可信度徽标和保存/分享操作；但来源卡片视觉太弱，引用标记和来源列表的对应关系不清楚，来源详情面板也没有明显展示当前选中状态。
+- 证据类型：pasted_summary
+- 摘要：生成的答案详情页已经包含搜索输入、答案面板、可信度徽标和保存/分享操作；但来源卡片视觉太弱，引用标记和来源列表的对应关系不清楚，来源详情面板也没有明显展示当前选中状态。
 
-## Strengths
+## 保留点
 
 - 生成结果保留了研究工作台方向。
 - 答案面板、可信度徽标和保存/分享控件已经出现。
 
-## Mismatches
+## 问题
 
-| Severity | Brief reference | Issue | Evidence | Recommended change |
+| 严重程度 | Brief 依据 | 问题 | 证据 | 建议修改 |
 |---|---|---|---|---|
 | medium | `quality_bar.review_criteria: 答案和来源有清楚层级` | 来源卡片相对答案正文过于低对比，用户不容易注意到。 | 粘贴摘要说明来源卡片视觉太安静、难以发现。 | 提高来源卡片层级，包括更清楚的标题字重、摘录对比、选中来源状态和可见来源数量。 |
 | medium | `structure.interaction_contract: 答案中的引用标记会滚动或聚焦到匹配的来源卡片。` | 引用标记没有清楚连接到对应来源卡片。 | 粘贴摘要说明引用标记很难和来源列表对应起来。 | 让引用标记和匹配来源卡片共享选中状态与可见 focus 处理。 |
 | low | `DESIGN.md Components: 来源卡片要展示标题、摘录、日期、负责人或系统，以及链接状态。` | 选中来源详情面板没有清楚展示当前选中状态。 | 粘贴摘要说明来源详情面板缺少明确的选中反馈。 | 在详情面板增加选中来源标签、活动卡片高亮和来源元数据。 |
 
-## Visual Review
+## 视觉评审
 
-- Status: unavailable
-- Notes: 本次没有可检查截图，因此使用粘贴摘要和已保存 brief 包作为后备证据。
+- 状态：unavailable
+- 说明：本次没有可检查截图，因此使用粘贴摘要和已保存 brief 包作为后备证据。
 
-## Decision
+## 决定
 
-- Decision: tweak
-- Strategy preserved: true
-- Prompt intent: targeted_modification
+- 决定：tweak
+- 策略是否保留：true
+- 提示意图：targeted_modification
 
-## Next Prompt Summary
+## 下一轮提示摘要
 
 保留“密集研究工作台”和 DESIGN.md 视觉系统。加强来源可见性、引用到来源的连接关系，以及选中来源反馈。

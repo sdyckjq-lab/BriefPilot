@@ -971,6 +971,76 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("review guidance is not Chinese-first", result.stdout + result.stderr)
 
+    def test_validate_review_demo_rejects_english_review_markdown(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            copied = Path(tmp) / "ai-search-workspace"
+            shutil.copytree(WORKSPACE_DIR, copied)
+            report = design_md_report.build_report((copied / "DESIGN.md").resolve(), requested_mode="fallback", official_command=None)
+            design_md_report.write_report(
+                report,
+                copied / "reviews" / "design-md-review.md",
+                copied / "reviews" / "design-md-review.json",
+            )
+
+            review = json.loads((copied / "reviews" / "result-review-pasted-summary.json").read_text(encoding="utf-8"))
+            finding = review["findings"][0]
+            markdown = copied / "reviews" / "result-review-pasted-summary.md"
+            markdown.write_text(
+                "\n".join(
+                    [
+                        "# Result Review: Pasted Summary",
+                        "",
+                        "## Source Package",
+                        "",
+                        "- Brief: `design-brief.json`",
+                        "- DESIGN.md: `DESIGN.md`",
+                        f"- Selected strategy: {review['selected_strategy']}",
+                        "- Target tool: generic",
+                        "",
+                        "## Reviewed Evidence",
+                        "",
+                        f"- Evidence kind: {review['evidence']['kind']}",
+                        f"- Summary: {review['evidence']['summary']}",
+                        "",
+                        "## Strengths",
+                        "",
+                        "- " + review["strengths"][0],
+                        "",
+                        "## Mismatches",
+                        "",
+                        "| Severity | Brief reference | Issue | Evidence | Recommended change |",
+                        "|---|---|---|---|---|",
+                        f"| {finding['severity']} | `{finding['brief_reference']}` | {finding['issue']} | {finding['evidence']} | {finding['recommended_change']} |",
+                        "",
+                        "## Visual Review",
+                        "",
+                        f"- Status: {review['visual_review']['status']}",
+                        f"- Notes: {review['visual_review']['notes']}",
+                        "",
+                        "## Decision",
+                        "",
+                        f"- Decision: {review['decision']}",
+                        f"- Strategy preserved: {str(review['strategy_preserved']).lower()}",
+                        f"- Prompt intent: {review['prompt_intent']}",
+                        "",
+                        "## Next Prompt Summary",
+                        "",
+                        "保留“密集研究工作台”和 DESIGN.md 视觉系统。",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [sys.executable, str(ROOT / "scripts" / "validate_review_demo.py"), str(copied)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("review markdown is not Chinese-first", result.stdout + result.stderr)
+
     def test_validate_comparison_demo(self):
         result = subprocess.run(
             [sys.executable, str(VALIDATE_COMPARISON), str(COMPARISON_DIR)],
@@ -1287,11 +1357,14 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertIn("old wrapper path", result.stdout)
 
     def test_result_review_templates_define_contract(self):
+        brief_template = (ROOT / "templates" / "design-brief.md").read_text(encoding="utf-8")
         review_template = json.loads((ROOT / "templates" / "result-review.json").read_text(encoding="utf-8"))
         prompt_template = (ROOT / "templates" / "modification-prompt.txt").read_text(encoding="utf-8")
         revision_template = (ROOT / "templates" / "brief-revision.md").read_text(encoding="utf-8")
         workflow = (ROOT / "references" / "result-review-workflow.md").read_text(encoding="utf-8")
 
+        self.assertIn("## DESIGN.md 参考", brief_template)
+        self.assertNotIn("## DESIGN.md Reference", brief_template)
         for field in ["schema_version", "source", "target_tool", "evidence", "decision", "selected_strategy", "strategy_preserved", "findings", "visual_review", "prompt"]:
             self.assertIn(field, review_template)
         for value in ["pasted_summary", "local_file", "screenshot_reference", "gstack_report"]:
@@ -1497,7 +1570,7 @@ class BriefPilotScriptTests(unittest.TestCase):
             copied = Path(tmp) / "ai-search-workspace"
             shutil.copytree(WORKSPACE_DIR, copied)
             markdown = copied / "reviews" / "result-review-pasted-summary.md"
-            text = markdown.read_text(encoding="utf-8").replace("Decision: tweak", "Decision: accept")
+            text = markdown.read_text(encoding="utf-8").replace("决定：tweak", "决定：accept")
             markdown.write_text(text, encoding="utf-8")
 
             result = subprocess.run(
