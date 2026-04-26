@@ -61,18 +61,27 @@ def load_json_object(path, findings, label):
     return data
 
 
-def resolve_path(raw_path, root, demo_dir):
+def resolve_repo_relative_path(raw_path, root, findings, field_name):
     if not has_text(raw_path):
-        return None
-    candidate = Path(raw_path).expanduser()
-    candidates = [candidate] if candidate.is_absolute() else [
-        root / candidate,
-        demo_dir / candidate,
-    ]
-    for entry in candidates:
-        if entry.exists():
-            return entry.resolve()
-    return None
+        return None, False
+    candidate = Path(raw_path)
+    if candidate.is_absolute() or str(raw_path).startswith("~"):
+        findings.append(f"{field_name} must be repo-relative")
+        return None, True
+    if ".." in candidate.parts:
+        findings.append(f"{field_name} must not contain parent directory traversal")
+        return None, True
+
+    resolved = (root / candidate).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError:
+        findings.append(f"{field_name} must stay within repository root")
+        return None, True
+
+    if not resolved.exists():
+        return None, False
+    return resolved, False
 
 
 def check_required_files(demo_dir, findings):
@@ -105,16 +114,27 @@ def check_manifest(manifest, root, demo_dir, findings):
         findings.append("baseline must not claim a named-tool source in this first version")
 
     enhanced_path = value_at(manifest, "enhanced.source_path")
-    resolved_enhanced = resolve_path(enhanced_path, root, demo_dir)
+    resolved_enhanced, invalid_enhanced_path = resolve_repo_relative_path(
+        enhanced_path,
+        root,
+        findings,
+        "enhanced.source_path",
+    )
     expected_enhanced = (root / "examples" / "ai-search-landing").resolve()
-    if not resolved_enhanced:
+    if not invalid_enhanced_path and not resolved_enhanced:
         findings.append(f"enhanced.source_path does not resolve: {enhanced_path}")
-    elif resolved_enhanced != expected_enhanced:
+    elif resolved_enhanced and resolved_enhanced != expected_enhanced:
         findings.append("enhanced.source_path must resolve to examples/ai-search-landing")
 
     page_path = value_at(manifest, "page.path")
-    resolved_page = resolve_path(page_path, root, demo_dir)
-    if not resolved_page or resolved_page != (demo_dir / "index.html").resolve():
+    resolved_page, invalid_page_path = resolve_repo_relative_path(
+        page_path,
+        root,
+        findings,
+        "page.path",
+    )
+    expected_page = (demo_dir / "index.html").resolve()
+    if not invalid_page_path and (not resolved_page or resolved_page != expected_page):
         findings.append("page.path must resolve to examples/comparison-demo/index.html")
     if value_at(manifest, "page.offline_safe") is not True:
         findings.append("page.offline_safe must be true")
@@ -131,8 +151,14 @@ def check_manifest(manifest, root, demo_dir, findings):
         findings.append("comparison_claims must contain at least four concrete claims")
 
     todo_path = value_at(manifest, "future_real_output_todo_path")
-    resolved_todo = resolve_path(todo_path, root, demo_dir)
-    if not resolved_todo or resolved_todo != (demo_dir / "future-real-output-todo.md").resolve():
+    resolved_todo, invalid_todo_path = resolve_repo_relative_path(
+        todo_path,
+        root,
+        findings,
+        "future_real_output_todo_path",
+    )
+    expected_todo = (demo_dir / "future-real-output-todo.md").resolve()
+    if not invalid_todo_path and (not resolved_todo or resolved_todo != expected_todo):
         findings.append("future_real_output_todo_path must resolve to future-real-output-todo.md")
 
 
@@ -190,7 +216,11 @@ def check_future_todo(text, findings):
 
 def check_readme(root, findings):
     readme = read_text(root / "README.md", findings, "root README.md")
-    if "examples/comparison-demo/index.html" not in readme:
+    link_targets = [
+        "(examples/comparison-demo/index.html)",
+        "(./examples/comparison-demo/index.html)",
+    ]
+    if not any(target in readme for target in link_targets):
         findings.append("README.md must link to examples/comparison-demo/index.html")
 
 

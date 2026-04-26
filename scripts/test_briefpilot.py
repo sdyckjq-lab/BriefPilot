@@ -142,7 +142,7 @@ def write_comparison_demo(root):
     demo.mkdir(parents=True)
     (root / "examples" / "ai-search-landing").mkdir(parents=True)
     (root / "README.md").write_text(
-        "# BriefPilot\n\nOpen examples/comparison-demo/index.html.\n",
+        "# BriefPilot\n\nOpen [comparison demo](examples/comparison-demo/index.html).\n",
         encoding="utf-8",
     )
     manifest = {
@@ -850,6 +850,14 @@ class BriefPilotScriptTests(unittest.TestCase):
             transform(payload)
             path.write_text(json.dumps(payload), encoding="utf-8")
 
+        def make_manifest_paths_absolute(root, demo):
+            def transform(payload):
+                payload["enhanced"]["source_path"] = str((root / "examples" / "ai-search-landing").resolve())
+                payload["page"]["path"] = str((demo / "index.html").resolve())
+                payload["future_real_output_todo_path"] = str((demo / "future-real-output-todo.md").resolve())
+
+            update_manifest(demo, transform)
+
         cases = [
             (
                 "missing_disclosure",
@@ -871,6 +879,11 @@ class BriefPilotScriptTests(unittest.TestCase):
                 "invalid_enhanced_path",
                 lambda root, demo: update_manifest(demo, lambda payload: payload["enhanced"].update({"source_path": "examples/missing"})),
                 "enhanced.source_path does not resolve",
+            ),
+            (
+                "absolute_manifest_path",
+                make_manifest_paths_absolute,
+                "must be repo-relative",
             ),
             (
                 "named_tool_baseline_claim",
@@ -905,6 +918,14 @@ class BriefPilotScriptTests(unittest.TestCase):
             (
                 "missing_readme_link",
                 lambda root, demo: (root / "README.md").write_text("# BriefPilot\n", encoding="utf-8"),
+                "README.md must link",
+            ),
+            (
+                "plain_readme_path",
+                lambda root, demo: (root / "README.md").write_text(
+                    "# BriefPilot\n\nOpen examples/comparison-demo/index.html.\n",
+                    encoding="utf-8",
+                ),
                 "README.md must link",
             ),
         ]
