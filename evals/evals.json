@@ -1,0 +1,41 @@
+{
+  "skill_name": "briefpilot",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "/briefpilot 帮我做一个 AI 搜索产品官网",
+      "expected_output": "The agent uses BriefPilot to structure a reusable Chinese-first design brief workflow rather than directly generating the final website.",
+      "files": [],
+      "expectations": [
+        "The response starts from diagnosis, assumptions or focused questions, and design strategy.",
+        "The response plans or creates design-brief.md, design-brief.json, DESIGN.md, target prompts, and review-checklist.md.",
+        "The response keeps user-visible content Chinese-first.",
+        "The response does not jump straight to final HTML unless the user explicitly asks."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "/briefpilot 我把生成结果摘要贴给你：页面像普通 SaaS 官网，来源证据和可信度不明显。请按之前 brief 评审并给修改提示。",
+      "expected_output": "The agent recognizes generated-result review mode and asks for or uses the source brief package before producing formal review artifacts.",
+      "files": [],
+      "expectations": [
+        "The response identifies this as post-generation result review.",
+        "The response requires design-brief.json and the linked DESIGN.md before a formal report.",
+        "The response mentions result-review.md, result-review.json, and modification prompts as expected outputs.",
+        "The response remains Chinese-first."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "/briefpilot 我有现成 DESIGN.md，想做一个研究工作台页面，尽量沿用现有视觉系统。",
+      "expected_output": "The agent preserves or reuses the existing DESIGN.md instead of creating an unrelated visual system.",
+      "files": [],
+      "expectations": [
+        "The response asks for or reads the existing DESIGN.md.",
+        "The response says the new brief should reference the existing visual system.",
+        "The response still produces a reusable brief package and target prompts.",
+        "The response keeps technical identifiers in English and visible copy in Simplified Chinese."
+      ]
+    }
+  ]
+}

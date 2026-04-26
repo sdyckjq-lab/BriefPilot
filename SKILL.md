@@ -1,11 +1,15 @@
 ---
 name: briefpilot
-description: Chinese-first design brief compiler and result-review loop for AI design workflows. Use when a user wants to turn a vague product or page request into a reusable design brief, Google-style DESIGN.md visual system, targeted prompts for huashu-design, Claude Design, and v0, a review checklist, and post-generation modification prompts.
+description: Chinese-first design brief compiler and result-review loop for AI design workflows. Use for /briefpilot, or whenever a user has a vague product/page/app design request, needs a reusable design brief, Google-style DESIGN.md visual system, prompts for huashu-design/Claude Design/v0, review checklist, or post-generation result review and modification prompts. Prefer this skill even if the user only says they want a landing page, app page, website, UI direction, generated design review, or prompt for an AI design tool.
 ---
 
 # BriefPilot
 
 BriefPilot 用在设计生成之前，也用在生成之后。它先把用户的模糊需求整理成可复用的 brief；当用户提供下游生成结果后，再用同一套 brief 判断结果是否够好，并产出下一轮修改提示。
+
+## 命令入口
+
+当用户调用 `/briefpilot` 时，直接执行本 Skill。短命令 `/bp` 是同一流程的别名，应该读取并沿用本 Skill。升级命令 `/briefpilot-upgrade` 只负责刷新或修复已安装的 BriefPilot Skill 包。
 
 ## 核心规则
 

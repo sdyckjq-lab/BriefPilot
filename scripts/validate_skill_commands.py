@@ -1,0 +1,276 @@
+#!/usr/bin/env python3
+import argparse
+import json
+import re
+import sys
+import zipfile
+from pathlib import Path
+
+
+DEFAULT_ROOT = Path(__file__).resolve().parents[1]
+COMMANDS = ("briefpilot", "bp", "briefpilot-upgrade")
+ALLOWED_FRONTMATTER = {"name", "description", "license", "allowed-tools", "metadata", "compatibility"}
+MAX_NAME_LENGTH = 64
+MAX_DESCRIPTION_LENGTH = 1024
+COMPANION_ALLOWED_PARTS = {
+    ("SKILL.md",),
+    ("agents", "openai.yaml"),
+    ("evals", "evals.json"),
+}
+FORBIDDEN_PACKAGE_PARTS = {
+    "AGENTS.md",
+    "docs",
+    ".git",
+    "__pycache__",
+    "evals",
+    "companions",
+    "briefpilot-skill-workspace",
+    "dist",
+}
+
+
+def has_cjk(text):
+    return any("\u4e00" <= char <= "\u9fff" for char in text)
+
+
+def parse_frontmatter(path, findings):
+    if not path.exists():
+        findings.append(f"missing SKILL.md: {path}")
+        return None, ""
+    text = path.read_text(encoding="utf-8")
+    match = re.match(r"^---\n(.*?)\n---", text, re.DOTALL)
+    if not match:
+        findings.append(f"{path} missing YAML frontmatter")
+        return None, text
+
+    frontmatter = {}
+    for raw_line in match.group(1).splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if ":" not in line:
+            findings.append(f"{path} has unsupported frontmatter line: {raw_line}")
+            continue
+        key, value = line.split(":", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        frontmatter[key] = value
+
+    unexpected = set(frontmatter) - ALLOWED_FRONTMATTER
+    if unexpected:
+        findings.append(f"{path} has unexpected frontmatter keys: {', '.join(sorted(unexpected))}")
+
+    return frontmatter, text
+
+
+def validate_skill_file(path, expected_name, required_terms, findings):
+    frontmatter, text = parse_frontmatter(path, findings)
+    if frontmatter is None:
+        return
+
+    name = frontmatter.get("name")
+    description = frontmatter.get("description", "")
+    if name != expected_name:
+        findings.append(f"{path} name must be {expected_name}, got {name!r}")
+    if not isinstance(name, str) or not re.match(r"^[a-z0-9-]+$", name or ""):
+        findings.append(f"{path} name must use lowercase letters, digits, and hyphens")
+    if name and (name.startswith("-") or name.endswith("-") or "--" in name):
+        findings.append(f"{path} name cannot start/end with hyphen or contain consecutive hyphens")
+    if name and len(name) > MAX_NAME_LENGTH:
+        findings.append(f"{path} name is longer than {MAX_NAME_LENGTH} characters")
+    if not description:
+        findings.append(f"{path} description is required")
+    if len(description) > MAX_DESCRIPTION_LENGTH:
+        findings.append(f"{path} description is longer than {MAX_DESCRIPTION_LENGTH} characters")
+    if "<" in description or ">" in description:
+        findings.append(f"{path} description cannot contain angle brackets")
+
+    missing_terms = [term for term in required_terms if term not in description and term not in text]
+    if missing_terms:
+        findings.append(f"{path} missing command or routing terms: {', '.join(missing_terms)}")
+
+
+def load_json(path, findings):
+    if not path.exists():
+        findings.append(f"missing JSON file: {path}")
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        findings.append(f"{path} is not valid JSON: {error}")
+        return None
+
+
+def validate_evals(path, expected_skill, min_count, findings):
+    payload = load_json(path, findings)
+    if not isinstance(payload, dict):
+        return
+    if payload.get("skill_name") != expected_skill:
+        findings.append(f"{path} skill_name must be {expected_skill}")
+    evals = payload.get("evals")
+    if not isinstance(evals, list) or len(evals) < min_count:
+        findings.append(f"{path} must contain at least {min_count} evals")
+        return
+
+    ids = set()
+    for index, item in enumerate(evals, start=1):
+        if not isinstance(item, dict):
+            findings.append(f"{path} eval {index} must be an object")
+            continue
+        eval_id = item.get("id")
+        if not isinstance(eval_id, int) or eval_id in ids:
+            findings.append(f"{path} eval {index} has missing or duplicate integer id")
+        ids.add(eval_id)
+        prompt = item.get("prompt", "")
+        expected_output = item.get("expected_output", "")
+        expectations = item.get("expectations", [])
+        if not isinstance(prompt, str) or len(prompt.strip()) < 20:
+            findings.append(f"{path} eval {index} prompt is too short to exercise a skill")
+        if not has_cjk(prompt):
+            findings.append(f"{path} eval {index} prompt must include Chinese user-facing text")
+        if not isinstance(expected_output, str) or len(expected_output.strip()) < 30:
+            findings.append(f"{path} eval {index} expected_output is too thin")
+        if not isinstance(expectations, list) or len(expectations) < 3:
+            findings.append(f"{path} eval {index} must include at least 3 expectations")
+        for expectation in expectations:
+            if not isinstance(expectation, str) or len(expectation.strip()) < 20:
+                findings.append(f"{path} eval {index} has a weak expectation")
+
+
+def validate_companion_is_lean(companion_dir, findings):
+    for path in companion_dir.rglob("*"):
+        if not path.is_file():
+            continue
+        relative = path.relative_to(companion_dir)
+        if relative.parts not in COMPANION_ALLOWED_PARTS:
+            findings.append(f"{companion_dir} contains non-lean companion file: {relative.as_posix()}")
+
+    for forbidden in ("references", "templates", "scripts", "examples"):
+        if (companion_dir / forbidden).exists():
+            findings.append(f"{companion_dir} must not duplicate main {forbidden}/ resources")
+
+
+def validate_source(root):
+    root = Path(root).resolve()
+    findings = []
+    validate_skill_file(root / "SKILL.md", "briefpilot", ["/briefpilot", "DESIGN.md"], findings)
+    validate_skill_file(root / "companions" / "bp" / "SKILL.md", "bp", ["/bp", "briefpilot"], findings)
+    validate_skill_file(
+        root / "companions" / "briefpilot-upgrade" / "SKILL.md",
+        "briefpilot-upgrade",
+        ["/briefpilot-upgrade", ".skill"],
+        findings,
+    )
+
+    validate_evals(root / "evals" / "evals.json", "briefpilot", 3, findings)
+    validate_evals(root / "companions" / "bp" / "evals" / "evals.json", "bp", 2, findings)
+    validate_evals(
+        root / "companions" / "briefpilot-upgrade" / "evals" / "evals.json",
+        "briefpilot-upgrade",
+        2,
+        findings,
+    )
+
+    validate_companion_is_lean(root / "companions" / "bp", findings)
+    validate_companion_is_lean(root / "companions" / "briefpilot-upgrade", findings)
+
+    for required in ["scripts/package_briefpilot_skills.py", "scripts/validate_skill_commands.py"]:
+        if not (root / required).exists():
+            findings.append(f"missing command package script: {required}")
+
+    gitignore = root / ".gitignore"
+    if gitignore.exists():
+        text = gitignore.read_text(encoding="utf-8")
+        for pattern in ["/dist/", "/briefpilot-skill-workspace/"]:
+            if pattern not in text:
+                findings.append(f".gitignore missing generated artifact ignore: {pattern}")
+    else:
+        findings.append(".gitignore missing")
+
+    return findings
+
+
+def validate_installed(install_dir):
+    install_dir = Path(install_dir).resolve()
+    findings = []
+    for command in COMMANDS:
+        skill_dir = install_dir / command
+        if not skill_dir.is_dir():
+            findings.append(f"installed command missing: {command}")
+            continue
+        validate_skill_file(skill_dir / "SKILL.md", command, [command], findings)
+
+    main_dir = install_dir / "briefpilot"
+    if main_dir.exists():
+        for part in FORBIDDEN_PACKAGE_PARTS:
+            if (main_dir / part).exists():
+                findings.append(f"installed briefpilot contains forbidden package part: {part}")
+        for required in ["SKILL.md", "references", "templates", "scripts", "examples"]:
+            if not (main_dir / required).exists():
+                findings.append(f"installed briefpilot missing required part: {required}")
+
+    for command in ("bp", "briefpilot-upgrade"):
+        skill_dir = install_dir / command
+        if skill_dir.exists():
+            validate_companion_is_lean(skill_dir, findings)
+
+    return findings
+
+
+def validate_dist(dist_dir):
+    dist_dir = Path(dist_dir).resolve()
+    findings = []
+    for command in COMMANDS:
+        archive = dist_dir / f"{command}.skill"
+        if not archive.exists():
+            findings.append(f"missing package artifact: {archive.name}")
+            continue
+        try:
+            with zipfile.ZipFile(archive) as zip_file:
+                names = zip_file.namelist()
+        except zipfile.BadZipFile:
+            findings.append(f"{archive.name} is not a valid zip archive")
+            continue
+        if not any(name == f"{command}/SKILL.md" for name in names):
+            findings.append(f"{archive.name} must contain {command}/SKILL.md")
+        wrong_roots = {name.split("/", 1)[0] for name in names if name and not name.startswith(f"{command}/")}
+        if wrong_roots:
+            findings.append(f"{archive.name} contains unexpected top-level roots: {', '.join(sorted(wrong_roots))}")
+        forbidden_hits = []
+        for name in names:
+            parts = Path(name).parts
+            if any(part in FORBIDDEN_PACKAGE_PARTS for part in parts[1:]):
+                forbidden_hits.append(name)
+        if forbidden_hits:
+            findings.append(f"{archive.name} contains forbidden package paths: {', '.join(forbidden_hits[:5])}")
+    return findings
+
+
+def parse_args(argv):
+    parser = argparse.ArgumentParser(description="Validate BriefPilot command Skill packaging.")
+    parser.add_argument("--root", type=Path, default=DEFAULT_ROOT, help="Repository root to validate.")
+    parser.add_argument("--installed-dir", type=Path, help="Validate an installed skills directory.")
+    parser.add_argument("--dist-dir", type=Path, help="Validate generated .skill artifacts.")
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(argv or sys.argv[1:])
+    findings = validate_source(args.root)
+    if args.installed_dir:
+        findings.extend(validate_installed(args.installed_dir))
+    if args.dist_dir:
+        findings.extend(validate_dist(args.dist_dir))
+
+    if findings:
+        print("invalid BriefPilot command package:")
+        for finding in findings:
+            print(f"- {finding}")
+        return 1
+
+    print("valid BriefPilot command package")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

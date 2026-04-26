@@ -29,7 +29,25 @@ BriefPilot 默认中文优先。技术文件名、命令、JSON keys 和工具�
 
 ## 怎么用
 
-让支持 Skill 的 agent 先读取 `SKILL.md`，然后给它一个模糊设计需求。agent 会诊断需求、补充假设或提问、选择策略，并在发送给设计生成工具前保存一套可复用的 brief 资产。
+安装 Skill 包后，优先用命令调用：
+
+```text
+/briefpilot 帮我做一个 AI 搜索产品官网
+```
+
+短命令等价：
+
+```text
+/bp 帮我做一个 AI 搜索产品官网
+```
+
+升级或修复安装：
+
+```text
+/briefpilot-upgrade
+```
+
+agent 会诊断需求、补充假设或提问、选择策略，并在发送给设计生成工具前保存一套可复用的 brief 资产。
 
 设计工具生成结果后，可以用同一套 brief 资产检查粘贴摘要或本地生成文件；如果结果需要调整，再导出下一轮修改提示。
 
@@ -92,4 +110,19 @@ target modification prompts
 
 ## Skill 包
 
-仓库根目录就是 Skill 包。发送给设计生成器之前，先使用 `SKILL.md`。
+仓库根目录是 BriefPilot 主 Skill 源码。当前命令包包含三个可安装 Skill：`briefpilot`、`bp` 和 `briefpilot-upgrade`。
+
+生成安装包：
+
+```text
+python3 scripts/validate_skill_commands.py
+python3 scripts/package_briefpilot_skills.py --out-dir dist
+```
+
+生成后会得到：
+
+```text
+dist/briefpilot.skill
+dist/bp.skill
+dist/briefpilot-upgrade.skill
+```

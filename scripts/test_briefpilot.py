@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
@@ -29,6 +30,8 @@ EXPORT_MODIFICATION = ROOT / "scripts" / "export_modification_prompt.py"
 STYLE_INDEX = ROOT / "references" / "design-style-index.json"
 CHECK_DESIGN_MD = ROOT / "scripts" / "check_design_md.py"
 VALIDATE_PUBLIC_PACKAGE = ROOT / "scripts" / "validate_public_package.py"
+VALIDATE_SKILL_COMMANDS = ROOT / "scripts" / "validate_skill_commands.py"
+PACKAGE_BRIEFPILOT_SKILLS = ROOT / "scripts" / "package_briefpilot_skills.py"
 DESIGN_MD_FIXTURES = ROOT / "examples" / "design-md-fixtures"
 
 
@@ -137,6 +140,15 @@ def run_public_package_validator(root):
     )
 
 
+def run_skill_command_validator(*args):
+    return subprocess.run(
+        [sys.executable, str(VALIDATE_SKILL_COMMANDS), *map(str, args)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+
 def write_comparison_demo(root):
     root = Path(root)
     demo = root / "examples" / "comparison-demo"
@@ -201,6 +213,25 @@ def write_comparison_demo(root):
     )
     (demo / "README.md").write_text("# Demo\n\nOpen index.html.\n", encoding="utf-8")
     return demo
+
+
+def write_minimal_command_package(root):
+    root = Path(root)
+    (root / ".gitignore").write_text("/dist/\n/briefpilot-skill-workspace/\n", encoding="utf-8")
+    (root / "SKILL.md").write_text((ROOT / "SKILL.md").read_text(encoding="utf-8"), encoding="utf-8")
+    for relative in [
+        "evals/evals.json",
+        "companions/bp/SKILL.md",
+        "companions/bp/evals/evals.json",
+        "companions/briefpilot-upgrade/SKILL.md",
+        "companions/briefpilot-upgrade/evals/evals.json",
+    ]:
+        target = root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text((ROOT / relative).read_text(encoding="utf-8"), encoding="utf-8")
+    (root / "scripts").mkdir()
+    (root / "scripts" / "package_briefpilot_skills.py").write_text("# package\n", encoding="utf-8")
+    (root / "scripts" / "validate_skill_commands.py").write_text("# validate\n", encoding="utf-8")
 
 
 def run_comparison_validator(root, demo):
@@ -1236,12 +1267,241 @@ class BriefPilotScriptTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
 
+    def test_skill_command_package_validates_and_packages(self):
+        result = run_skill_command_validator()
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertIn("valid BriefPilot command package", result.stdout)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "dist"
+            install_dir = Path(tmp) / "skills"
+            package = subprocess.run(
+                [
+                    sys.executable,
+                    str(PACKAGE_BRIEFPILOT_SKILLS),
+                    "--out-dir",
+                    str(out_dir),
+                    "--install-dir",
+                    str(install_dir),
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
+
+            result = run_skill_command_validator("--dist-dir", out_dir, "--installed-dir", install_dir)
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+                self.assertTrue((out_dir / f"{command}.skill").exists())
+                self.assertTrue((install_dir / command / "SKILL.md").exists())
+
+            with zipfile.ZipFile(out_dir / "briefpilot.skill") as archive:
+                names = set(archive.namelist())
+            main_root = "brief" + "pilot"
+            self.assertIn(f"{main_root}/SKILL.md", names)
+            self.assertIn(f"{main_root}/references/workflow.md", names)
+            self.assertIn(f"{main_root}/install-manifest.json", names)
+            for forbidden in [
+                f"{main_root}/AGENTS.md",
+                f"{main_root}/docs/",
+                f"{main_root}/evals/evals.json",
+            ]:
+                self.assertNotIn(forbidden, names)
+
+            with zipfile.ZipFile(out_dir / "bp.skill") as archive:
+                names = set(archive.namelist())
+            self.assertEqual(names, {"bp/SKILL.md"})
+
+    def test_skill_command_packager_dry_run_does_not_write_artifacts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "dist"
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(PACKAGE_BRIEFPILOT_SKILLS),
+                    "--dry-run",
+                    "--out-dir",
+                    str(out_dir),
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            self.assertIn("planned artifacts", result.stdout)
+            self.assertFalse(out_dir.exists())
+
+    def test_skill_command_packager_rejects_non_empty_staging_dir_without_deleting(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            staging_dir = Path(tmp) / "stage"
+            staging_dir.mkdir()
+            sentinel = staging_dir / "sentinel.txt"
+            sentinel.write_text("do not delete\n", encoding="utf-8")
+            out_dir = Path(tmp) / "dist"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(PACKAGE_BRIEFPILOT_SKILLS),
+                    "--dry-run",
+                    "--staging-dir",
+                    str(staging_dir),
+                    "--out-dir",
+                    str(out_dir),
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("staging dir must be empty or absent", result.stdout)
+            self.assertTrue(sentinel.exists())
+            self.assertFalse(out_dir.exists())
+
+    def test_skill_command_packager_rejects_project_root_as_staging_dir(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(PACKAGE_BRIEFPILOT_SKILLS),
+                    "--dry-run",
+                    "--staging-dir",
+                    str(ROOT),
+                    "--out-dir",
+                    str(Path(tmp) / "dist"),
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("refusing unsafe staging dir", result.stdout)
+            self.assertTrue((ROOT / ".git").exists())
+
+    def test_skill_command_packager_rejects_invalid_source_before_packaging(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_minimal_command_package(root)
+            (root / "companions" / "bp" / "SKILL.md").unlink()
+            out_dir = root / "dist"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(PACKAGE_BRIEFPILOT_SKILLS),
+                    "--root",
+                    str(root),
+                    "--out-dir",
+                    str(out_dir),
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("missing SKILL.md", result.stdout)
+            self.assertFalse(out_dir.exists())
+
+    def test_skill_command_packager_falls_back_when_install_dir_is_not_writable(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "dist"
+            blocked_install_target = Path(tmp) / "not-a-directory"
+            blocked_install_target.write_text("file blocks install dir\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(PACKAGE_BRIEFPILOT_SKILLS),
+                    "--out-dir",
+                    str(out_dir),
+                    "--install-dir",
+                    str(blocked_install_target),
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            self.assertIn("generated .skill artifacts instead", result.stdout)
+            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+                self.assertTrue((out_dir / f"{command}.skill").exists())
+
+    def test_skill_command_packager_does_not_partially_replace_blocked_install(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            install_dir = Path(tmp) / "skills"
+            old_main = install_dir / "briefpilot"
+            old_main.mkdir(parents=True)
+            sentinel = old_main / "old.txt"
+            sentinel.write_text("old install remains\n", encoding="utf-8")
+            blocked_bp = install_dir / "bp"
+            blocked_bp.write_text("file blocks bp directory\n", encoding="utf-8")
+            out_dir = Path(tmp) / "dist"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(PACKAGE_BRIEFPILOT_SKILLS),
+                    "--out-dir",
+                    str(out_dir),
+                    "--install-dir",
+                    str(install_dir),
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            self.assertIn("generated .skill artifacts instead", result.stdout)
+            self.assertEqual(sentinel.read_text(encoding="utf-8"), "old install remains\n")
+            self.assertEqual(blocked_bp.read_text(encoding="utf-8"), "file blocks bp directory\n")
+            self.assertFalse((install_dir / ".bp.tmp").exists())
+            self.assertFalse((install_dir / "briefpilot-upgrade").exists())
+            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+                self.assertTrue((out_dir / f"{command}.skill").exists())
+
+    def test_skill_command_validator_rejects_non_lean_alias(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_minimal_command_package(root)
+            copied = root / "companions" / "bp" / "templates" / "design-brief.md"
+            copied.parent.mkdir(parents=True)
+            copied.write_text("# copied template\n", encoding="utf-8")
+
+            result = run_skill_command_validator("--root", root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("must not duplicate main templates", result.stdout)
+
+    def test_briefpilot_upgrade_uses_manifest_or_complete_source(self):
+        upgrade_skill = (ROOT / "companions" / "briefpilot-upgrade" / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("install-manifest.json", upgrade_skill)
+        self.assertIn("source_remote", upgrade_skill)
+        self.assertIn("完整源码", upgrade_skill)
+        self.assertIn("不要把已安装的 `brief" + "pilot` 目录直接当作源码", upgrade_skill)
+
     def test_public_package_validator_allows_ignored_local_docs(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = init_public_package_repo(tmp)
             (root / "AGENTS.md").write_text("local rules\n", encoding="utf-8")
             (root / "docs").mkdir()
             (root / "docs" / "note.md").write_text("local note\n", encoding="utf-8")
+
+            result = run_public_package_validator(root)
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+
+    def test_public_package_validator_allows_command_source_dirs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = init_public_package_repo(tmp)
+            (root / "companions" / "bp").mkdir(parents=True)
+            (root / "companions" / "bp" / "SKILL.md").write_text("# bp\n", encoding="utf-8")
+            (root / "evals").mkdir()
+            (root / "evals" / "evals.json").write_text("{}\n", encoding="utf-8")
+            subprocess.run(
+                ["git", "-C", str(root), "add", "companions/bp/SKILL.md", "evals/evals.json"],
+                text=True,
+                capture_output=True,
+                check=True,
+            )
 
             result = run_public_package_validator(root)
             self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
