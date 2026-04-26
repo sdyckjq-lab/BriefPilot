@@ -11,6 +11,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 
 import check_design_md as design_md_report
+import language_checks
 import validate_golden_demo
 
 
@@ -266,6 +267,24 @@ class BriefPilotScriptTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
         self.assertIn("valid", result.stdout.lower())
+
+    def test_language_checks_reject_english_heavy_zh_cn_content(self):
+        english_brief = {
+            "meta": {"content_language": "zh-CN"},
+            "project": {"summary": "English product brief. " * 80},
+            "audience": {"primary_user": "knowledge workers " * 60},
+            "goals": {"business_goal": "drive signup " * 60},
+        }
+        chinese_brief = {
+            "meta": {"content_language": "zh-CN"},
+            "project": {"summary": "这是面向中文用户的产品说明。" * 80},
+            "audience": {"primary_user": "知识工作者和小团队需要跨工作资料查找可信答案。" * 40},
+            "goals": {"business_goal": "推动试用注册并让用户理解产品价值。" * 40},
+        }
+        self.assertFalse(language_checks.is_chinese_first_brief(english_brief))
+        self.assertTrue(language_checks.is_chinese_first_brief(chinese_brief))
+        self.assertFalse(language_checks.is_chinese_first_prompt("Use Simplified Chinese.\n" + "English prompt body. " * 300))
+        self.assertTrue(language_checks.is_chinese_first_prompt("用户可见 UI 文案必须使用简体中文。\n" + "中文提示词正文。" * 300))
 
     def test_validate_example_design_md(self):
         result = subprocess.run(
@@ -981,12 +1000,12 @@ class BriefPilotScriptTests(unittest.TestCase):
                 self.assertIn("Visual Strategy", text)
                 self.assertIn("DESIGN.md Visual System", text)
                 self.assertIn("Review Criteria", text)
-                self.assertIn("Enterprise Trust", text)
-                self.assertIn("Search Copilot Demo", text)
-                self.assertIn("Founder-Led Launch", text)
+                self.assertIn("企业信任型", text)
+                self.assertIn("搜索助手演示型", text)
+                self.assertIn("创始人发布型", text)
                 self.assertIn("Interaction contract", text)
                 self.assertIn("Responsive and accessibility requirements", text)
-                self.assertIn("44px touch target", text)
+                self.assertIn("移动端触控目标至少 44px", text)
 
     def test_result_review_references_are_linked(self):
         skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")

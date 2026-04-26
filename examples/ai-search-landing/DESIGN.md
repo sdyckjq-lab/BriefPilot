@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: BriefSearch
-description: Restrained, enterprise-trustworthy, product-led visual system for an AI search landing page.
+description: 面向 AI 搜索产品官网的克制、可信、产品驱动视觉系统。
 colors:
   background: "#F8FAFC"
   surface: "#FFFFFF"
@@ -81,58 +81,58 @@ components:
 
 ## Overview
 
-BriefSearch should feel restrained, enterprise-trustworthy, and product-led. The page must explain cross-workspace AI search quickly, then prove the claim with a realistic sourced-answer product surface.
+BriefSearch 应该给人克制、可信、产品驱动的感觉。页面先快速说明跨工作空间 AI 搜索能解决什么，再用真实感的带来源答案界面证明这个承诺，而不是只靠抽象口号。
 
 ## Visual Theme
 
-The theme is a calm enterprise SaaS launch page: light neutral background, deep ink text, restrained blue action color, realistic answer panels, and compact trust proof. The design should feel useful before it feels decorative.
+整体主题是冷静的企业 SaaS 官网：浅中性背景、深色正文、克制蓝色操作色、真实答案面板和紧凑信任证明。视觉应该先显得有用，再显得漂亮；所有装饰都要服务于产品证明、转化路径或信任层级。
 
 ## Colors
 
-Use role-based color, not decorative labels. `background` carries the page, `surface` carries cards and product mock panels, `text` and `muted_text` define hierarchy, `border` separates low-depth surfaces, and `primary_action` is reserved for CTA, source links, and visible focus. Use `success` only for verified or secure states, `warning` for caution, `danger` for failed signup or unavailable demo, and `info` for neutral guidance.
+使用按角色命名的颜色，而不是装饰性命名。`background` 承载页面底色，`surface` 承载卡片和产品示意面板，`text` 与 `muted_text` 建立信息层级，`border` 用于低深度分隔，`primary_action` 只用于 CTA、来源链接和可见 focus。`success` 只表达已验证或安全状态，`warning` 表达谨慎提醒，`danger` 表达注册失败或演示不可用，`info` 表达中性提示。
 
 ## Typography
 
-Use `display` only for the main headline. Use `title` for major sections, `heading` for capability blocks, `body` for explanations, `caption` for metadata and source labels, and `label` for buttons, badges, and form labels. Keep line lengths readable and avoid dramatic display typography that makes the product feel speculative.
+`display` 只用于主标题，`title` 用于主要区块，`heading` 用于能力块，`body` 用于解释文字，`caption` 用于元信息和来源标签，`label` 用于按钮、徽标和表单标签。控制行长，避免夸张展示字体让产品显得不成熟。
 
 ## Layout
 
-Desktop uses a product-led landing rhythm: hero with claim, CTA pair, and sourced-answer mock; then pain, solution, workflow, integrations, security, and final CTA. Use consistent spacing and keep the first screen focused on value, product proof, and conversion. Mobile stacks headline, copy, CTAs, and product surface in that order without horizontal scrolling.
+桌面端采用产品驱动的官网节奏：首屏包含核心承诺、双 CTA 和带来源答案示意，之后依次展示痛点、解决方案、工作流、集成范围、安全信任和最终 CTA。首屏必须同时回答价值、产品证明和下一步动作。移动端按标题、说明、CTA、产品界面的顺序堆叠，不能横向滚动。
 
 ## Elevation & Depth
 
-Use subtle shadows only to lift the product mock and key panels from the neutral background. Prefer borders for most section separation. Avoid floating decorative panels that do not carry product, source, integration, or trust content.
+只用轻微阴影把产品示意和关键证明面板从中性背景中托起。大多数区块用边框分隔即可。避免没有承载产品、来源、集成或信任内容的漂浮装饰面板。
 
 ## Shapes
 
-Use 8px radius as the default. Use 12px for the main product mock and large proof panels. Avoid over-rounded novelty shapes, decorative blobs, and pill-heavy compositions.
+默认使用 8px 圆角。主产品示意和大型证明面板可以使用 12px。避免过度圆角、装饰色块、泡泡感构图和大量胶囊元素。
 
 ## Components
 
-Primary CTA states: default blue, hover darker blue, pressed compact shadow, disabled muted border, loading spinner with unchanged width, success confirmation, error retry message, and visible focus ring. Secondary CTA stays text-forward with default, hover, pressed, disabled, loading, and focus states. Product cards show empty, loading, success, and error states. Source chips show default, hover, pressed, focus, unavailable, and selected states.
+主 CTA 状态包括 default 蓝色、hover 深蓝、pressed 紧凑阴影、disabled 弱化边框、loading 等宽加载、success 确认、error 重试提示和可见 focus ring。次 CTA 保持文字优先，包含 default、hover、pressed、disabled、loading 和 focus 状态。产品卡片要展示 empty、loading、success、error 状态。来源标签要展示 default、hover、pressed、focus、unavailable 和 selected 状态。
 
 ## Responsive Behavior
 
-Use desktop >= 1024px, tablet 768-1023px, and mobile <= 767px. The hero product mock must resize without clipping answer text or source chips. Keep the primary CTA above the fold on mobile or repeat it immediately after the product proof. Maintain at least 44px touch targets and preserve visible keyboard focus.
+使用桌面端 >= 1024px、平板 768-1023px、移动端 <= 767px。首屏产品示意缩放时不能裁切答案文字或来源标签。移动端主 CTA 要在首屏可见，或在产品证明后立即重复一次。触控目标至少 44px，并保留清楚的 keyboard focus。
 
 ## Motion & Feedback
 
-Motion should be restrained and purposeful: quick hover transitions, loading shimmer inside the product mock, CTA loading feedback, and success/error state changes that do not move surrounding layout. Respect reduced motion settings by replacing animation with static state changes.
+动效要克制且有目的：短促 hover 过渡、产品示意内的 loading shimmer、CTA loading 反馈，以及不会推动周围布局的 success/error 状态变化。尊重 reduced motion 设置，用静态状态变化替代动画。
 
 ## Content Voice
 
-Voice is direct, trustworthy, concrete, and product-led. Prefer "Find trusted answers across every work document" over vague AI claims. Do not invent customer metrics, certifications, integration partnerships, or brand claims.
+文案语气直接、可信、具体、产品驱动。优先写“从所有工作资料里找到可信答案”，不要写空泛的“释放 AI 潜能”。不要虚构客户指标、认证、集成伙伴或品牌背书。
 
 ## Do's and Don'ts
 
-Do show real product surfaces, source links, integrations, specific workflow steps, security proof, keyboard focus, readable contrast, and mobile CTA visibility. Don't use generic AI slogans, excessive glow, abstract gradients, fake customer logos, unsupported metrics, hidden source links, or unreadable text in images.
+Do：展示真实产品界面、来源链接、集成范围、具体工作流、安全证明、keyboard focus、可读对比度和移动端 CTA 可见性。Don't：使用泛泛 AI 口号、过量发光、抽象渐变、虚构客户 Logo、无依据指标、隐藏来源链接，或把文字放进不可读图片。
 
 ## Reference Direction
 
-Reference direction: `ai_product_landing_page` - AI product landing page.
+Reference direction: `ai_product_landing_page` - AI 产品官网。
 
-Use this direction for product proof, conversion clarity, trust hierarchy, and source-backed visual evidence. It is an inspiration boundary only: do not copy third-party brand assets, logos, proprietary fonts, screenshots, full color systems, or complete `DESIGN.md` files.
+只借鉴产品证明、转化清晰度、信任层级和来源支撑的视觉证据。这只是灵感边界：do not copy 第三方品牌资产、Logo、专有字体、截图、完整配色系统或完整 `DESIGN.md` 文件。
 
 ## Agent Guidance
 
-Treat front matter tokens as normative. If a needed token is missing, derive from the closest role token and record the assumption. Preserve the selected Enterprise Trust strategy, product-led hero, source-backed mock, restrained blue action color, visible focus states, and no-fake-proof boundary.
+把 front matter tokens 当成强约束。如果缺少必要 token，从最接近的角色 token 派生，并记录假设。保留已选的“企业信任型”策略、产品驱动首屏、带来源答案示意、克制蓝色操作色、可见 focus 状态，以及不虚构证明的边界。

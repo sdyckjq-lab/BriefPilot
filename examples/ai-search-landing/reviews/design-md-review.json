@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "source_path": "examples/ai-search-landing/DESIGN.md",
-  "source_sha256": "869dea3e071aba1a62394264e831d8f44c750e61ab1a0c8382adb77d5d74f044",
+  "source_sha256": "20b652a0287808bf8acf32aafeea73d2a536d2990b4922031971e6aedb78387e",
   "mode": "briefpilot_fallback",
   "official_tool": {
     "available": false,
@@ -18,12 +18,28 @@
   },
   "summary": {
     "blocking": 0,
-    "warning": 0,
+    "warning": 2,
     "info": 1
   },
   "blocking": false,
   "next_action": "continue",
   "findings": [
+    {
+      "severity": "warning",
+      "rule_id": "missing_accessibility_guidance",
+      "location": "Markdown body",
+      "message": "Accessibility guidance does not mention touch.",
+      "suggested_fix": "Add explicit accessibility guidance.",
+      "source": "briefpilot_fallback"
+    },
+    {
+      "severity": "warning",
+      "rule_id": "reference_direction_drift",
+      "location": "drift_checks.product_proof",
+      "message": "Landing direction should mention product surface proof, screenshot, mock, or demo.",
+      "suggested_fix": "Add guidance that matches the selected reference direction, or choose a better direction.",
+      "source": "briefpilot_fallback"
+    },
     {
       "severity": "info",
       "rule_id": "optional_official_check",

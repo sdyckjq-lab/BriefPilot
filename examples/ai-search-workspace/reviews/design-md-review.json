@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "source_path": "examples/ai-search-workspace/DESIGN.md",
-  "source_sha256": "8e390ee70bb79cff995c6b6e8aced2e8d0dfb86e5712ab8fe3cf2a8fb0ee1302",
+  "source_sha256": "91ec3856e75d78446680917497eef94bb5f9ff7e11436ec9d3de68a1447d2207",
   "mode": "briefpilot_fallback",
   "official_tool": {
     "available": false,
@@ -18,12 +18,28 @@
   },
   "summary": {
     "blocking": 0,
-    "warning": 0,
+    "warning": 2,
     "info": 1
   },
   "blocking": false,
   "next_action": "continue",
   "findings": [
+    {
+      "severity": "warning",
+      "rule_id": "missing_accessibility_guidance",
+      "location": "Markdown body",
+      "message": "Accessibility guidance does not mention touch.",
+      "suggested_fix": "Add explicit accessibility guidance.",
+      "source": "briefpilot_fallback"
+    },
+    {
+      "severity": "warning",
+      "rule_id": "reference_direction_drift",
+      "location": "drift_checks.data_density",
+      "message": "Workspace direction should define scan density, panels, rows, or metadata hierarchy.",
+      "suggested_fix": "Add guidance that matches the selected reference direction, or choose a better direction.",
+      "source": "briefpilot_fallback"
+    },
     {
       "severity": "info",
       "rule_id": "optional_official_check",

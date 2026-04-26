@@ -1,13 +1,13 @@
-# AI Search Landing Assumptions
+# AI 搜索产品官网 Assumptions
 
-These assumptions were used because the original request was intentionally vague.
+这些假设用于补齐原始需求中的空白。
 
-- Product name: BriefSearch.
-- Product category: AI search for work knowledge.
-- Primary audience: knowledge workers and small teams.
-- Primary goal: drive trial signup.
-- Secondary goal: support demo requests.
-- Brand assets: no real logo, screenshots, customer logos, metrics, or certification badges are available.
-- Product proof: use realistic interface placeholders and source links, not invented customer proof.
-- Visual direction: restrained enterprise SaaS, product-led, clear, and trustworthy.
-- Platform: responsive landing page for desktop and mobile.
+- 产品名：BriefSearch。
+- 产品类别：面向工作知识的 AI 搜索。
+- 主要受众：知识工作者和小团队。
+- 主要目标：推动试用注册。
+- 次要目标：支持演示预约。
+- 品牌资产：没有真实 Logo、截图、客户 Logo、指标或认证徽章。
+- 产品证明：使用可信的界面占位和来源链接，不虚构客户证明。
+- 视觉方向：克制的企业 SaaS、产品驱动、清楚可信。
+- 平台：面向桌面端和移动端的响应式官网。

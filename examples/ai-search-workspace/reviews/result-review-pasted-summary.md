@@ -4,31 +4,31 @@
 
 - Brief: `design-brief.json`
 - DESIGN.md: `DESIGN.md`
-- Selected strategy: Dense Research Workspace
+- Selected strategy: 密集研究工作台
 - Target tool: generic
 
 ## Reviewed Evidence
 
 - Evidence kind: pasted_summary
-- Summary: the generated page has the right search input, answer panel, confidence badge, and save/share actions, but source cards are too quiet and citation-to-source connection is weak.
+- Summary: 生成的答案详情页已经包含搜索输入、答案面板、可信度徽标和保存/分享操作；但来源卡片视觉太弱，引用标记和来源列表的对应关系不清楚，来源详情面板也没有明显展示当前选中状态。
 
 ## Strengths
 
-- The result keeps the research workspace direction.
-- The answer panel, confidence badge, and save/share controls are present.
+- 生成结果保留了研究工作台方向。
+- 答案面板、可信度徽标和保存/分享控件已经出现。
 
 ## Mismatches
 
 | Severity | Brief reference | Issue | Evidence | Recommended change |
 |---|---|---|---|---|
-| Medium | `quality_bar.review_criteria` | Source cards are too low-contrast compared with the answer body. | Pasted summary says source cards are visually quiet. | Increase source card hierarchy with clearer title weight, excerpt contrast, active source state, and visible source count. |
-| Medium | `structure.interaction_contract` | Citation markers do not clearly connect to source cards. | Pasted summary says citation markers are hard to connect to sources. | Make citation markers and matching source cards share an active state and visible focus treatment. |
-| Low | `DESIGN.md Components` | The selected source detail panel does not clearly show active selection. | Pasted summary says selection is unclear. | Add selected-source label, active card highlight, and source metadata in the detail panel. |
+| medium | `quality_bar.review_criteria: 答案和来源有清楚层级` | 来源卡片相对答案正文过于低对比，用户不容易注意到。 | 粘贴摘要说明来源卡片视觉太安静、难以发现。 | 提高来源卡片层级，包括更清楚的标题字重、摘录对比、选中来源状态和可见来源数量。 |
+| medium | `structure.interaction_contract: 答案中的引用标记会滚动或聚焦到匹配的来源卡片。` | 引用标记没有清楚连接到对应来源卡片。 | 粘贴摘要说明引用标记很难和来源列表对应起来。 | 让引用标记和匹配来源卡片共享选中状态与可见 focus 处理。 |
+| low | `DESIGN.md Components: 来源卡片要展示标题、摘录、日期、负责人或系统，以及链接状态。` | 选中来源详情面板没有清楚展示当前选中状态。 | 粘贴摘要说明来源详情面板缺少明确的选中反馈。 | 在详情面板增加选中来源标签、活动卡片高亮和来源元数据。 |
 
 ## Visual Review
 
 - Status: unavailable
-- Notes: no inspectable screenshot was available; the review used pasted summary and saved brief package evidence.
+- Notes: 本次没有可检查截图，因此使用粘贴摘要和已保存 brief 包作为后备证据。
 
 ## Decision
 
@@ -38,4 +38,4 @@
 
 ## Next Prompt Summary
 
-Keep the Dense Research Workspace strategy and DESIGN.md visual system. Strengthen source visibility, citation-to-source connection, and selected-source feedback.
+保留“密集研究工作台”和 DESIGN.md 视觉系统。加强来源可见性、引用到来源的连接关系，以及选中来源反馈。

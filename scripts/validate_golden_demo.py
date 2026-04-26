@@ -5,6 +5,7 @@ from pathlib import Path
 
 import check_design_md
 import export_prompt
+import language_checks
 
 
 REQUIRED_FILES = [
@@ -100,6 +101,8 @@ def check_content_language(brief, findings):
     language = meta.get("content_language")
     if language != DEFAULT_CONTENT_LANGUAGE:
         findings.append(f"design-brief.json meta.content_language must be {DEFAULT_CONTENT_LANGUAGE}")
+    elif not language_checks.is_chinese_first_brief(brief):
+        findings.append("design-brief.json declares zh-CN but brief values are not Chinese-first")
 
 
 def check_prompts(example_dir, strategy_names, findings):
@@ -117,6 +120,8 @@ def check_prompts(example_dir, strategy_names, findings):
                 findings.append(f"{relative} missing strategy option: {name}")
         if OUTPUT_LANGUAGE_PHRASE not in text or OUTPUT_LANGUAGE_CHINESE_PHRASE not in text:
             findings.append(f"{relative} missing Simplified Chinese output-language rule")
+        if not language_checks.is_chinese_first_prompt(text):
+            findings.append(f"{relative} declares Simplified Chinese but prompt body is not Chinese-first")
 
 
 def check_prompt_exports_match(example_dir, brief, findings):
