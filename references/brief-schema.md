@@ -25,6 +25,8 @@ Every Markdown brief must contain:
 
 ## JSON Brief Shape
 
+`meta.content_language` records the default user-facing output language for this brief. Verified public examples use `zh-CN`. Keep JSON keys and technical identifiers in English, but write generated user-facing content in the declared language.
+
 Use this shape:
 
 ```json
@@ -32,6 +34,7 @@ Use this shape:
   "meta": {
     "version": "0.1",
     "created_by": "BriefPilot",
+    "content_language": "zh-CN",
     "target_tools": []
   },
   "project": {

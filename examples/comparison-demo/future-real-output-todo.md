@@ -1,26 +1,26 @@
-# Future Real Output Capture TODO
+# 真实工具输出采集 TODO
 
-The first comparison demo uses a controlled baseline. To make the evidence stronger, capture real downstream outputs later while preserving the same shared input and comparison structure.
+第一个对比演示使用受控基线。以后如果要增强证据，可以在保持同一个输入和对比结构的前提下，采集真实下游工具输出。
 
-## Capture Contract
+## 采集记录
 
-For each captured output, record:
+每个真实输出都要记录：
 
-- Tool name
-- Capture date
-- Tool version or model label, if visible
-- Exact prompt used
-- Whether the result was edited after generation
-- Raw export, screenshot, or saved HTML when available
-- Short review against the same BriefPilot criteria
+- 工具名称
+- 记录日期
+- 可见的工具版本或模型标签
+- 使用的完整提示词
+- 生成后是否编辑
+- 可保存时的原始导出、截图或 HTML
+- 按同一套 BriefPilot 标准做的简短评审
 
-## Targets To Capture
+## 待采集目标
 
 - v0
 - Lovable
 - Bolt
 - Figma Make
 
-## Update Rule
+## 更新规则
 
-Do not claim that a baseline came from a named tool unless the captured evidence is saved in the repository and the prompt/date/edit status are recorded.
+除非证据已经保存到仓库，并且完整提示词、记录日期、工具名称和是否编辑都已记录，否则不要声称某个基线来自命名工具。

@@ -2,11 +2,12 @@
   "meta": {
     "version": "0.1",
     "created_by": "BriefPilot",
+    "content_language": "zh-CN",
     "target_tools": ["huashu-design", "claude-design", "v0"]
   },
   "project": {
-    "name": "AI Search Landing",
-    "summary": "A product-led SaaS landing page for an AI search product that helps knowledge workers and small teams find answers across scattered work documents.",
+    "name": "BriefSearch AI 搜索产品官网",
+    "summary": "一个面向知识工作者和小团队的 SaaS 产品官网，用来说明 BriefSearch 如何在分散的工作文档、聊天记录、工单和网盘中找到可信答案。",
     "task_type": "saas_website",
     "stage": "golden_demo"
   },
@@ -15,223 +16,223 @@
     "initial_score": 42,
     "level": "can_generate_unstable",
     "main_gaps": [
-      "No target audience was named.",
-      "No conversion goal or CTA was specified.",
-      "No product proof, screenshots, metrics, or integration list was provided.",
-      "No brand voice, visual tone, or design system was provided.",
-      "No responsive, accessibility, or content constraints were provided."
+      "没有说明目标用户是谁。",
+      "没有明确转化目标和主要 CTA。",
+      "没有提供产品证据、截图、指标或集成范围。",
+      "没有给出品牌语气、视觉方向或设计系统。",
+      "没有说明响应式、可访问性和内容边界。"
     ],
     "recommended_mode": "quick",
     "risk": [
-      "Without assumptions, a generator may produce a generic AI landing page.",
-      "Unsupported logos, metrics, or certifications must not be invented."
+      "如果不补充假设，生成结果很容易变成泛泛的 AI 产品官网。",
+      "不能虚构客户 Logo、指标、认证或集成伙伴关系。"
     ]
   },
   "audience": {
-    "primary_user": "knowledge workers and small teams that search across scattered work documents",
-    "secondary_user": "team leads evaluating productivity tools for fast-moving internal teams",
-    "context_of_use": "Visitors arrive after hearing about the product and need to understand whether it can search across their work tools without setup friction.",
+    "primary_user": "需要跨工作资料查找答案的知识工作者和小团队",
+    "secondary_user": "为高速协作团队评估效率工具的团队负责人",
+    "context_of_use": "访问者通常是在听说产品后进入官网，需要快速判断它是否能低门槛接入常用工作工具，并且给出可核查的答案。",
     "pain_points": [
-      "Important answers are buried across documents, chats, tickets, and shared drives.",
-      "Teams waste time asking repeat questions because source material is hard to find.",
-      "Generic AI search claims do not prove whether the product fits real workflows."
+      "重要答案散落在文档、聊天、工单和共享网盘里，很难一次找到。",
+      "团队反复问同样的问题，因为原始资料难找、上下文不完整。",
+      "空泛的 AI 搜索说法不足以证明产品真的适合日常工作流。"
     ],
     "jobs_to_be_done": [
-      "Understand what the product searches and how answers are grounded.",
-      "Decide whether to start a trial or request a demo.",
-      "Trust that the product is secure enough for work knowledge."
+      "理解产品能搜索哪些资料，以及答案如何被来源支撑。",
+      "判断是否开始试用或预约演示。",
+      "确认产品对工作知识足够安全，权限和来源边界清楚。"
     ]
   },
   "goals": {
-    "business_goal": "drive trial signup",
-    "design_goal": "make the value of cross-workspace AI search clear in the first screen while building enterprise trust",
-    "conversion_goal": "convert qualified visitors into trial signups or demo requests",
-    "primary_cta": "Start free trial",
-    "secondary_cta": "Watch product demo"
+    "business_goal": "推动试用注册",
+    "design_goal": "在首屏讲清跨工作空间 AI 搜索的价值，同时建立企业级信任感",
+    "conversion_goal": "把合格访问者转化为试用注册或演示预约",
+    "primary_cta": "免费开始试用",
+    "secondary_cta": "观看产品演示"
   },
   "message": {
-    "core_claim": "Find trusted answers across every work document in seconds.",
+    "core_claim": "几秒内，从所有工作资料里找到可信答案。",
     "supporting_points": [
-      "Connect common work tools and search across them from one place.",
-      "Show answer sources so teams can verify results.",
-      "Help small teams reduce repeat questions and knowledge bottlenecks."
+      "连接常用工作工具，在一个入口跨资料搜索。",
+      "展示答案来源，让团队能核查结果。",
+      "帮助小团队减少重复提问和知识阻塞。"
     ],
     "proof_points": [
-      "Product surface showing a question, sourced answer, and linked documents.",
-      "Integration row for docs, chat, tickets, and drives.",
-      "Security section covering permissions-aware search and admin controls."
+      "产品界面示意：问题、带来源的答案和关联文档链接。",
+      "集成范围展示：文档、聊天、工单和网盘。",
+      "安全区块说明：按权限搜索、管理员控制和来源可见。"
     ],
     "content_warnings": [
-      "Avoid vague AI slogans without concrete product behavior.",
-      "Do not imply customer logos, metrics, or certifications that are not provided."
+      "避免只有“AI 赋能”“智能搜索”这类空泛口号，必须描述具体产品行为。",
+      "不要暗示未提供的客户 Logo、指标、认证或合作伙伴。"
     ]
   },
   "structure": {
-    "sections": ["hero", "pain", "solution", "workflow", "integrations", "security", "CTA"],
-    "screens": ["desktop landing page", "mobile landing page"],
-    "flows": ["visitor reads hero", "visitor reviews product workflow", "visitor clicks trial signup"],
+    "sections": ["首屏", "痛点", "解决方案", "工作流", "集成范围", "安全信任", "最终 CTA"],
+    "screens": ["桌面端官网", "移动端官网"],
+    "flows": ["访问者阅读首屏价值", "访问者查看产品工作流", "访问者点击试用注册"],
     "section_details": [
       {
-        "section": "hero",
-        "purpose": "Explain the product promise immediately and show a realistic sourced-answer product surface.",
-        "content": ["headline", "short supporting copy", "primary CTA", "secondary CTA", "product surface mock"],
-        "visual_anchor": "Search answer panel with linked source documents"
+        "section": "首屏",
+        "purpose": "立刻说明产品承诺，并展示真实可信的带来源答案界面。",
+        "content": ["标题", "简短说明", "主 CTA", "次 CTA", "产品界面示意"],
+        "visual_anchor": "带来源文档链接的搜索答案面板"
       },
       {
-        "section": "pain",
-        "purpose": "Name the cost of scattered work knowledge without overexplaining.",
-        "content": ["three pain points", "plain-language impact statement"],
-        "visual_anchor": "Lightweight split showing docs, chats, tickets, and drives"
+        "section": "痛点",
+        "purpose": "直接点出工作知识分散造成的成本，不做过度解释。",
+        "content": ["三个痛点", "一句清楚的影响说明"],
+        "visual_anchor": "文档、聊天、工单和网盘分散在不同来源的轻量示意"
       },
       {
-        "section": "solution",
-        "purpose": "Connect the AI search value to concrete user actions.",
-        "content": ["cross-tool search", "source-backed answers", "team knowledge reuse"],
-        "visual_anchor": "Three compact product capability blocks"
+        "section": "解决方案",
+        "purpose": "把 AI 搜索价值连接到用户能理解的具体动作。",
+        "content": ["跨工具搜索", "来源支撑答案", "团队知识复用"],
+        "visual_anchor": "三个紧凑的产品能力区块"
       },
       {
-        "section": "workflow",
-        "purpose": "Show the path from question to trusted answer.",
-        "content": ["ask a question", "review sourced answer", "open source document"],
-        "visual_anchor": "Three-step product flow"
+        "section": "工作流",
+        "purpose": "展示从提问到可信答案的路径。",
+        "content": ["提出问题", "查看带来源答案", "打开来源文档"],
+        "visual_anchor": "三步产品流程"
       },
       {
-        "section": "integrations",
-        "purpose": "Make the search coverage feel practical while avoiding fake partner claims.",
-        "content": ["docs", "chat", "tickets", "drives"],
-        "visual_anchor": "Generic integration placeholders with labels"
+        "section": "集成范围",
+        "purpose": "让搜索覆盖面显得具体可用，同时避免虚构合作关系。",
+        "content": ["文档", "聊天", "工单", "网盘"],
+        "visual_anchor": "带文字标签的通用集成占位图标"
       },
       {
-        "section": "security",
-        "purpose": "Build trust before the final CTA.",
-        "content": ["permissions-aware search", "admin controls", "source visibility"],
-        "visual_anchor": "Calm trust panel with clear copy"
+        "section": "安全信任",
+        "purpose": "在最终 CTA 前建立信任。",
+        "content": ["按权限搜索", "管理员控制", "来源可见"],
+        "visual_anchor": "克制、清楚的信任说明面板"
       },
       {
-        "section": "CTA",
-        "purpose": "Give qualified visitors a clear next step.",
-        "content": ["trial CTA", "demo CTA", "short reassurance line"],
-        "visual_anchor": "Simple conversion band"
+        "section": "最终 CTA",
+        "purpose": "给合格访问者明确下一步。",
+        "content": ["试用 CTA", "演示 CTA", "简短放心提示"],
+        "visual_anchor": "简单直接的转化区"
       }
     ],
     "interaction_states": [
-      "Primary CTA has default, hover, focus, and mobile-visible states.",
-      "Secondary demo CTA remains available but visually secondary.",
-      "Product mock shows a typed question, answer, source chips, and linked documents.",
-      "Mobile layout keeps headline, product surface, and CTA readable without overlap."
+      "主 CTA 需要默认、悬停、聚焦和移动端可见状态。",
+      "次级演示 CTA 始终可用，但视觉层级要低于主 CTA。",
+      "产品示意要展示已输入的问题、答案、来源标签和关联文档。",
+      "移动端布局要保证标题、产品界面和 CTA 易读，不发生遮挡。"
     ],
     "interaction_contract": [
-      "Primary CTA opens a trial signup form or navigates to /signup. It must show default, hover, focus, disabled, loading, success, and error states when implemented.",
-      "Secondary CTA opens or scrolls to a product demo section. It must remain visually secondary and have default, hover, focus, and loading states when implemented.",
-      "Source chips and linked documents in the product mock are clickable when the target tool supports interactions; otherwise label them as visual-only proof elements.",
-      "Integration items are non-clickable placeholders in the golden demo unless real integration URLs are provided.",
-      "Failed signup or unavailable demo states should keep the visitor on the page with a clear retry path."
+      "主 CTA 打开试用注册表单或跳转到 /signup；实现时必须包含默认、悬停、聚焦、禁用、加载、成功和错误状态。",
+      "次 CTA 打开或滚动到产品演示区；实现时要保持视觉次级，并包含默认、悬停、聚焦和加载状态。",
+      "产品示意中的来源标签和关联文档在目标工具支持交互时可点击；否则要标为视觉证明元素。",
+      "集成项在黄金样例中是不可点击占位，除非提供真实集成链接。",
+      "注册失败或演示不可用时，访问者应留在当前页面，并看到清楚的重试路径。"
     ],
     "responsive_accessibility": [
-      "Use desktop >= 1024px, tablet 768-1023px, and mobile <= 767px as target layout bands.",
-      "On mobile, stack headline, copy, CTAs, and product surface in that order; keep the primary CTA visible above the fold or repeated after the product proof.",
-      "Product mock must resize without horizontal scrolling and keep answer text, source chips, and linked documents readable.",
-      "Keyboard tab order follows navigation, primary CTA, secondary CTA, product source links, integrations, security proof, final CTA.",
-      "Every interactive element has a visible focus state and at least a 44px touch target on mobile.",
-      "Use semantic heading order and descriptive alt text for product mock, source icons, and integration placeholders."
+      "使用桌面端 >= 1024px、平板 768-1023px、移动端 <= 767px 作为布局断点。",
+      "移动端按标题、说明、CTA、产品界面的顺序堆叠；主 CTA 要在首屏可见，或在产品证明后立即重复一次。",
+      "产品示意缩放时不能出现横向滚动，答案文字、来源标签和文档链接都要保持可读。",
+      "键盘顺序依次经过导航、主 CTA、次 CTA、产品来源链接、集成项、安全证明和最终 CTA。",
+      "每个可交互元素都要有可见聚焦状态，移动端触控目标至少 44px。",
+      "使用语义化标题顺序，并为产品示意、来源图标和集成占位提供描述性替代文本。"
     ]
   },
   "visual": {
-    "strategy_name": "Enterprise Trust",
-    "tone_keywords": ["restrained", "credible", "product-led", "clear", "secure"],
-    "references": ["modern enterprise SaaS landing pages", "product screenshots with sourced answers", "clean documentation-style trust patterns"],
-    "differentiators": ["real product surface in the hero", "clear source attribution UI", "security proof before final CTA"],
-    "avoid": ["generic AI futurism", "excessive glow", "abstract gradient blobs", "fake customer logos", "over-rounded novelty"]
+    "strategy_name": "企业信任型",
+    "tone_keywords": ["克制", "可信", "产品驱动", "清楚", "安全"],
+    "references": ["现代企业 SaaS 官网", "带来源答案的产品截图表达", "清晰的文档式信任结构"],
+    "differentiators": ["首屏展示真实产品界面", "清楚的来源归因 UI", "最终 CTA 前的安全证明"],
+    "avoid": ["泛化的 AI 未来感", "过量发光效果", "抽象渐变色块", "虚构客户 Logo", "过度圆角的新奇风格"]
   },
   "strategy_options": [
     {
-      "name": "Enterprise Trust",
+      "name": "企业信任型",
       "selected": true,
-      "best_use_case": "Best when the product must feel credible for teams evaluating work knowledge and security.",
-      "visual_tone": "Restrained, product-led, sharp typography, neutral surfaces, restrained blue accents.",
-      "information_structure_focus": "Lead with value, prove with sourced-answer product UI, then address workflow, integrations, and security.",
-      "risk": "Can feel too reserved if the product needs a more consumer-facing launch tone.",
+      "best_use_case": "适合需要让团队在评估工作知识和安全性时感到可信的产品官网。",
+      "visual_tone": "克制、产品驱动、字体清晰、界面中性，并使用少量蓝色强调。",
+      "information_structure_focus": "先讲价值，再用带来源答案的产品 UI 证明，随后补充工作流、集成范围和安全信息。",
+      "risk": "如果产品需要更强发布声量，可能显得过于保守。",
       "best_target_tools": ["huashu-design", "claude-design", "v0"]
     },
     {
-      "name": "Search Copilot Demo",
+      "name": "搜索助手演示型",
       "selected": false,
-      "best_use_case": "Best when the page should quickly demonstrate the search interaction.",
-      "visual_tone": "Interactive, product-forward, slightly more energetic, with a larger live-search mock.",
-      "information_structure_focus": "Lead with an example question and answer, then explain why the answer is trustworthy.",
-      "risk": "May over-index on the demo and under-explain business trust.",
+      "best_use_case": "适合页面需要快速展示搜索交互时使用。",
+      "visual_tone": "更互动、更产品前置、稍有活力，使用更大的实时搜索示意。",
+      "information_structure_focus": "先展示示例问题和答案，再解释为什么答案可信。",
+      "risk": "可能过度强调演示机制，而弱化商业信任。",
       "best_target_tools": ["huashu-design", "v0"]
     },
     {
-      "name": "Founder-Led Launch",
+      "name": "创始人发布型",
       "selected": false,
-      "best_use_case": "Best when the product is early and needs a sharper narrative around the problem.",
-      "visual_tone": "Editorial, direct, sparse, with strong copy and fewer interface panels.",
-      "information_structure_focus": "Lead with the pain of scattered knowledge, then introduce the product as a focused answer.",
-      "risk": "Can feel less mature for enterprise buyers if proof and security are too light.",
+      "best_use_case": "适合早期产品需要用更锐利叙事说明问题时使用。",
+      "visual_tone": "偏编辑感、直接、留白多，用更强文案和更少界面面板。",
+      "information_structure_focus": "先讲工作知识分散的痛点，再把产品作为聚焦解法推出。",
+      "risk": "如果证明和安全信息太少，企业买家会觉得成熟度不足。",
       "best_target_tools": ["claude-design", "huashu-design"]
     }
   ],
   "brand": {
     "brand_name": "BriefSearch",
-    "logo": "wordmark placeholder only",
-    "colors": ["deep ink primary", "slate secondary", "restrained blue accent", "light neutral surface"],
-    "typography": ["clear headline sans", "readable body sans"],
-    "voice": "direct, trustworthy, concrete, product-led",
-    "existing_assets": ["product surface mock placeholder", "integration icon placeholders"]
+    "logo": "仅使用文字标识占位",
+    "colors": ["深色正文主色", "灰蓝次级色", "克制蓝色强调", "浅中性背景"],
+    "typography": ["清晰标题无衬线", "易读正文无衬线"],
+    "voice": "直接、可信、具体、产品驱动",
+    "existing_assets": ["产品界面示意占位", "集成图标占位"]
   },
   "design_system": {
     "design_md_path": "DESIGN.md",
     "reference_direction": {
       "id": "ai_product_landing_page",
-      "name": "AI product landing page",
-      "source_boundary": "Use product proof, conversion clarity, and trust hierarchy as mechanisms; do not copy third-party brand assets or full DESIGN.md files."
+      "name": "AI 产品官网",
+      "source_boundary": "只借鉴产品证明、转化清晰度和信任层级这些机制；不要复制第三方品牌资产或完整 DESIGN.md 文件。"
     },
     "token_summary": [
-      "Deep ink primary for text and high-trust surfaces.",
-      "Restrained blue accent for links, focus, and primary action.",
-      "Light neutral backgrounds with low-contrast borders.",
-      "8px default radius and restrained card depth."
+      "深色正文主色用于文字和高信任界面。",
+      "克制蓝色强调用于链接、聚焦和主操作。",
+      "浅中性背景搭配低对比边框。",
+      "默认 8px 圆角，并控制卡片阴影深度。"
     ],
     "assumptions": [
-      "No real logo, customer metrics, or screenshots were provided.",
-      "Use realistic product placeholders rather than invented proprietary assets."
+      "没有提供真实 Logo、客户指标或产品截图。",
+      "使用可信的产品占位界面，不虚构专有资产。"
     ]
   },
   "constraints": {
-    "platform": "responsive web landing page",
+    "platform": "响应式 Web 官网",
     "responsive": true,
-    "tech_stack": ["HTML prototype", "React or Next.js compatible structure", "Tailwind-compatible tokens"],
-    "accessibility": ["clear focus states", "readable contrast", "CTA visible on mobile", "no text embedded in unreadable imagery"],
+    "tech_stack": ["HTML 原型", "兼容 React 或 Next.js 的结构", "兼容 Tailwind 的 design tokens"],
+    "accessibility": ["清楚的聚焦状态", "可读对比度", "移动端 CTA 可见", "不要把文字嵌在不可读图片里"],
     "deadline": "golden demo MVP"
   },
   "quality_bar": {
     "must_have": [
-      "first-screen clarity",
-      "clear CTA",
-      "real product surface",
-      "security trust section",
-      "mobile CTA visibility"
+      "首屏价值清楚",
+      "CTA 明确",
+      "真实产品界面",
+      "安全信任区块",
+      "移动端 CTA 可见"
     ],
     "must_avoid": [
-      "generic AI wording",
-      "decorative glow as the main visual idea",
-      "fake logos or unsupported metrics"
+      "泛泛的 AI 话术",
+      "把装饰性发光当成主要视觉想法",
+      "虚构 Logo 或无依据指标"
     ],
     "review_criteria": [
-      "first-screen clarity",
-      "clear CTA",
-      "real product surface",
-      "no generic AI wording",
-      "mobile CTA visibility"
+      "首屏价值清楚",
+      "CTA 明确",
+      "真实产品界面",
+      "没有泛泛的 AI 话术",
+      "移动端 CTA 可见"
     ]
   },
   "assumptions": [
-    "The product is early but credible enough to show a realistic product surface.",
-    "The first conversion target is trial signup, with demo as secondary."
+    "产品仍处早期，但可信到可以展示真实感产品界面。",
+    "第一转化目标是试用注册，演示预约作为次要路径。"
   ],
   "open_questions": [
-    "Which integrations are confirmed for launch?",
-    "Are there real screenshots or customer proof points available?"
+    "哪些集成已确认可以在发布时展示？",
+    "是否已有真实截图或客户证明材料？"
   ]
 }

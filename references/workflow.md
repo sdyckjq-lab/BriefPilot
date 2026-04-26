@@ -66,6 +66,8 @@ Ask the user to choose one strategy, combine strategies, or revise the strategie
 
 ## Step 6: Generate Assets
 
+Default user-facing content is Simplified Chinese (`zh-CN`) unless the user asks for another language. Keep filenames, JSON keys, commands, tool names, component names, and design token keys in English. Every `design-brief.json` must include `meta.content_language`.
+
 Write:
 
 - `diagnosis-and-strategies.md`

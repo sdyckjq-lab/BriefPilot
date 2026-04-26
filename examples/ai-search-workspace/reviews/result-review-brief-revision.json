@@ -7,69 +7,69 @@
   "target_tool": "generic",
   "evidence": {
     "kind": "local_file",
-    "summary": "The local generated HTML shows two cited sources that disagree about whether external sharing approval is final, but the page presents the answer as complete and gives no source disagreement explanation, freshness cue, or recovery path.",
+    "summary": "本地生成的 HTML 中有两个引用来源对外部分享审批是否最终完成给出冲突信息，但页面把答案呈现为完整结论，没有解释来源冲突、信息新鲜度或恢复路径。",
     "path": "generated-results/brief-revision-case.html"
   },
   "decision": "revise_brief_then_regenerate",
-  "selected_strategy": "Dense Research Workspace",
+  "selected_strategy": "密集研究工作台",
   "strategy_preserved": true,
   "strategy_change_reason": "",
   "strengths": [
-    "The generated file keeps the basic answer and source layout.",
-    "The local result includes multiple source cards and a source detail area."
+    "生成文件保留了基础答案和来源布局。",
+    "本地结果包含多个来源卡片和来源详情区域。"
   ],
   "findings": [
     {
       "severity": "high",
-      "brief_reference": "brief gap: source disagreement handling was not specified",
-      "issue": "The result presents a disputed claim as complete even though cited sources disagree.",
-      "evidence": "The local HTML includes Security policy v4 and Admin memo draft with conflicting external sharing status, but no disagreement explanation.",
-      "recommended_change": "Revise the brief to require explicit source disagreement explanation before regenerating."
+      "brief_reference": "brief gap: 没有指定来源冲突处理",
+      "issue": "结果把有争议的说法呈现为完整结论，但引用来源之间存在冲突。",
+      "evidence": "本地 HTML 同时包含 Security policy v4 和 Admin memo draft，二者对外部分享状态描述冲突，但页面没有冲突说明。",
+      "recommended_change": "先修订 brief，明确要求展示来源冲突说明，再重新生成。"
     },
     {
       "severity": "medium",
-      "brief_reference": "structure.section_details: cited source list and source detail panel",
-      "issue": "The source list does not show freshness or unresolved-conflict state.",
-      "evidence": "The local HTML has source titles and excerpts but no freshness cue or conflict status.",
-      "recommended_change": "Add freshness metadata and conflict status to source cards and source detail."
+      "brief_reference": "structure.section_details: 引用来源列表和来源详情面板",
+      "issue": "来源列表没有展示信息新鲜度或未解决冲突状态。",
+      "evidence": "本地 HTML 有来源标题和摘录，但没有新鲜度提示或冲突状态。",
+      "recommended_change": "在来源卡片和来源详情中加入新鲜度元数据和冲突状态。"
     },
     {
       "severity": "medium",
-      "brief_reference": "quality_bar.must_have: source-unavailable and permission-blocked states",
-      "issue": "The source recovery path does not cover outdated or conflicting sources.",
-      "evidence": "The generated result has no retry, request-review, or mark-unresolved path for disputed evidence.",
-      "recommended_change": "Extend the brief guidance to include expired, conflicting, and unresolved source recovery."
+      "brief_reference": "quality_bar.must_have: 来源不可用和权限受限状态",
+      "issue": "来源恢复路径没有覆盖过期或冲突来源。",
+      "evidence": "生成结果没有为有争议证据提供重试、请求复核或标记未解决路径。",
+      "recommended_change": "扩展 brief 指导，加入过期、冲突和未解决来源的恢复方式。"
     }
   ],
   "visual_review": {
     "status": "not_provided",
     "source": "",
-    "notes": "No visual evidence was supplied for this local-file review. The judgment is based on the HTML content and saved brief package."
+    "notes": "本地文件评审没有提供视觉证据；判断依据是 HTML 内容和已保存 brief 包。"
   },
   "brief_revision_path": "brief-revision.md",
   "prompt_intent": "brief_revision_regeneration",
   "prompt": {
     "keep": [
-      "Keep Dense Research Workspace.",
-      "Keep the query, answer, source list, source detail, and save/share workflow.",
-      "Keep the BriefSearch Workspace DESIGN.md visual system."
+      "保留“密集研究工作台”。",
+      "保留查询、答案、来源列表、来源详情和保存/分享工作流。",
+      "保留 BriefSearch Workspace 的 DESIGN.md 视觉系统。"
     ],
     "change": [
-      "Add explicit source disagreement handling.",
-      "Show source freshness or last-updated metadata when available.",
-      "Distinguish confirmed, stale, unavailable, and conflicting evidence.",
-      "Add a retry, request-review, or mark-unresolved path for expired or conflicting sources."
+      "加入明确的来源冲突处理。",
+      "在可用时展示来源新鲜度或最近更新时间。",
+      "区分已确认、过期、不可用和冲突证据。",
+      "为过期或冲突来源增加重试、请求复核或标记未解决路径。"
     ],
     "do_not_change": [
-      "Do not change to a different visual strategy.",
-      "Do not remove required answer states or mobile ordering.",
-      "Do not invent source truth when evidence conflicts."
+      "不要切换到其他视觉策略。",
+      "不要移除必要答案状态或移动端顺序。",
+      "不要在证据冲突时虚构唯一正确答案。"
     ],
     "acceptance_checks": [
-      "Conflicting cited sources are called out before the answer is treated as final.",
-      "Source cards show freshness or conflict status.",
-      "The source detail panel explains disputed evidence and offers a recovery path.",
-      "The regenerated result still follows DESIGN.md visual rules."
+      "在答案被当成最终结论前，冲突引用来源已被明确说明。",
+      "来源卡片展示新鲜度或冲突状态。",
+      "来源详情面板解释争议证据，并提供恢复路径。",
+      "重新生成结果仍然遵循 DESIGN.md 视觉规则。"
     ]
   }
 }

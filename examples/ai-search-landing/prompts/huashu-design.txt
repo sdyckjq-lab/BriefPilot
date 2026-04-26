@@ -1,57 +1,63 @@
 Task
-Create AI Search Landing.
+Create BriefSearch AI 搜索产品官网.
 Task type: saas_website.
 
 Context
-A product-led SaaS landing page for an AI search product that helps knowledge workers and small teams find answers across scattered work documents.
+一个面向知识工作者和小团队的 SaaS 产品官网，用来说明 BriefSearch 如何在分散的工作文档、聊天记录、工单和网盘中找到可信答案。
 Stage: golden_demo
 Pain points:
-- Important answers are buried across documents, chats, tickets, and shared drives.
-- Teams waste time asking repeat questions because source material is hard to find.
-- Generic AI search claims do not prove whether the product fits real workflows.
+- 重要答案散落在文档、聊天、工单和共享网盘里，很难一次找到。
+- 团队反复问同样的问题，因为原始资料难找、上下文不完整。
+- 空泛的 AI 搜索说法不足以证明产品真的适合日常工作流。
 Jobs to be done:
-- Understand what the product searches and how answers are grounded.
-- Decide whether to start a trial or request a demo.
-- Trust that the product is secure enough for work knowledge.
+- 理解产品能搜索哪些资料，以及答案如何被来源支撑。
+- 判断是否开始试用或预约演示。
+- 确认产品对工作知识足够安全，权限和来源边界清楚。
 
 Audience
-Primary: knowledge workers and small teams that search across scattered work documents
-Secondary: team leads evaluating productivity tools for fast-moving internal teams
-Context: Visitors arrive after hearing about the product and need to understand whether it can search across their work tools without setup friction.
+Primary: 需要跨工作资料查找答案的知识工作者和小团队
+Secondary: 为高速协作团队评估效率工具的团队负责人
+Context: 访问者通常是在听说产品后进入官网，需要快速判断它是否能低门槛接入常用工作工具，并且给出可核查的答案。
 
 Goal
-Business goal: drive trial signup
-Design goal: make the value of cross-workspace AI search clear in the first screen while building enterprise trust
-Conversion goal: convert qualified visitors into trial signups or demo requests
-Primary CTA: Start free trial
-Secondary CTA: Watch product demo
+Business goal: 推动试用注册
+Design goal: 在首屏讲清跨工作空间 AI 搜索的价值，同时建立企业级信任感
+Conversion goal: 把合格访问者转化为试用注册或演示预约
+Primary CTA: 免费开始试用
+Secondary CTA: 观看产品演示
+
+Output Language
+用户可见 UI 文案必须使用简体中文（Simplified Chinese / zh-CN）。
+Use Simplified Chinese for all user-visible UI copy.
+代码标识、文件名、组件名、命令示例、design token keys 和工具名保持英文。
+如果输入里有用户原话引用，除非明确要求翻译，否则保持原文。
 
 Visual Strategy
-Strategy: Enterprise Trust
+Strategy: 企业信任型
 Strategy options:
-- Enterprise Trust (selected): best use: Best when the product must feel credible for teams evaluating work knowledge and security.; tone: Restrained, product-led, sharp typography, neutral surfaces, restrained blue accents.; structure: Lead with value, prove with sourced-answer product UI, then address workflow, integrations, and security.; risk: Can feel too reserved if the product needs a more consumer-facing launch tone.; tools: huashu-design, claude-design, v0
-- Search Copilot Demo: best use: Best when the page should quickly demonstrate the search interaction.; tone: Interactive, product-forward, slightly more energetic, with a larger live-search mock.; structure: Lead with an example question and answer, then explain why the answer is trustworthy.; risk: May over-index on the demo and under-explain business trust.; tools: huashu-design, v0
-- Founder-Led Launch: best use: Best when the product is early and needs a sharper narrative around the problem.; tone: Editorial, direct, sparse, with strong copy and fewer interface panels.; structure: Lead with the pain of scattered knowledge, then introduce the product as a focused answer.; risk: Can feel less mature for enterprise buyers if proof and security are too light.; tools: claude-design, huashu-design
+- 企业信任型 (selected): best use: 适合需要让团队在评估工作知识和安全性时感到可信的产品官网。; tone: 克制、产品驱动、字体清晰、界面中性，并使用少量蓝色强调。; structure: 先讲价值，再用带来源答案的产品 UI 证明，随后补充工作流、集成范围和安全信息。; risk: 如果产品需要更强发布声量，可能显得过于保守。; tools: huashu-design, claude-design, v0
+- 搜索助手演示型: best use: 适合页面需要快速展示搜索交互时使用。; tone: 更互动、更产品前置、稍有活力，使用更大的实时搜索示意。; structure: 先展示示例问题和答案，再解释为什么答案可信。; risk: 可能过度强调演示机制，而弱化商业信任。; tools: huashu-design, v0
+- 创始人发布型: best use: 适合早期产品需要用更锐利叙事说明问题时使用。; tone: 偏编辑感、直接、留白多，用更强文案和更少界面面板。; structure: 先讲工作知识分散的痛点，再把产品作为聚焦解法推出。; risk: 如果证明和安全信息太少，企业买家会觉得成熟度不足。; tools: claude-design, huashu-design
 Tone keywords:
-- restrained
-- credible
-- product-led
-- clear
-- secure
+- 克制
+- 可信
+- 产品驱动
+- 清楚
+- 安全
 References:
-- modern enterprise SaaS landing pages
-- product screenshots with sourced answers
-- clean documentation-style trust patterns
+- 现代企业 SaaS 官网
+- 带来源答案的产品截图表达
+- 清晰的文档式信任结构
 Differentiators:
-- real product surface in the hero
-- clear source attribution UI
-- security proof before final CTA
+- 首屏展示真实产品界面
+- 清楚的来源归因 UI
+- 最终 CTA 前的安全证明
 
 DESIGN.md Visual System
 ---
 version: alpha
 name: BriefSearch
-description: Restrained, enterprise-trustworthy, product-led visual system for an AI search landing page.
+description: 面向 AI 搜索产品官网的克制、可信、产品驱动视觉系统。
 colors:
   background: "#F8FAFC"
   surface: "#FFFFFF"
@@ -131,156 +137,156 @@ components:
 
 ## Overview
 
-BriefSearch should feel restrained, enterprise-trustworthy, and product-led. The page must explain cross-workspace AI search quickly, then prove the claim with a realistic sourced-answer product surface.
+BriefSearch 应该给人克制、可信、产品驱动的感觉。页面先快速说明跨工作空间 AI 搜索能解决什么，再用真实感的带来源答案界面证明这个承诺，而不是只靠抽象口号。
 
 ## Visual Theme
 
-The theme is a calm enterprise SaaS launch page: light neutral background, deep ink text, restrained blue action color, realistic answer panels, and compact trust proof. The design should feel useful before it feels decorative.
+整体主题是冷静的企业 SaaS 官网：浅中性背景、深色正文、克制蓝色操作色、真实答案面板和紧凑信任证明。视觉应该先显得有用，再显得漂亮；所有装饰都要服务于产品证明、转化路径或信任层级。
 
 ## Colors
 
-Use role-based color, not decorative labels. `background` carries the page, `surface` carries cards and product mock panels, `text` and `muted_text` define hierarchy, `border` separates low-depth surfaces, and `primary_action` is reserved for CTA, source links, and visible focus. Use `success` only for verified or secure states, `warning` for caution, `danger` for failed signup or unavailable demo, and `info` for neutral guidance.
+使用按角色命名的颜色，而不是装饰性命名。`background` 承载页面底色，`surface` 承载卡片和产品示意面板，`text` 与 `muted_text` 建立信息层级，`border` 用于低深度分隔，`primary_action` 只用于 CTA、来源链接和可见 focus。`success` 只表达已验证或安全状态，`warning` 表达谨慎提醒，`danger` 表达注册失败或演示不可用，`info` 表达中性提示。
 
 ## Typography
 
-Use `display` only for the main headline. Use `title` for major sections, `heading` for capability blocks, `body` for explanations, `caption` for metadata and source labels, and `label` for buttons, badges, and form labels. Keep line lengths readable and avoid dramatic display typography that makes the product feel speculative.
+`display` 只用于主标题，`title` 用于主要区块，`heading` 用于能力块，`body` 用于解释文字，`caption` 用于元信息和来源标签，`label` 用于按钮、徽标和表单标签。控制行长，避免夸张展示字体让产品显得不成熟。
 
 ## Layout
 
-Desktop uses a product-led landing rhythm: hero with claim, CTA pair, and sourced-answer mock; then pain, solution, workflow, integrations, security, and final CTA. Use consistent spacing and keep the first screen focused on value, product proof, and conversion. Mobile stacks headline, copy, CTAs, and product surface in that order without horizontal scrolling.
+桌面端采用产品驱动的官网节奏：首屏包含核心承诺、双 CTA 和带来源答案示意，之后依次展示痛点、解决方案、工作流、集成范围、安全信任和最终 CTA。首屏必须同时回答价值、产品证明和下一步动作。移动端按标题、说明、CTA、产品界面的顺序堆叠，不能横向滚动。
 
 ## Elevation & Depth
 
-Use subtle shadows only to lift the product mock and key panels from the neutral background. Prefer borders for most section separation. Avoid floating decorative panels that do not carry product, source, integration, or trust content.
+只用轻微阴影把产品示意和关键证明面板从中性背景中托起。大多数区块用边框分隔即可。避免没有承载产品、来源、集成或信任内容的漂浮装饰面板。
 
 ## Shapes
 
-Use 8px radius as the default. Use 12px for the main product mock and large proof panels. Avoid over-rounded novelty shapes, decorative blobs, and pill-heavy compositions.
+默认使用 8px 圆角。主产品示意和大型证明面板可以使用 12px。避免过度圆角、装饰色块、泡泡感构图和大量胶囊元素。
 
 ## Components
 
-Primary CTA states: default blue, hover darker blue, pressed compact shadow, disabled muted border, loading spinner with unchanged width, success confirmation, error retry message, and visible focus ring. Secondary CTA stays text-forward with default, hover, pressed, disabled, loading, and focus states. Product cards show empty, loading, success, and error states. Source chips show default, hover, pressed, focus, unavailable, and selected states.
+主 CTA 状态包括 default 蓝色、hover 深蓝、pressed 紧凑阴影、disabled 弱化边框、loading 等宽加载、success 确认、error 重试提示和可见 focus ring。次 CTA 保持文字优先，包含 default、hover、pressed、disabled、loading 和 focus 状态。产品卡片要展示 empty、loading、success、error 状态。来源标签要展示 default、hover、pressed、focus、unavailable 和 selected 状态。
 
 ## Responsive Behavior
 
-Use desktop >= 1024px, tablet 768-1023px, and mobile <= 767px. The hero product mock must resize without clipping answer text or source chips. Keep the primary CTA above the fold on mobile or repeat it immediately after the product proof. Maintain at least 44px touch targets and preserve visible keyboard focus.
+使用桌面端 >= 1024px、平板 768-1023px、移动端 <= 767px。首屏产品示意缩放时不能裁切答案文字或来源标签。移动端主 CTA 要在首屏可见，或在产品证明后立即重复一次。触控目标至少 44px，并保留清楚的 keyboard focus。
 
 ## Motion & Feedback
 
-Motion should be restrained and purposeful: quick hover transitions, loading shimmer inside the product mock, CTA loading feedback, and success/error state changes that do not move surrounding layout. Respect reduced motion settings by replacing animation with static state changes.
+动效要克制且有目的：短促 hover 过渡、产品示意内的 loading shimmer、CTA loading 反馈，以及不会推动周围布局的 success/error 状态变化。尊重 reduced motion 设置，用静态状态变化替代动画。
 
 ## Content Voice
 
-Voice is direct, trustworthy, concrete, and product-led. Prefer "Find trusted answers across every work document" over vague AI claims. Do not invent customer metrics, certifications, integration partnerships, or brand claims.
+文案语气直接、可信、具体、产品驱动。优先写“从所有工作资料里找到可信答案”，不要写空泛的“释放 AI 潜能”。不要虚构客户指标、认证、集成伙伴或品牌背书。
 
 ## Do's and Don'ts
 
-Do show real product surfaces, source links, integrations, specific workflow steps, security proof, keyboard focus, readable contrast, and mobile CTA visibility. Don't use generic AI slogans, excessive glow, abstract gradients, fake customer logos, unsupported metrics, hidden source links, or unreadable text in images.
+Do：展示真实产品界面、来源链接、集成范围、具体工作流、安全证明、keyboard focus、可读对比度和移动端 CTA 可见性。Don't：使用泛泛 AI 口号、过量发光、抽象渐变、虚构客户 Logo、无依据指标、隐藏来源链接，或把文字放进不可读图片。
 
 ## Reference Direction
 
-Reference direction: `ai_product_landing_page` - AI product landing page.
+Reference direction: `ai_product_landing_page` - AI 产品官网。
 
-Use this direction for product proof, conversion clarity, trust hierarchy, and source-backed visual evidence. It is an inspiration boundary only: do not copy third-party brand assets, logos, proprietary fonts, screenshots, full color systems, or complete `DESIGN.md` files.
+只借鉴产品证明、转化清晰度、信任层级和来源支撑的视觉证据。这只是灵感边界：do not copy 第三方品牌资产、Logo、专有字体、截图、完整配色系统或完整 `DESIGN.md` 文件。
 
 ## Agent Guidance
 
-Treat front matter tokens as normative. If a needed token is missing, derive from the closest role token and record the assumption. Preserve the selected Enterprise Trust strategy, product-led hero, source-backed mock, restrained blue action color, visible focus states, and no-fake-proof boundary.
+把 front matter tokens 当成强约束。如果缺少必要 token，从最接近的角色 token 派生，并记录假设。保留已选的“企业信任型”策略、产品驱动首屏、带来源答案示意、克制蓝色操作色、可见 focus 状态，以及不虚构证明的边界。
 
 Required Content
-Core claim: Find trusted answers across every work document in seconds.
+Core claim: 几秒内，从所有工作资料里找到可信答案。
 Supporting points:
-- Connect common work tools and search across them from one place.
-- Show answer sources so teams can verify results.
-- Help small teams reduce repeat questions and knowledge bottlenecks.
+- 连接常用工作工具，在一个入口跨资料搜索。
+- 展示答案来源，让团队能核查结果。
+- 帮助小团队减少重复提问和知识阻塞。
 Proof points:
-- Product surface showing a question, sourced answer, and linked documents.
-- Integration row for docs, chat, tickets, and drives.
-- Security section covering permissions-aware search and admin controls.
+- 产品界面示意：问题、带来源的答案和关联文档链接。
+- 集成范围展示：文档、聊天、工单和网盘。
+- 安全区块说明：按权限搜索、管理员控制和来源可见。
 Sections:
-- hero
-- pain
-- solution
-- workflow
-- integrations
-- security
-- CTA
+- 首屏
+- 痛点
+- 解决方案
+- 工作流
+- 集成范围
+- 安全信任
+- 最终 CTA
 Section details:
-- hero: purpose: Explain the product promise immediately and show a realistic sourced-answer product surface.; content: headline, short supporting copy, primary CTA, secondary CTA, product surface mock; visual anchor: Search answer panel with linked source documents
-- pain: purpose: Name the cost of scattered work knowledge without overexplaining.; content: three pain points, plain-language impact statement; visual anchor: Lightweight split showing docs, chats, tickets, and drives
-- solution: purpose: Connect the AI search value to concrete user actions.; content: cross-tool search, source-backed answers, team knowledge reuse; visual anchor: Three compact product capability blocks
-- workflow: purpose: Show the path from question to trusted answer.; content: ask a question, review sourced answer, open source document; visual anchor: Three-step product flow
-- integrations: purpose: Make the search coverage feel practical while avoiding fake partner claims.; content: docs, chat, tickets, drives; visual anchor: Generic integration placeholders with labels
-- security: purpose: Build trust before the final CTA.; content: permissions-aware search, admin controls, source visibility; visual anchor: Calm trust panel with clear copy
-- CTA: purpose: Give qualified visitors a clear next step.; content: trial CTA, demo CTA, short reassurance line; visual anchor: Simple conversion band
+- 首屏: purpose: 立刻说明产品承诺，并展示真实可信的带来源答案界面。; content: 标题, 简短说明, 主 CTA, 次 CTA, 产品界面示意; visual anchor: 带来源文档链接的搜索答案面板
+- 痛点: purpose: 直接点出工作知识分散造成的成本，不做过度解释。; content: 三个痛点, 一句清楚的影响说明; visual anchor: 文档、聊天、工单和网盘分散在不同来源的轻量示意
+- 解决方案: purpose: 把 AI 搜索价值连接到用户能理解的具体动作。; content: 跨工具搜索, 来源支撑答案, 团队知识复用; visual anchor: 三个紧凑的产品能力区块
+- 工作流: purpose: 展示从提问到可信答案的路径。; content: 提出问题, 查看带来源答案, 打开来源文档; visual anchor: 三步产品流程
+- 集成范围: purpose: 让搜索覆盖面显得具体可用，同时避免虚构合作关系。; content: 文档, 聊天, 工单, 网盘; visual anchor: 带文字标签的通用集成占位图标
+- 安全信任: purpose: 在最终 CTA 前建立信任。; content: 按权限搜索, 管理员控制, 来源可见; visual anchor: 克制、清楚的信任说明面板
+- 最终 CTA: purpose: 给合格访问者明确下一步。; content: 试用 CTA, 演示 CTA, 简短放心提示; visual anchor: 简单直接的转化区
 Screens:
-- desktop landing page
-- mobile landing page
+- 桌面端官网
+- 移动端官网
 Flows:
-- visitor reads hero
-- visitor reviews product workflow
-- visitor clicks trial signup
+- 访问者阅读首屏价值
+- 访问者查看产品工作流
+- 访问者点击试用注册
 Interaction states:
-- Primary CTA has default, hover, focus, and mobile-visible states.
-- Secondary demo CTA remains available but visually secondary.
-- Product mock shows a typed question, answer, source chips, and linked documents.
-- Mobile layout keeps headline, product surface, and CTA readable without overlap.
+- 主 CTA 需要默认、悬停、聚焦和移动端可见状态。
+- 次级演示 CTA 始终可用，但视觉层级要低于主 CTA。
+- 产品示意要展示已输入的问题、答案、来源标签和关联文档。
+- 移动端布局要保证标题、产品界面和 CTA 易读，不发生遮挡。
 Interaction contract:
-- Primary CTA opens a trial signup form or navigates to /signup. It must show default, hover, focus, disabled, loading, success, and error states when implemented.
-- Secondary CTA opens or scrolls to a product demo section. It must remain visually secondary and have default, hover, focus, and loading states when implemented.
-- Source chips and linked documents in the product mock are clickable when the target tool supports interactions; otherwise label them as visual-only proof elements.
-- Integration items are non-clickable placeholders in the golden demo unless real integration URLs are provided.
-- Failed signup or unavailable demo states should keep the visitor on the page with a clear retry path.
+- 主 CTA 打开试用注册表单或跳转到 /signup；实现时必须包含默认、悬停、聚焦、禁用、加载、成功和错误状态。
+- 次 CTA 打开或滚动到产品演示区；实现时要保持视觉次级，并包含默认、悬停、聚焦和加载状态。
+- 产品示意中的来源标签和关联文档在目标工具支持交互时可点击；否则要标为视觉证明元素。
+- 集成项在黄金样例中是不可点击占位，除非提供真实集成链接。
+- 注册失败或演示不可用时，访问者应留在当前页面，并看到清楚的重试路径。
 
 Constraints
-Platform: responsive web landing page
+Platform: 响应式 Web 官网
 Responsive: True
 Tech stack:
-- HTML prototype
-- React or Next.js compatible structure
-- Tailwind-compatible tokens
+- HTML 原型
+- 兼容 React 或 Next.js 的结构
+- 兼容 Tailwind 的 design tokens
 Accessibility:
-- clear focus states
-- readable contrast
-- CTA visible on mobile
-- no text embedded in unreadable imagery
+- 清楚的聚焦状态
+- 可读对比度
+- 移动端 CTA 可见
+- 不要把文字嵌在不可读图片里
 Responsive and accessibility requirements:
-- Use desktop >= 1024px, tablet 768-1023px, and mobile <= 767px as target layout bands.
-- On mobile, stack headline, copy, CTAs, and product surface in that order; keep the primary CTA visible above the fold or repeated after the product proof.
-- Product mock must resize without horizontal scrolling and keep answer text, source chips, and linked documents readable.
-- Keyboard tab order follows navigation, primary CTA, secondary CTA, product source links, integrations, security proof, final CTA.
-- Every interactive element has a visible focus state and at least a 44px touch target on mobile.
-- Use semantic heading order and descriptive alt text for product mock, source icons, and integration placeholders.
+- 使用桌面端 >= 1024px、平板 768-1023px、移动端 <= 767px 作为布局断点。
+- 移动端按标题、说明、CTA、产品界面的顺序堆叠；主 CTA 要在首屏可见，或在产品证明后立即重复一次。
+- 产品示意缩放时不能出现横向滚动，答案文字、来源标签和文档链接都要保持可读。
+- 键盘顺序依次经过导航、主 CTA、次 CTA、产品来源链接、集成项、安全证明和最终 CTA。
+- 每个可交互元素都要有可见聚焦状态，移动端触控目标至少 44px。
+- 使用语义化标题顺序，并为产品示意、来源图标和集成占位提供描述性替代文本。
 Deadline: golden demo MVP
 
 Do Not Do
 Forbidden visual directions:
-- generic AI futurism
-- excessive glow
-- abstract gradient blobs
-- fake customer logos
-- over-rounded novelty
+- 泛化的 AI 未来感
+- 过量发光效果
+- 抽象渐变色块
+- 虚构客户 Logo
+- 过度圆角的新奇风格
 Must avoid:
-- generic AI wording
-- decorative glow as the main visual idea
-- fake logos or unsupported metrics
+- 泛泛的 AI 话术
+- 把装饰性发光当成主要视觉想法
+- 虚构 Logo 或无依据指标
 Content warnings:
-- Avoid vague AI slogans without concrete product behavior.
-- Do not imply customer logos, metrics, or certifications that are not provided.
+- 避免只有“AI 赋能”“智能搜索”这类空泛口号，必须描述具体产品行为。
+- 不要暗示未提供的客户 Logo、指标、认证或合作伙伴。
 
 Deliverable
 Create a high-fidelity HTML prototype with real product surfaces, clickable interactions, and reviewable visual detail.
 
 Review Criteria
 Must have:
-- first-screen clarity
-- clear CTA
-- real product surface
-- security trust section
-- mobile CTA visibility
+- 首屏价值清楚
+- CTA 明确
+- 真实产品界面
+- 安全信任区块
+- 移动端 CTA 可见
 Review criteria:
-- first-screen clarity
-- clear CTA
-- real product surface
-- no generic AI wording
-- mobile CTA visibility
+- 首屏价值清楚
+- CTA 明确
+- 真实产品界面
+- 没有泛泛的 AI 话术
+- 移动端 CTA 可见

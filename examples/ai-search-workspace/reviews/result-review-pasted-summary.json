@@ -7,68 +7,68 @@
   "target_tool": "generic",
   "evidence": {
     "kind": "pasted_summary",
-    "summary": "The generated answer-detail page has the right search input, answer panel, confidence badge, and save/share actions. However, the source cards are visually quiet, citation markers are hard to connect to the source list, and the source detail panel does not clearly show active selection."
+    "summary": "生成的答案详情页已经包含搜索输入、答案面板、可信度徽标和保存/分享操作；但来源卡片视觉太弱，引用标记和来源列表的对应关系不清楚，来源详情面板也没有明显展示当前选中状态。"
   },
   "decision": "tweak",
-  "selected_strategy": "Dense Research Workspace",
+  "selected_strategy": "密集研究工作台",
   "strategy_preserved": true,
   "strategy_change_reason": "",
   "strengths": [
-    "The generated result keeps the research workspace direction.",
-    "The answer panel, confidence badge, and save/share controls are present."
+    "生成结果保留了研究工作台方向。",
+    "答案面板、可信度徽标和保存/分享控件已经出现。"
   ],
   "findings": [
     {
       "severity": "medium",
-      "brief_reference": "quality_bar.review_criteria: answer and sources have clear hierarchy",
-      "issue": "Source cards are too low-contrast compared with the answer body.",
-      "evidence": "The pasted summary says source cards are visually quiet and hard to notice.",
-      "recommended_change": "Increase source card hierarchy with clearer title weight, excerpt contrast, active source state, and visible source count."
+      "brief_reference": "quality_bar.review_criteria: 答案和来源有清楚层级",
+      "issue": "来源卡片相对答案正文过于低对比，用户不容易注意到。",
+      "evidence": "粘贴摘要说明来源卡片视觉太安静、难以发现。",
+      "recommended_change": "提高来源卡片层级，包括更清楚的标题字重、摘录对比、选中来源状态和可见来源数量。"
     },
     {
       "severity": "medium",
-      "brief_reference": "structure.interaction_contract: Citation markers in the answer scroll or focus the matching source card.",
-      "issue": "Citation markers do not clearly connect to source cards.",
-      "evidence": "The pasted summary says citation markers are hard to connect to the source list.",
-      "recommended_change": "Make citation markers and matching source cards share an active state and visible focus treatment."
+      "brief_reference": "structure.interaction_contract: 答案中的引用标记会滚动或聚焦到匹配的来源卡片。",
+      "issue": "引用标记没有清楚连接到对应来源卡片。",
+      "evidence": "粘贴摘要说明引用标记很难和来源列表对应起来。",
+      "recommended_change": "让引用标记和匹配来源卡片共享选中状态与可见 focus 处理。"
     },
     {
       "severity": "low",
-      "brief_reference": "DESIGN.md Components: source cards should reveal title, excerpt, date, owner or system, and link status.",
-      "issue": "The selected source detail panel does not clearly show active selection.",
-      "evidence": "The pasted summary says the source detail panel lacks clear active selection.",
-      "recommended_change": "Add selected-source label, active card highlight, and source metadata in the detail panel."
+      "brief_reference": "DESIGN.md Components: 来源卡片要展示标题、摘录、日期、负责人或系统，以及链接状态。",
+      "issue": "选中来源详情面板没有清楚展示当前选中状态。",
+      "evidence": "粘贴摘要说明来源详情面板缺少明确的选中反馈。",
+      "recommended_change": "在详情面板增加选中来源标签、活动卡片高亮和来源元数据。"
     }
   ],
   "visual_review": {
     "status": "unavailable",
     "source": "",
-    "notes": "No inspectable screenshot was available in this run, so the review used the pasted summary and saved brief package as fallback evidence."
+    "notes": "本次没有可检查截图，因此使用粘贴摘要和已保存 brief 包作为后备证据。"
   },
   "brief_revision_path": "",
   "prompt_intent": "targeted_modification",
   "prompt": {
     "keep": [
-      "Keep the Dense Research Workspace strategy.",
-      "Keep the top search area, answer panel, confidence badge, and save/share controls.",
-      "Keep the restrained BriefSearch Workspace visual system from DESIGN.md."
+      "保留“密集研究工作台”策略。",
+      "保留顶部搜索区、答案面板、可信度徽标和保存/分享控件。",
+      "保留 DESIGN.md 中克制的 BriefSearch Workspace 视觉系统。"
     ],
     "change": [
-      "Make source cards more visible without overpowering the answer body.",
-      "Add a clear active state linking citation markers, source cards, and source detail.",
-      "Show source title, excerpt, date, owner or system, link status, and relevance more clearly.",
-      "Improve source detail selection feedback on desktop, tablet, and mobile."
+      "让来源卡片更明显，但不要压过答案正文。",
+      "增加清楚的选中状态，把引用标记、来源卡片和来源详情连接起来。",
+      "更清楚展示来源标题、摘录、日期、负责人或系统、链接状态和相关度。",
+      "改进桌面端、平板和移动端的来源详情选中反馈。"
     ],
     "do_not_change": [
-      "Do not switch to a marketing-first composition.",
-      "Do not replace the dense research workspace with a generic dashboard.",
-      "Do not remove answer confidence, save/share feedback, or required answer states."
+      "不要改成营销优先构图。",
+      "不要把密集研究工作台替换成普通仪表盘。",
+      "不要移除答案可信度、保存/分享反馈或必要答案状态。"
     ],
     "acceptance_checks": [
-      "The first screen still shows query, answer confidence, answer body, and source origin.",
-      "Citation markers visibly connect to matching source cards.",
-      "The selected source detail panel has an obvious active state.",
-      "All changes continue to follow DESIGN.md colors, spacing, radius, and source-card rules."
+      "首屏仍然展示查询、答案可信度、答案正文和来源出处。",
+      "引用标记能明显连接到匹配来源卡片。",
+      "选中来源详情面板有清楚的活动状态。",
+      "所有修改继续遵循 DESIGN.md 的颜色、间距、圆角和来源卡片规则。"
     ]
   }
 }

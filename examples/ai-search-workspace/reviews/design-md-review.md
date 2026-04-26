@@ -1,27 +1,29 @@
-# DESIGN.md Review
+# DESIGN.md 评审报告
 
-Mode: briefpilot_fallback
+模式：briefpilot_fallback
 
-Blocking: false
+是否阻断：false
 
-Reference direction: enterprise_data_workspace
+参考方向：enterprise_data_workspace
 
-Source SHA-256: 8e390ee70bb79cff995c6b6e8aced2e8d0dfb86e5712ab8fe3cf2a8fb0ee1302
+来源 SHA-256：91ec3856e75d78446680917497eef94bb5f9ff7e11436ec9d3de68a1447d2207
 
-Severity counts:
+问题数量：
 
 - blocking: 0
-- warning: 0
+- warning: 2
 - info: 1
 
-Next action: continue
+下一步：continue
 
-Official tool:
+官方工具：
 
-- available: false
-- command: 
-- merged: false
+- 可用：false
+- 命令：
+- 已合并：false
 
-## Findings
+## 发现
 
-- info [optional_official_check] official_tool: Google official DESIGN.md lint was not run; fallback checks were used. Fix: For stricter checks, provide a safe absolute --official-command path or run the official tool manually.
+- warning [missing_accessibility_guidance] Markdown body：可访问性说明缺少 touch 要求。 修复建议：补充明确的可访问性要求。
+- warning [reference_direction_drift] drift_checks.data_density：工作台方向需要说明扫描密度、面板、行或元数据层级。 修复建议：补充数据密度和信息层级指导，或换成更合适的参考方向。
+- info [optional_official_check] official_tool：未运行 Google 官方 DESIGN.md lint，本报告使用内置 fallback 检查。 修复建议：如需更严格检查，提供安全的 --official-command 绝对路径，或手动运行官方工具。

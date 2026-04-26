@@ -1,21 +1,27 @@
-# DESIGN.md Review
+# DESIGN.md 评审报告
 
-Mode: briefpilot_fallback
+模式：briefpilot_fallback
 
-Blocking: false
+是否阻断：false
 
-Reference direction:
+参考方向：
 
-Source SHA-256:
+来源 SHA-256：
 
-Severity counts:
+问题数量：
 
 - blocking: 0
 - warning: 0
 - info: 0
 
-Next action: continue
+下一步：continue
 
-## Findings
+官方工具：
 
-- None
+- 可用：false
+- 命令：
+- 已合并：false
+
+## 发现
+
+- 无

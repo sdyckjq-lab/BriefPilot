@@ -1,57 +1,63 @@
 Task
-Create AI Search Workspace Answer Detail.
+Create BriefSearch AI 搜索研究工作台答案详情.
 Task type: app_page.
 
 Context
-An app-page workflow for an AI search product where a user asks a question, reviews a sourced answer, inspects citations, and saves or shares the result.
+一个 AI 搜索产品的应用页面工作流：用户提出问题、查看带来源答案、核查引用、打开来源详情，并把结果保存或分享给团队。
 Stage: phase_2_review_demo
 Pain points:
-- AI answers are hard to trust when sources are buried.
-- Users need to inspect source details without losing the answer context.
-- Failed, partial, or low-confidence answers need clear recovery paths.
+- 当来源被埋得太深时，AI 答案很难让人信任。
+- 用户需要查看来源详情，同时不能丢失答案上下文。
+- 失败、部分完成或低可信度答案需要清楚的恢复路径。
 Jobs to be done:
-- Ask a work question and understand the answer state.
-- Verify which sources support the answer.
-- Open source details, recover from unavailable sources, and save or share useful answers.
+- 提出一个工作问题，并理解当前答案状态。
+- 核查哪些来源支撑了答案。
+- 打开来源详情，处理不可用来源，并保存或分享有用答案。
 
 Audience
-Primary: knowledge workers and analysts who need to verify AI search answers before using them
-Secondary: team leads reviewing saved research artifacts from teammates
-Context: The user is inside the product, comparing an AI answer with source documents under time pressure.
+Primary: 需要在使用 AI 搜索答案前先核查来源的知识工作者和分析人员
+Secondary: 查看队友保存研究结果的团队负责人
+Context: 用户已经在产品内部，需要在时间压力下把 AI 答案和来源文档对照核查。
 
 Goal
-Business goal: increase trust and repeat use of sourced AI answers
-Design goal: make the query, answer confidence, answer body, and source origin clear in the first screen
-Conversion goal: move users from one-off search to saved and shared research workflows
-Primary CTA: Save answer
-Secondary CTA: Share with team
+Business goal: 提升用户对带来源 AI 答案的信任和重复使用率
+Design goal: 让查询、答案可信度、答案正文和来源出处在首屏就清楚可见
+Conversion goal: 让用户从一次性搜索转向保存和分享研究结果的工作流
+Primary CTA: 保存答案
+Secondary CTA: 分享给团队
+
+Output Language
+用户可见 UI 文案必须使用简体中文（Simplified Chinese / zh-CN）。
+Use Simplified Chinese for all user-visible UI copy.
+代码标识、文件名、组件名、命令示例、design token keys 和工具名保持英文。
+如果输入里有用户原话引用，除非明确要求翻译，否则保持原文。
 
 Visual Strategy
-Strategy: Dense Research Workspace
+Strategy: 密集研究工作台
 Strategy options:
-- Dense Research Workspace (selected): best use: Best when analysts need to inspect a sourced AI answer quickly.; tone: Calm, dense, product-led, high-trust.; structure: Search input, answer status, answer body, source list, and source detail panel all visible on desktop.; risk: Can feel too busy if hierarchy is weak.; tools: huashu-design, claude-design, v0
-- Evidence-First Answer Detail: best use: Best when the product must prove trust and citation quality before speed.; tone: Source-forward, slightly more editorial, with evidence confidence in the first screen.; structure: Show answer provenance before secondary actions.; risk: May make the answer feel less fast or less conversational.; tools: claude-design, v0
-- Lightweight Team Notebook: best use: Best when the page should feel like a saved research artifact for teams.; tone: Workspace-like, organized, collaborative.; structure: Saved answer, notes, share action, and source detail.; risk: May underplay the live search interaction.; tools: huashu-design, v0
+- 密集研究工作台 (selected): best use: 适合分析人员需要快速核查带来源 AI 答案时使用。; tone: 冷静、密集、产品驱动、高信任。; structure: 桌面端同时展示搜索输入、答案状态、答案正文、来源列表和来源详情面板。; risk: 如果层级不清楚，界面可能显得拥挤。; tools: huashu-design, claude-design, v0
+- 证据优先答案详情: best use: 适合产品必须先证明可信度和引用质量，再强调速度时使用。; tone: 来源优先，略带编辑感，并在首屏强调证据可信度。; structure: 在次级操作之前先展示答案来源和证据状态。; risk: 可能让答案显得不够快速或不够对话式。; tools: claude-design, v0
+- 轻量团队笔记: best use: 适合页面更像团队保存的研究资料时使用。; tone: 工作区感、组织清楚、偏协作。; structure: 保存的答案、笔记、分享操作和来源详情。; risk: 可能弱化实时搜索交互。; tools: huashu-design, v0
 Tone keywords:
-- dense
-- trustworthy
-- calm
-- product-led
-- source-forward
+- 密集
+- 可信
+- 冷静
+- 产品驱动
+- 来源优先
 References:
-- enterprise research tools
-- documentation-style source panels
-- structured answer review surfaces
+- 企业研究工具
+- 文档式来源面板
+- 结构化答案审查界面
 Differentiators:
-- query, confidence, answer, and source origin visible together
-- source detail panel with unavailable and permission-blocked states
-- clear save/share workflow for useful answers
+- 查询、可信度、答案和来源出处同时可见
+- 来源详情面板包含不可用和权限受限状态
+- 有清楚的保存/分享工作流
 
 DESIGN.md Visual System
 ---
 version: alpha
 name: BriefSearch Workspace
-description: Dense, trustworthy product workspace visual system for AI search answer review.
+description: 面向 AI 搜索答案审查的密集、可信、产品工作台视觉系统。
 colors:
   background: "#F8FAFC"
   surface: "#FFFFFF"
@@ -131,171 +137,171 @@ components:
 
 ## Overview
 
-BriefSearch Workspace should feel like a serious research surface, not a marketing page. It must help users understand the query, answer status, confidence, source origin, and recovery path at a glance.
+BriefSearch Workspace 应该像严肃的研究工作台，而不是营销页。界面必须让用户一眼看清查询、答案状态、可信度、来源出处和恢复路径，帮助他们判断 AI 答案是否能被使用。
 
 ## Visual Theme
 
-The theme is a dense but calm enterprise data workspace: compact panels, visible status, strong source hierarchy, restrained blue interactions, semantic state color, and minimal decoration. Every visual choice should help users verify an AI answer.
+主题是密集但冷静的企业数据工作台：紧凑面板、可见状态、强来源层级、克制蓝色交互、语义化状态颜色和极少装饰。每个视觉选择都要服务于核查 AI 答案，而不是制造气氛。
 
 ## Colors
 
-Use `background` for the app canvas, `surface` for answer and source panels, `text` for primary content, `muted_text` for metadata, and `border` for structure. Use `primary_action` for active links, citations, selected source cards, and focus. Use `success` for verified sources, `warning` for low-confidence or partial answers, `danger` for failed answer or permission errors, and `info` for neutral guidance.
+`background` 用于应用画布，`surface` 用于答案和来源面板，`text` 用于主内容，`muted_text` 用于元信息，`border` 用于结构分隔。`primary_action` 用于活动链接、引用标记、选中来源卡片和 focus。`success` 表示已验证来源，`warning` 表示低可信度或部分完成答案，`danger` 表示答案失败或权限错误，`info` 表示中性引导。
 
 ## Typography
 
-Use compact interface typography. `display` is reserved for the query or page title, `title` for answer section headers, `heading` for panel titles, `body` for answer text, `caption` for source metadata, and `label` for badges and controls. Source metadata must remain legible even when dense.
+使用紧凑的界面字体。`display` 用于查询或页面标题，`title` 用于答案区标题，`heading` 用于面板标题，`body` 用于答案正文，`caption` 用于来源元信息，`label` 用于徽标和控件。即使信息密度高，来源元信息也必须保持可读。
 
 ## Layout
 
-Desktop uses a top search area, main answer column, cited source list, and right source-detail panel. Tablet collapses source detail below the source list. Mobile order is search, answer status, answer body, sources, source detail, then save/share actions. Keep query, confidence, answer, and source origin visible in the first screen on desktop.
+桌面端使用顶部搜索区、主答案列、引用来源列表和右侧来源详情面板。平板端把来源详情折叠到来源列表下方。移动端顺序是搜索、答案状态、答案正文、来源、来源详情，然后是保存/分享操作。桌面端首屏要同时保留查询、可信度、答案和来源出处。
 
 ## Elevation & Depth
 
-Use subtle borders more than shadows. Panels should feel stable and workspace-like, with no floating decorative cards. Use elevation only for active overlays, menus, or selected-source detail.
+多用细边框，少用阴影。面板应稳定、工作台化，不使用漂浮装饰卡片。只有活动浮层、菜单或选中来源详情可以使用更明显的层级。
 
 ## Shapes
 
-Use 8px radius as the default and 10px for larger panels. Keep badges compact. Avoid pill-heavy layouts, novelty shapes, decorative blobs, and over-rounded panels.
+默认使用 8px 圆角，大面板可使用 10px。徽标保持紧凑。避免大量胶囊形、特殊异形、装饰色块和过度圆角面板。
 
 ## Components
 
-Search input states: empty, input, submitting, failed, retry, disabled, and focus. Answer panel states: empty, generating, success, partial, low-confidence, failed, and unavailable. Source cards show default, hover, pressed, selected, focus, loading, unavailable, permission-blocked, and error states. Save/share controls show idle, working, success, failed, disabled, and focus states.
+搜索输入状态包括 empty、input、submitting、failed、retry、disabled 和 focus。答案面板状态包括 empty、generating、success、partial、low-confidence、failed 和 unavailable。来源卡片要展示 default、hover、pressed、selected、focus、loading、unavailable、permission-blocked 和 error 状态。保存/分享控件要展示 idle、working、success、failed、disabled 和 focus 状态。
 
 ## Responsive Behavior
 
-Use desktop >= 1024px, tablet 768-1023px, and mobile <= 767px. No horizontal scrolling on mobile. Source cards, citation markers, and save/share controls wrap cleanly. Keyboard order follows search input, submit, answer citations, source cards, source detail actions, then save/share controls. Touch targets are at least 44px on mobile.
+使用桌面端 >= 1024px、平板 768-1023px、移动端 <= 767px。移动端不能横向滚动。来源卡片、引用标记和保存/分享控件要自然换行。键盘顺序依次经过搜索输入、提交、答案引用、来源卡片、来源详情操作，再到保存/分享控件。移动端触控目标至少 44px。
 
 ## Motion & Feedback
 
-Use restrained feedback: answer generation skeleton, source-card loading row, selected-source highlight, save/share progress, and retry feedback. Respect reduced motion by replacing animated loading with static progress labels. State changes must not jump the layout.
+反馈要克制：答案生成 skeleton、来源卡片 loading 行、选中来源高亮、保存/分享进度和 retry 反馈。尊重 reduced motion，用静态进度标签替代动画加载。状态变化不能让布局跳动。
 
 ## Content Voice
 
-Voice is clear, trustworthy, source-forward, and operational. Labels should say what happened and what to do next: "Low confidence, check sources" is better than "AI is thinking." Do not invent customer data, proprietary source names, accuracy metrics, or unsupported claims.
+文案语气清楚、可信、来源优先、偏操作场景。标签要说明发生了什么以及下一步怎么做，比如“低可信度，请先核查来源”优于“AI 正在思考”。不要虚构客户数据、专有来源名称、准确率指标或无依据承诺。
 
 ## Do's and Don'ts
 
-Do show answer provenance, confidence, source citations, selected source detail, keyboard focus, touch-safe controls, low-confidence states, unavailable source states, and permission-blocked recovery. Don't use marketing-first composition, generic AI glow, abstract gradients, hidden sources, identical-looking states, fake source data, or decorative panels that compete with the answer.
+Do：展示答案出处、可信度、来源引用、选中来源详情、keyboard focus、适合触控的控件、低可信度状态、来源不可用状态和权限受限恢复。Don't：使用营销优先构图、泛化 AI 发光、抽象渐变、隐藏来源、看起来完全一样的状态、虚构来源数据，或用装饰面板抢走答案注意力。
 
 ## Reference Direction
 
-Reference direction: `enterprise_data_workspace` - Enterprise data workspace.
+Reference direction: `enterprise_data_workspace` - 企业数据工作台。
 
-Use this direction for data density, source hierarchy, permission states, and repeated-use ergonomics. It is an inspiration boundary only: do not copy third-party brand assets, logos, proprietary fonts, screenshots, full color systems, or complete `DESIGN.md` files.
+只借鉴数据密度、来源层级、权限状态和高频使用的人机工效。这只是灵感边界：do not copy 第三方品牌资产、Logo、专有字体、截图、完整配色系统或完整 `DESIGN.md` 文件。
 
 ## Agent Guidance
 
-Treat front matter tokens as normative. If a needed token is missing, derive from the closest semantic role and record the assumption. Preserve the Dense Research Workspace strategy, source-forward hierarchy, visible low-confidence and permission states, restrained blue interactions, and no-fake-source-data boundary.
+把 front matter tokens 当成强约束。如果缺少必要 token，从最接近的语义角色派生，并记录假设。保留“密集研究工作台”策略、来源优先层级、可见的低可信度和权限状态、克制蓝色交互，以及不虚构来源数据的边界。
 
 Required Content
-Core claim: Review every AI answer with visible sources, confidence, and recovery paths.
+Core claim: 用可见来源、可信度和恢复路径审查每一个 AI 答案。
 Supporting points:
-- Keep the query, answer status, and confidence visible.
-- Show source titles, excerpts, link status, date, and owner or system.
-- Let users inspect source detail without losing the answer context.
-- Handle empty, loading, partial, low-confidence, failed, and source-unavailable states.
+- 始终保留查询、答案状态和可信度。
+- 展示来源标题、摘录、链接状态、日期以及负责人或系统。
+- 让用户在不丢失答案上下文的情况下查看来源详情。
+- 覆盖空状态、加载中、成功、部分完成、低可信度、失败和来源不可用状态。
 Proof points:
-- Answer panel with confidence and citation markers.
-- Source list with excerpts and status labels.
-- Source detail panel with selected source metadata.
-- Save/share controls with success and failed states.
+- 带可信度和引用标记的答案面板。
+- 带摘录和状态标签的来源列表。
+- 带选中来源元数据的来源详情面板。
+- 保存/分享控件，并包含成功和失败反馈。
 Sections:
-- top search area
-- answer status strip
-- answer body
-- cited source list
-- source detail panel
-- save/share controls
+- 顶部搜索区
+- 答案状态条
+- 答案正文
+- 引用来源列表
+- 来源详情面板
+- 保存/分享控件
 Section details:
-- top search area: purpose: Keep the user's query visible and editable.; content: query input, submit control, recent query context; visual anchor: Full-width search bar with compact metadata
-- answer status strip: purpose: Answer what the user asked, how trustworthy it is, and where it comes from.; content: answer state, confidence badge, source count, last updated metadata; visual anchor: Compact status row above the answer
-- answer body: purpose: Present the sourced answer in a readable structure.; content: summary, key points, citation markers, follow-up prompt affordance; visual anchor: Main answer panel
-- cited source list: purpose: Make source origin discoverable and scannable.; content: source title, excerpt, system or owner, date, link status, relevance; visual anchor: Stacked source cards with active and unavailable states
-- source detail panel: purpose: Show selected source details without hiding the answer.; content: selected source title, longer excerpt, metadata, open source action, permission state; visual anchor: Right panel on desktop and expandable panel on tablet/mobile
-- save/share controls: purpose: Turn useful answers into team artifacts.; content: save answer, share with team, copy link, status feedback; visual anchor: Compact action row tied to answer state
+- 顶部搜索区: purpose: 让用户的问题始终可见并可编辑。; content: 查询输入框, 提交控件, 最近查询上下文; visual anchor: 带紧凑元信息的全宽搜索栏
+- 答案状态条: purpose: 回答用户问了什么、答案有多可信，以及答案来自哪里。; content: 答案状态, 可信度徽标, 来源数量, 最近更新时间; visual anchor: 答案上方的紧凑状态行
+- 答案正文: purpose: 用易读结构呈现带来源答案。; content: 摘要, 关键点, 引用标记, 追问入口; visual anchor: 主答案面板
+- 引用来源列表: purpose: 让来源出处容易发现和快速扫描。; content: 来源标题, 摘录, 系统或负责人, 日期, 链接状态, 相关度; visual anchor: 带选中和不可用状态的纵向来源卡片
+- 来源详情面板: purpose: 展示选中来源详情，同时不遮挡答案。; content: 选中来源标题, 更长摘录, 元数据, 打开来源操作, 权限状态; visual anchor: 桌面端右侧面板，平板和移动端为可展开面板
+- 保存/分享控件: purpose: 把有用答案变成团队可复用资料。; content: 保存答案, 分享给团队, 复制链接, 状态反馈; visual anchor: 绑定答案状态的紧凑操作行
 Screens:
-- desktop research workspace
-- tablet answer detail with collapsible source detail
-- mobile answer detail stack
+- 桌面端研究工作台
+- 平板端答案详情和可展开来源详情
+- 移动端答案详情堆叠
 Flows:
-- user enters a query and submits search
-- answer generates with visible loading state
-- user reviews confidence and cited source markers
-- user selects a source and opens source detail
-- user saves or shares the answer
-- user retries when answer generation or source loading fails
+- 用户输入问题并提交搜索
+- 答案生成时展示清楚的加载状态
+- 用户查看可信度和引用来源标记
+- 用户选择一个来源并打开来源详情
+- 用户保存或分享答案
+- 答案生成失败或来源加载失败时，用户可以重试
 Interaction states:
-- Search input states: empty, input, submitting, failed, retry.
-- Answer area states: empty, generating, success, partial, low-confidence, failed.
-- Source list states: empty, loading, available, source-unavailable.
-- Source detail states: unselected, loading, success, permission-blocked.
-- Save/share states: idle, working, success, failed.
+- 搜索输入状态：空、已输入、提交中、失败、重试。
+- 答案区域状态：空、生成中、成功、部分完成、低可信度、失败。
+- 来源列表状态：空、加载中、可用、来源不可用。
+- 来源详情状态：未选择、加载中、成功、权限受限。
+- 保存/分享状态：空闲、处理中、成功、失败。
 Interaction contract:
-- Submitting a query shows a generating state in the answer area and loading state in the source list.
-- Citation markers in the answer scroll or focus the matching source card.
-- Selecting a source card updates the source detail panel without losing the answer context.
-- Unavailable sources show a reason and a retry or request-access path.
-- Low-confidence answers show a caution state and suggest checking sources before sharing.
-- Save and share controls show working, success, and failed feedback without changing the selected strategy.
+- 提交查询后，答案区域进入生成中状态，来源列表进入加载状态。
+- 答案中的引用标记会滚动或聚焦到匹配的来源卡片。
+- 选择来源卡片会更新来源详情面板，并保持答案上下文不丢失。
+- 不可用来源要显示原因，并提供重试或申请访问路径。
+- 低可信度答案要显示谨慎提示，并建议分享前先核查来源。
+- 保存和分享控件要显示处理中、成功和失败反馈，同时不改变已选策略。
 
 Constraints
-Platform: responsive app-page UI
+Platform: 响应式应用页面 UI
 Responsive: True
 Tech stack:
-- HTML prototype
-- React or Next.js compatible structure
-- Tailwind-compatible tokens
+- HTML 原型
+- 兼容 React 或 Next.js 的结构
+- 兼容 Tailwind 的 design tokens
 Accessibility:
-- visible focus
-- semantic sections
-- readable contrast
-- 44px mobile touch targets
-- clear state labels
+- 可见聚焦
+- 语义化区块
+- 可读对比度
+- 移动端 44px 触控目标
+- 清楚的状态标签
 Responsive and accessibility requirements:
-- Desktop >= 1024px uses a top search area, main answer-and-citations area, and right source detail panel.
-- Tablet 768-1023px collapses source detail into an expandable panel below the source list.
-- Mobile <= 767px orders content as search, answer status, answer body, sources, source detail, then save/share actions.
-- The first screen must answer: what did the user ask, how trustworthy is the answer, and where does the answer come from.
-- No horizontal scrolling on mobile; source cards, citation markers, and save/share controls must wrap cleanly.
-- Keyboard order follows search input, submit, answer citations, source cards, source detail actions, save/share controls.
-- Every interactive element has visible focus and at least a 44px mobile touch target.
-- Use semantic headings and descriptive labels for confidence, source status, and permission-blocked states.
+- 桌面端 >= 1024px 使用顶部搜索区、主答案和引用区域，以及右侧来源详情面板。
+- 平板 768-1023px 将来源详情折叠到来源列表下方。
+- 移动端 <= 767px 的内容顺序是搜索、答案状态、答案正文、来源、来源详情，然后是保存/分享操作。
+- 首屏必须回答：用户问了什么、答案有多可信、答案来自哪里。
+- 移动端不能横向滚动；来源卡片、引用标记和保存/分享控件都要自然换行。
+- 键盘顺序依次经过搜索输入、提交、答案引用、来源卡片、来源详情操作和保存/分享控件。
+- 每个可交互元素都要有可见聚焦状态，移动端触控目标至少 44px。
+- 为可信度、来源状态和权限受限状态使用语义化标题和描述性标签。
 Deadline: Phase 2 result review demo
 
 Do Not Do
 Forbidden visual directions:
-- marketing hero layout
-- generic AI glow
-- abstract gradients
-- fake source data
-- decorative panels without function
+- 营销首屏布局
+- 泛化 AI 发光效果
+- 抽象渐变
+- 虚构来源数据
+- 没有功能意义的装饰面板
 Must avoid:
-- marketing-first composition
-- hidden or low-contrast sources
-- generic AI wording
-- state changes that look identical
-- fake source or customer proof
+- 营销优先构图
+- 隐藏或低对比来源
+- 泛泛的 AI 话术
+- 看不出差异的状态变化
+- 虚构来源或客户证明
 Content warnings:
-- Do not invent customer data, proprietary source names, or unsupported accuracy claims.
-- Avoid vague AI assistant copy that does not explain source trust.
+- 不要虚构客户数据、专有来源名称或无依据的准确率说法。
+- 避免没有解释来源可信度的空泛 AI 助手话术。
 
 Deliverable
 Create a high-fidelity HTML prototype with real product surfaces, clickable interactions, and reviewable visual detail.
 
 Review Criteria
 Must have:
-- query visibility
-- answer confidence
-- source citation list
-- source detail panel
-- empty/loading/success/partial/low-confidence/failed states
-- source-unavailable and permission-blocked states
-- save/share feedback
-- mobile content order
+- 查询可见
+- 答案可信度
+- 来源引用列表
+- 来源详情面板
+- 空、加载中、成功、部分完成、低可信度、失败状态
+- 来源不可用和权限受限状态
+- 保存/分享反馈
+- 移动端内容顺序
 Review criteria:
-- first screen shows query, trust, and source origin
-- answer and sources have clear hierarchy
-- source detail is discoverable
-- all required states are represented
-- mobile order keeps answer and source context intact
-- DESIGN.md visual rules are followed
+- 首屏展示查询、可信度和来源出处
+- 答案和来源有清楚层级
+- 来源详情容易发现
+- 所有必要状态都有体现
+- 移动端顺序保持答案和来源上下文
+- 遵循 DESIGN.md 视觉规则

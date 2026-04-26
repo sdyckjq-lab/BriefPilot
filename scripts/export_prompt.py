@@ -11,12 +11,26 @@ TARGET_DELIVERABLES = {
     "v0": "Create a runnable React or Next.js UI component, using shadcn/ui and Tailwind-compatible tokens when suitable.",
 }
 
+SUPPORTED_CONTENT_LANGUAGES = {"zh-CN"}
+DEFAULT_CONTENT_LANGUAGE = "zh-CN"
+OUTPUT_LANGUAGE_RULES = {
+    "zh-CN": "\n".join(
+        [
+            "用户可见 UI 文案必须使用简体中文（Simplified Chinese / zh-CN）。",
+            "Use Simplified Chinese for all user-visible UI copy.",
+            "代码标识、文件名、组件名、命令示例、design token keys 和工具名保持英文。",
+            "如果输入里有用户原话引用，除非明确要求翻译，否则保持原文。",
+        ]
+    )
+}
+
 
 SECTION_ORDER = [
     "Task",
     "Context",
     "Audience",
     "Goal",
+    "Output Language",
     "Visual Strategy",
     "DESIGN.md Visual System",
     "Required Content",
@@ -68,6 +82,14 @@ def read_optional(path):
     return Path(path).read_text(encoding="utf-8")
 
 
+def content_language(brief):
+    meta = brief.get("meta", {}) if isinstance(brief.get("meta", {}), dict) else {}
+    language = meta.get("content_language") or DEFAULT_CONTENT_LANGUAGE
+    if language not in SUPPORTED_CONTENT_LANGUAGES:
+        return DEFAULT_CONTENT_LANGUAGE
+    return language
+
+
 def build_sections(brief, design_text, target):
     project = brief.get("project", {})
     audience = brief.get("audience", {})
@@ -112,6 +134,7 @@ def build_sections(brief, design_text, target):
             f"Secondary CTA: {goals.get('secondary_cta', '')}",
         ]
     )
+    output_language = OUTPUT_LANGUAGE_RULES[content_language(brief)]
     visual_strategy = compact(
         [
             f"Strategy: {visual.get('strategy_name', '')}",
@@ -209,6 +232,7 @@ def build_sections(brief, design_text, target):
         "Context": context,
         "Audience": audience_text,
         "Goal": goal,
+        "Output Language": output_language,
         "Visual Strategy": visual_strategy,
         "DESIGN.md Visual System": design_md,
         "Required Content": required_content,

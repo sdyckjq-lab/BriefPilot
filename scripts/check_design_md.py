@@ -246,6 +246,148 @@ def source_sha256(design_path):
         return ""
 
 
+def term_between(text, prefix, suffix):
+    if not isinstance(text, str) or prefix not in text:
+        return ""
+    tail = text.split(prefix, 1)[1]
+    if suffix and suffix in tail:
+        tail = tail.split(suffix, 1)[0]
+    return tail.strip().strip(".")
+
+
+def localized_reference_direction_drift(item):
+    location = item.get("location", "")
+    if location.endswith("product_proof"):
+        return (
+            "官网方向需要补充产品界面证明、截图、mock 或 demo。",
+            "补充与所选参考方向一致的产品证明指导，或换成更合适的参考方向。",
+        )
+    if location.endswith("conversion_path"):
+        return (
+            "官网方向需要补充 CTA、注册、试用、演示或转化路径。",
+            "补充清楚的转化路径指导，或换成更合适的参考方向。",
+        )
+    if location.endswith("data_density"):
+        return (
+            "工作台方向需要说明扫描密度、面板、行或元数据层级。",
+            "补充数据密度和信息层级指导，或换成更合适的参考方向。",
+        )
+    if location.endswith("stateful_surface"):
+        return (
+            "界面方向需要补充 loading、empty、success、error、权限或不可用状态。",
+            "补充关键页面状态指导，或换成更合适的参考方向。",
+        )
+    return (
+        "参考方向需要补充与所选方向一致的机制。",
+        "补充匹配所选参考方向的设计指导，或换成更合适的参考方向。",
+    )
+
+
+def localize_finding(item):
+    localized = dict(item)
+    rule_id = item.get("rule_id", "")
+    location = item.get("location", "")
+    message = item.get("message", "")
+
+    if rule_id == "missing_canonical_section":
+        localized["message"] = f"缺少规范章节：{location}。"
+        localized["suggested_fix"] = "按规范顺序补上该章节。"
+    elif rule_id == "section_order":
+        localized["message"] = "规范章节顺序不符合要求。"
+        localized["suggested_fix"] = "按 DESIGN.md 规范顺序重新排列章节。"
+    elif rule_id == "missing_quality_section":
+        localized["message"] = f"缺少高质量指导章节：{location}。"
+        localized["suggested_fix"] = "生成升级版 BriefPilot DESIGN.md 时补上该章节。"
+    elif rule_id == "missing_token_group":
+        localized["message"] = f"缺少必需 token 分组：{location}。"
+        localized["suggested_fix"] = "在 front matter 中补上该 token 分组。"
+    elif rule_id == "missing_color_role":
+        localized["message"] = f"缺少必需语义颜色：{location}。"
+        localized["suggested_fix"] = "补上对应的语义颜色角色。"
+    elif rule_id == "invalid_required_color":
+        value = message.rsplit(": ", 1)[-1] if ": " in message else ""
+        localized["message"] = f"必需颜色值无效：{location} = {value}。"
+        localized["suggested_fix"] = "使用 #RGB 或 #RRGGBB 格式的十六进制颜色。"
+    elif rule_id == "invalid_color":
+        value = message.rsplit(": ", 1)[-1] if ": " in message else ""
+        localized["message"] = f"颜色值无效：{location} = {value}。"
+        localized["suggested_fix"] = "使用 #RGB 或 #RRGGBB 格式的十六进制颜色。"
+    elif rule_id == "missing_typography_level":
+        localized["message"] = f"缺少字体层级：{location}。"
+        localized["suggested_fix"] = "补完整 display、title、heading、body、caption 和 label 层级。"
+    elif rule_id == "broken_token_reference":
+        localized["message"] = f"token 引用无法解析：{{{location}}}。"
+        localized["suggested_fix"] = "补上被引用的 token，或更新引用路径。"
+    elif rule_id == "low_contrast":
+        localized["message"] = f"组件文字和背景对比度低于 4.5:1：{location}。"
+        localized["suggested_fix"] = "调整组件文字或背景颜色，保证可读。"
+    elif rule_id == "missing_component_state":
+        term = term_between(message, "does not mention ", " state")
+        localized["message"] = f"组件指导缺少 {term or '必要'} 状态。"
+        localized["suggested_fix"] = "补充可落地的组件状态指导。"
+    elif rule_id == "missing_page_state":
+        term = term_between(message, "does not mention ", "")
+        localized["message"] = f"页面或数据状态指导缺少 {term or '必要'} 状态。"
+        localized["suggested_fix"] = "补充生成页面或应用界面需要的状态指导。"
+    elif rule_id == "missing_accessibility_guidance":
+        term = term_between(message, "does not mention ", "")
+        localized["message"] = f"可访问性说明缺少 {term or '必要'} 要求。"
+        localized["suggested_fix"] = "补充明确的可访问性要求。"
+    elif rule_id == "missing_motion_guidance":
+        localized["message"] = "缺少动效和反馈指导。"
+        localized["suggested_fix"] = "补充克制动效、反馈和 reduced-motion 指导。"
+    elif rule_id == "missing_content_voice":
+        localized["message"] = "缺少内容语气指导。"
+        localized["suggested_fix"] = "补充语气和文案指导。"
+    elif rule_id == "missing_reference_direction":
+        localized["message"] = "缺少本地参考方向。"
+        localized["suggested_fix"] = "从 design-style-index.json 选择一个方向，并说明使用边界。"
+    elif rule_id == "unknown_reference_direction":
+        localized["message"] = f"未知参考方向：{location}。"
+        localized["suggested_fix"] = "使用 design-style-index.json 中存在的 id。"
+    elif rule_id == "reference_direction_conflict":
+        localized["message"] = "当前参考方向和装饰性 hero-only 指导冲突。"
+        localized["suggested_fix"] = "使用登录后数据工作台指导，或改选 ai_product_landing_page。"
+    elif rule_id == "reference_direction_drift":
+        localized["message"], localized["suggested_fix"] = localized_reference_direction_drift(item)
+    elif rule_id == "brand_copy_risk":
+        localized["message"] = "检测到直接复制品牌的指令。"
+        localized["suggested_fix"] = "改写为抽象参考机制，并移除复制受保护品牌资产的要求。"
+    elif rule_id == "front_matter_parse_error":
+        localized["message"] = f"front matter 解析失败：{message}。"
+        localized["suggested_fix"] = "使用支持的嵌套 key/value front matter 格式。"
+    elif rule_id == "missing_front_matter":
+        localized["message"] = "缺少由 --- 包裹的 YAML front matter。"
+        localized["suggested_fix"] = "添加包含必需 token 分组的 front matter。"
+    elif rule_id == "missing_name":
+        localized["message"] = "front matter 缺少 name。"
+        localized["suggested_fix"] = "补上视觉系统名称。"
+    elif rule_id == "design_md_unreadable":
+        localized["message"] = f"DESIGN.md 无法读取：{message}。"
+        localized["suggested_fix"] = "使用可读取的 UTF-8 Markdown 文件。"
+    elif rule_id == "official_tool_unavailable":
+        localized["message"] = "official 模式需要安全的本地官方命令路径。"
+        localized["suggested_fix"] = "改用 fallback 模式，或提供安全的本地官方命令绝对路径。"
+    elif rule_id == "official_lint_timeout":
+        localized["message"] = "官方 lint 执行超时。"
+        localized["suggested_fix"] = "使用 fallback 报告，或用确认可用的官方工具重新运行。"
+    elif rule_id == "official_lint_error":
+        localized["message"] = "官方 lint 启动失败。"
+        localized["suggested_fix"] = "使用 fallback 报告，或用确认可用的官方工具重新运行。"
+    elif rule_id == "official_lint_failed":
+        localized["message"] = "Google 官方 DESIGN.md lint 返回非零状态。"
+        localized["suggested_fix"] = "阅读官方输出，并修复更严格的 lint 问题。"
+    elif rule_id == "optional_official_check":
+        localized["message"] = "未运行 Google 官方 DESIGN.md lint，本报告使用内置 fallback 检查。"
+        localized["suggested_fix"] = "如需更严格检查，提供安全的 --official-command 绝对路径，或手动运行官方工具。"
+
+    return localized
+
+
+def localize_findings(findings):
+    return [localize_finding(item) for item in findings]
+
+
 def build_report(design_path, requested_mode="auto", official_command=None):
     analysis = design_md_checks.analyze_path(design_path)
     findings = list(analysis["findings"])
@@ -262,6 +404,7 @@ def build_report(design_path, requested_mode="auto", official_command=None):
                 "For stricter checks, provide a safe absolute --official-command path or run the official tool manually.",
             )
         )
+    findings = localize_findings(findings)
     counts = design_md_checks.severity_counts(findings)
     directions = design_md_checks.style_directions_by_id()
     direction_id = analysis.get("reference_direction")
@@ -293,37 +436,37 @@ def markdown_safe(value):
 def render_markdown(report):
     findings = report.get("findings", [])
     lines = [
-        "# DESIGN.md Review",
+        "# DESIGN.md 评审报告",
         "",
-        f"Mode: {markdown_safe(report['mode'])}",
+        f"模式：{markdown_safe(report['mode'])}",
         "",
-        f"Blocking: {str(report['blocking']).lower()}",
+        f"是否阻断：{str(report['blocking']).lower()}",
         "",
-        f"Reference direction: {markdown_safe(report['reference_direction'].get('id', ''))}",
+        f"参考方向：{markdown_safe(report['reference_direction'].get('id', ''))}",
         "",
-        f"Source SHA-256: {markdown_safe(report.get('source_sha256', ''))}",
+        f"来源 SHA-256：{markdown_safe(report.get('source_sha256', ''))}",
         "",
-        "Severity counts:",
+        "问题数量：",
         "",
         f"- blocking: {report['summary'].get('blocking', 0)}",
         f"- warning: {report['summary'].get('warning', 0)}",
         f"- info: {report['summary'].get('info', 0)}",
         "",
-        f"Next action: {report['next_action']}",
+        f"下一步：{report['next_action']}",
         "",
-        "Official tool:",
+        "官方工具：",
         "",
-        f"- available: {str(report['official_tool'].get('available', False)).lower()}",
-        f"- command: {markdown_safe(report['official_tool'].get('command') or '')}",
-        f"- merged: {str(report['official_tool'].get('merged', False)).lower()}",
+        f"- 可用：{str(report['official_tool'].get('available', False)).lower()}",
+        f"- 命令：{markdown_safe(report['official_tool'].get('command') or '')}",
+        f"- 已合并：{str(report['official_tool'].get('merged', False)).lower()}",
         "",
-        "## Findings",
+        "## 发现",
         "",
     ]
     if findings:
         for item in findings:
             lines.append(
-                "- {severity} [{rule_id}] {location}: {message} Fix: {suggested_fix}".format(
+                "- {severity} [{rule_id}] {location}：{message} 修复建议：{suggested_fix}".format(
                     severity=markdown_safe(item.get("severity", "")),
                     rule_id=markdown_safe(item.get("rule_id", "")),
                     location=markdown_safe(item.get("location", "")),
@@ -332,7 +475,7 @@ def render_markdown(report):
                 )
             )
     else:
-        lines.append("- None")
+        lines.append("- 无")
     return "\n".join(lines).rstrip() + "\n"
 
 

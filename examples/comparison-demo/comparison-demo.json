@@ -3,26 +3,26 @@
   "raw_input": "帮我做一个 AI 搜索产品官网",
   "baseline": {
     "source_type": "controlled",
-    "label": "Controlled direct-generation baseline",
-    "summary": "An authored baseline example that represents common weak output from sending the vague request directly to a design generator.",
+    "label": "直接生成的受控基线",
+    "summary": "手工整理的受控基线示例，用来代表把模糊需求直接交给设计生成器后常见的弱结果。",
     "weaknesses": [
-      "Generic AI headline with no named audience",
-      "Vague feature cards without product proof",
-      "No sourced-answer product surface",
-      "Unclear trust, security, and review criteria",
-      "No loading, error, empty, or mobile behavior"
+      "泛化 AI 标题，没有明确受众",
+      "功能卡片空泛，缺少产品证据",
+      "没有带来源答案的产品界面",
+      "信任、安全和评审标准不清楚",
+      "没有加载、错误、空状态或移动端行为"
     ]
   },
   "enhanced": {
-    "label": "BriefPilot-enhanced result",
+    "label": "BriefPilot 强化结果",
     "source_path": "examples/ai-search-landing",
-    "summary": "A condensed demo view grounded in the verified AI search landing package.",
+    "summary": "基于已验证 AI 搜索官网样例包整理出的压缩演示视图。",
     "evidence": [
-      "Audience: knowledge workers and small teams",
-      "Goal: drive trial signup with demo as secondary action",
-      "Strategy: Enterprise Trust",
-      "Proof: sourced-answer product surface and source chips",
-      "Quality bar: first-screen clarity, CTA hierarchy, responsive fit, and trust cues"
+      "受众：知识工作者和小团队",
+      "目标：推动试用注册，预约演示为次要动作",
+      "策略：企业信任型",
+      "证据：带来源答案的产品界面和来源标签",
+      "评审标准：首屏清楚、CTA 层级、响应式适配和信任线索"
     ]
   },
   "page": {
@@ -34,10 +34,10 @@
     "enhanced_region": "briefpilot-mockup"
   },
   "comparison_claims": [
-    "BriefPilot makes the audience and business goal explicit.",
-    "BriefPilot turns a vague page request into a concrete product structure.",
-    "BriefPilot adds product proof instead of relying on generic AI claims.",
-    "BriefPilot carries review criteria and state requirements into the next prompt."
+    "BriefPilot 让受众和业务目标变明确。",
+    "BriefPilot 把模糊页面需求变成具体结构。",
+    "BriefPilot 加入产品证据，而不是依赖泛化 AI 说法。",
+    "BriefPilot 把评审标准和状态要求带进下一轮提示。"
   ],
   "future_real_output_todo_path": "examples/comparison-demo/future-real-output-todo.md"
 }

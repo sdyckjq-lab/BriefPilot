@@ -1,79 +1,81 @@
-# AI Search Workspace Answer Detail
+# BriefSearch AI 搜索研究工作台答案详情
 
-## Project Overview
+## 项目概览
 
-Create an app-page workflow for an AI search product where a user asks a question, reviews a sourced answer, inspects citations, and saves or shares the result.
+创建一个 AI 搜索产品的应用页面工作流：用户提出问题、查看带来源答案、核查引用、打开来源详情，并把结果保存或分享给团队。
 
-This is a product workspace screen, not a marketing page.
+这是产品内的研究工作台页面，不是营销页。
 
-## Brief Diagnosis
+内容语言：面向用户的 UI 文案使用简体中文 (`zh-CN`)；技术标识、文件名、工具名和 design token keys 保持英文。
 
-Initial score: 58.
+## 需求诊断
 
-Main gaps resolved by assumptions:
+初始分数：58。
 
-- Answer states were unspecified.
-- Source citation behavior was unspecified.
-- Source detail hierarchy was unspecified.
-- Save/share behavior was unspecified.
-- Mobile order and keyboard behavior were unspecified.
+通过假设补齐了以下缺口：
 
-## Target Audience
+- 答案状态没有定义。
+- 来源引用行为没有定义。
+- 来源详情层级没有定义。
+- 保存/分享行为没有定义。
+- 移动端顺序和键盘行为没有定义。
 
-Primary user: knowledge workers and analysts who need to verify AI search answers before using them.
+## 目标受众
 
-Secondary user: team leads reviewing saved research artifacts from teammates.
+主要用户：需要在使用 AI 搜索答案前先核查来源的知识工作者和分析人员。
 
-## Business Goal
+次要用户：查看队友保存研究结果的团队负责人。
 
-Increase trust and repeat use of sourced AI answers.
+## 业务目标
 
-## Design Goal
+提升用户对带来源 AI 答案的信任和重复使用率。
 
-Make the query, answer confidence, answer body, and source origin clear in the first screen.
+## 设计目标
 
-## Core Message
+让查询、答案可信度、答案正文和来源出处在首屏就清楚可见。
 
-Review every AI answer with visible sources, confidence, and recovery paths.
+## 核心信息
 
-## Required Structure
+用可见来源、可信度和恢复路径审查每一个 AI 答案。
 
-- Top search area
-- Answer status strip
-- Answer body
-- Cited source list
-- Source detail panel
-- Save/share controls
+## 必要结构
 
-Desktop should show a top search area, a main answer-and-citations area, and a right source detail panel. Tablet can collapse source detail below the source list. Mobile should order content as search, answer status, answer body, sources, source detail, then save/share actions.
+- 顶部搜索区
+- 答案状态条
+- 答案正文
+- 引用来源列表
+- 来源详情面板
+- 保存/分享控件
 
-## Visual Direction
+桌面端展示顶部搜索区、主答案与引用区域，以及右侧来源详情面板。平板端可以把来源详情折叠到来源列表下方。移动端内容顺序是搜索、答案状态、答案正文、来源、来源详情，然后是保存/分享操作。
 
-Selected strategy: Dense Research Workspace.
+## 视觉方向
 
-Tone: dense, trustworthy, calm, product-led, source-forward.
+已选策略：密集研究工作台。
 
-The screen should feel like a serious research surface. It should show answer provenance, confidence, source citations, and source-detail interaction without feeling cluttered.
+视觉语气：密集、可信、冷静、产品驱动、来源优先。
 
-## Strategy Options
+这个界面应该像严肃的研究工作台。它需要展示答案出处、可信度、来源引用和来源详情交互，但不能显得杂乱。
 
-1. Dense Research Workspace: selected. Best when analysts need to inspect a sourced AI answer quickly.
-2. Evidence-First Answer Detail: source-forward, best when trust proof must come before speed.
-3. Lightweight Team Notebook: organized and collaborative, best for saved team research.
+## 策略选项
 
-## Brand Context
+1. 密集研究工作台：已选，适合分析人员快速核查带来源 AI 答案。
+2. 证据优先答案详情：来源优先，适合必须先证明可信度再强调速度的产品。
+3. 轻量团队笔记：组织清楚、偏协作，适合保存后的团队研究资料。
 
-Brand: BriefSearch.
+## 品牌上下文
 
-Use deep ink, slate, restrained blue, muted success green, and amber caution. Do not invent real customer data or proprietary source names.
+品牌：BriefSearch。
 
-## DESIGN.md Reference
+使用深色正文、灰蓝、克制蓝、柔和成功绿和琥珀色警示。不要虚构真实客户数据或专有来源名称。
 
-Use `DESIGN.md` from this package as the source of truth for colors, type, spacing, radius, panels, source cards, and forbidden visual directions.
+## DESIGN.md 参考
 
-Reference direction: `enterprise_data_workspace` - use data density, source hierarchy, permission states, and repeated-use ergonomics as mechanisms only.
+本包内的 `DESIGN.md` 是颜色、字体、间距、圆角、面板、来源卡片和禁止视觉方向的事实来源。
 
-## Asset List
+参考方向：`enterprise_data_workspace` - 只借鉴数据密度、来源层级、权限状态和高频使用的人机工效。
+
+## 资产
 
 - `input.txt`
 - `diagnosis-and-strategies.md`
@@ -86,48 +88,48 @@ Reference direction: `enterprise_data_workspace` - use data density, source hier
 - `prompts/claude-design.txt`
 - `prompts/v0.txt`
 
-## Interaction Requirements
+## 交互要求
 
-- Search input states: empty, input, submitting, failed, retry.
-- Answer area states: empty, generating, success, partial, low-confidence, failed.
-- Source list states: empty, loading, available, source-unavailable.
-- Source detail states: unselected, loading, success, permission-blocked.
-- Save/share states: idle, working, success, failed.
-- Citation markers in the answer should focus the matching source card.
-- Selecting a source should update source detail without losing answer context.
+- 搜索输入状态：empty、input、submitting、failed、retry。
+- 答案区域状态：empty、generating、success、partial、low-confidence、failed。
+- 来源列表状态：empty、loading、available、source-unavailable。
+- 来源详情状态：unselected、loading、success、permission-blocked。
+- 保存/分享状态：idle、working、success、failed。
+- 答案中的引用标记应该聚焦到匹配的来源卡片。
+- 选择来源时，来源详情要更新，同时不丢失答案上下文。
 
-## Constraints
+## 约束
 
-- Responsive app-page UI.
-- HTML prototype or React/Next.js-compatible structure.
-- Tailwind-compatible tokens are acceptable.
-- Keep realistic placeholders; do not invent customer proof.
+- 响应式应用页面 UI。
+- HTML 原型或兼容 React/Next.js 的结构。
+- 可以使用兼容 Tailwind 的 tokens。
+- 使用可信占位，不虚构客户证明。
 
-## Forbidden Directions
+## 禁止方向
 
-- Marketing-first composition.
-- Hidden or low-contrast sources.
-- Generic AI glow.
-- Abstract gradients.
-- State changes that look identical.
-- Fake source or customer proof.
+- 营销优先构图。
+- 隐藏或低对比来源。
+- 泛化 AI 发光效果。
+- 抽象渐变。
+- 看不出差异的状态变化。
+- 虚构来源或客户证明。
 
-## Success Criteria
+## 成功标准
 
-- First screen shows query, trust, and source origin.
-- Answer and sources have clear hierarchy.
-- Source detail is discoverable.
-- All required states are represented.
-- Mobile order keeps answer and source context intact.
-- `DESIGN.md` visual rules are followed.
+- 首屏展示查询、可信度和来源出处。
+- 答案和来源有清楚层级。
+- 来源详情容易发现。
+- 所有必要状态都有体现。
+- 移动端顺序保持答案和来源上下文。
+- 遵循 `DESIGN.md` 视觉规则。
 
-## Open Questions
+## 待确认问题
 
-- Which source systems are real at launch?
-- How should permission requests be routed inside the product?
+- 发布时有哪些真实来源系统？
+- 产品内应该如何路由权限申请？
 
-## Assumptions
+## 假设
 
-- The app user is already signed in.
-- The product has permission-aware source access.
-- The answer may be generated from multiple internal sources.
+- 应用用户已经登录。
+- 产品具备按权限访问来源的能力。
+- 答案可能由多个内部来源共同生成。

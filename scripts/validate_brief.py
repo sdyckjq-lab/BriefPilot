@@ -3,10 +3,13 @@ import json
 import sys
 from pathlib import Path
 
+import language_checks
+
 
 REQUIRED_FIELDS = [
     "meta.version",
     "meta.created_by",
+    "meta.content_language",
     "project.name",
     "project.summary",
     "project.task_type",
@@ -19,6 +22,8 @@ REQUIRED_FIELDS = [
     "design_system.design_md_path",
     "quality_bar.review_criteria",
 ]
+
+SUPPORTED_CONTENT_LANGUAGES = {"zh-CN"}
 
 
 def value_at(data, dotted_path):
@@ -74,6 +79,12 @@ def main(argv):
             print(f"- {field}")
         return 1
 
+    content_language = value_at(data, "meta.content_language")
+    if content_language not in SUPPORTED_CONTENT_LANGUAGES:
+        print("invalid references:")
+        print(f"- meta.content_language must be one of: {', '.join(sorted(SUPPORTED_CONTENT_LANGUAGES))}")
+        return 1
+
     if not has_value(data.get("assumptions")) and not has_value(data.get("open_questions")):
         print("missing fields:")
         print("- assumptions or open_questions")
@@ -83,6 +94,11 @@ def main(argv):
     if not resolve_existing_path(design_md_path, path):
         print("invalid references:")
         print(f"- design_system.design_md_path does not exist: {design_md_path}")
+        return 1
+
+    if content_language == "zh-CN" and not language_checks.is_chinese_first_brief(data):
+        print("invalid content:")
+        print("- design-brief.json declares zh-CN but brief values are not Chinese-first")
         return 1
 
     print(f"valid: {path}")

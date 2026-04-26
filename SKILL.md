@@ -1,66 +1,70 @@
 ---
 name: briefpilot
-description: Design brief compiler and result-review loop for AI design workflows. Verified on one AI search SaaS landing page golden demo and one AI search workspace answer-detail review demo. Use when a user wants to turn a vague product or page request into a reusable design brief, Google-style DESIGN.md visual system, targeted prompts for huashu-design, Claude Design, and v0, a review checklist, and post-generation modification prompts.
+description: Chinese-first design brief compiler and result-review loop for AI design workflows. Use when a user wants to turn a vague product or page request into a reusable design brief, Google-style DESIGN.md visual system, targeted prompts for huashu-design, Claude Design, and v0, a review checklist, and post-generation modification prompts.
 ---
 
 # BriefPilot
 
-Use BriefPilot before design generation starts, and use it again after generation when the user asks whether a downstream result is good enough or how to fix it.
+BriefPilot 用在设计生成之前，也用在生成之后。它先把用户的模糊需求整理成可复用的 brief；当用户提供下游生成结果后，再用同一套 brief 判断结果是否够好，并产出下一轮修改提示。
 
-## Core Rule
+## 核心规则
 
-Do not directly generate the final design unless the user explicitly asks. First compile the user's request into a reusable brief. After a downstream tool generates a result, review that result against the same saved brief package before writing any modification prompt.
+不要直接生成最终设计，除非用户明确要求。先把用户请求整理成可复用 brief。下游工具生成结果后，先对照保存好的 brief 包做评审，再写修改提示。
 
-## Default Workflow
+## 默认语言
 
-1. Read the user's request, existing project context, and any existing `DESIGN.md`.
-2. Diagnose the request with the scoring rubric in `references/scoring-rubric.md`.
-3. Identify missing high-value information.
-4. Ask 3-7 questions in standard mode, or create visible assumptions in quick mode.
-5. Offer three design strategies before choosing one final direction.
-6. Match a local reference direction from `references/design-style-index.json` before creating a new `DESIGN.md`.
-7. Generate `design-brief.md`, `design-brief.json`, `DESIGN.md` when needed, target prompts, and `review-checklist.md`.
-8. Save outputs under `.briefpilot/` by default unless the user asks for a visible directory.
+BriefPilot 是中文优先。公开示例、brief 内容、提示词正文、评审报告和用户可见 UI 文案默认使用简体中文。文件名、JSON keys、脚本名、命令示例、工具名、组件名和设计 token 保持英文。每个 `design-brief.json` 都要写 `meta.content_language`。
 
-## Post-Generation Review Mode
+## 默认流程
 
-Use this mode when the user provides a generated result, pasted result summary, screenshot description, rendered-page review, or local generated file.
+1. 读取用户需求、已有项目上下文，以及已有 `DESIGN.md`。
+2. 按 `references/scoring-rubric.md` 诊断需求。
+3. 找出最有价值的缺失信息。
+4. 标准模式问 3-7 个问题；快速模式写出明确假设。
+5. 先给出三个设计策略，再选择最终方向。
+6. 创建新 `DESIGN.md` 前，先从 `references/design-style-index.json` 匹配本地参考方向。
+7. 生成 `design-brief.md`、`design-brief.json`、必要的 `DESIGN.md`、目标提示词和 `review-checklist.md`。
+8. 默认把输出保存到 `.briefpilot/`；用户要求可见目录时再改到指定目录。
 
-1. Load the source brief package: `design-brief.json`, linked `DESIGN.md`, selected strategy, and `review-checklist.md`.
-2. Gather result evidence: pasted summary, local `.txt`/`.md`/`.html`/`.json` file, screenshot reference, or an already-provided visual review.
-3. If the brief package or result evidence is missing, ask for the missing material and do not create a formal review report yet.
-4. Decide whether visual review evidence is available. Use image-capable review or an already-provided gstack visual review when available; otherwise record a text/file fallback.
-5. Compare the result against the chosen strategy, original brief, `DESIGN.md`, and review checklist.
-6. Choose one decision: `accept`, `tweak`, `revise_brief_then_regenerate`, or `regenerate_from_scratch`.
-7. Save `result-review.md` and `result-review.json`. For every non-accepted result, also save a ready-to-use modification or regeneration prompt.
+## 生成后评审模式
 
-## Verified Scope
+当用户提供生成结果、粘贴摘要、截图描述、页面评审或本地生成文件时，使用这个模式。
 
-Verified examples:
+1. 读取源 brief 包：`design-brief.json`、关联的 `DESIGN.md`、已选策略和 `review-checklist.md`。
+2. 收集结果证据：粘贴摘要、本地 `.txt` / `.md` / `.html` / `.json` 文件、截图引用或已有视觉评审。
+3. 如果 brief 包或结果证据缺失，先索要缺失材料，不要直接创建正式评审报告。
+4. 判断是否有视觉评审证据；有图像能力或已有 gstack 视觉评审时使用，否则记录文本/文件 fallback。
+5. 对照策略、原始 brief、`DESIGN.md` 和评审清单检查结果。
+6. 选择一个决定：`accept`、`tweak`、`revise_brief_then_regenerate` 或 `regenerate_from_scratch`。
+7. 保存 `result-review.md` 和 `result-review.json`。每个未接受的结果都要同时保存可直接使用的修改或重生成提示。
 
-- AI search SaaS landing page golden demo.
-- AI search research workspace / answer detail review loop.
+## 已验证范围
 
-For other SaaS landing pages, app pages, dashboards, decks, social visuals, or creative tasks, label the output as adjacent trial coverage unless a matching example exists.
+已验证样例：
 
-## Modes
+- AI 搜索 SaaS 官网黄金样例。
+- AI 搜索研究工作台 / 答案详情页评审闭环。
 
-- Quick mode: skip questions, generate explicit assumptions, then create outputs after confirmation.
-- Standard mode: ask 3-7 focused questions, then create outputs after strategy confirmation.
-- Expert mode: ask 8-12 focused questions for high-stakes design work.
+其他 SaaS 官网、应用页面、仪表盘、幻灯片、社媒视觉或创意任务，除非已经有匹配样例，否则标记为相邻试用范围。
 
-## Resources
+## 模式
 
-- Read `references/workflow.md` for the full process.
-- Read `references/result-review-workflow.md` before reviewing generated results.
-- Read `references/visual-review-routing.md` before recording visual review evidence.
-- Read `references/asset-layout.md` before writing files.
-- Read `references/design-md.md` before reading or creating `DESIGN.md`.
-- Read `references/design-style-index.md` before choosing a `DESIGN.md` reference direction.
-- Read `references/design-md-quality-rules.md` before judging `DESIGN.md` issues.
-- Read `references/brief-schema.md` before creating `design-brief.json`.
-- Read `references/scoring-rubric.md` before scoring.
-- Read `references/question-bank.md` before interviewing.
-- Read the relevant adapter reference before exporting a target prompt.
-- Use templates in `templates/` for output structure.
-- Use scripts in `scripts/` when deterministic validation or export is useful.
+- 快速模式：跳过提问，写出明确假设，确认后生成输出。
+- 标准模式：问 3-7 个聚焦问题，策略确认后生成输出。
+- 专家模式：高风险设计任务问 8-12 个聚焦问题。
+
+## 资源
+
+- 完整流程：`references/workflow.md`
+- 生成后评审：`references/result-review-workflow.md`
+- 视觉评审记录：`references/visual-review-routing.md`
+- 资产布局：`references/asset-layout.md`
+- 读取或创建 `DESIGN.md`：`references/design-md.md`
+- 选择参考方向：`references/design-style-index.md`
+- 判断 `DESIGN.md` 质量：`references/design-md-quality-rules.md`
+- 创建 `design-brief.json`：`references/brief-schema.md`
+- 评分：`references/scoring-rubric.md`
+- 提问：`references/question-bank.md`
+- 导出目标提示词前，读取对应 adapter reference。
+- 输出结构优先复用 `templates/`。
+- 需要确定性校验或导出时，优先使用 `scripts/`。

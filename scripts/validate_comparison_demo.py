@@ -17,7 +17,18 @@ REQUIRED_FILES = [
 ]
 CONTROLLED_SOURCE_TYPES = {"controlled", "simulated", "controlled_baseline"}
 NAMED_TOOL_TOKENS = ["v0", "Lovable", "Bolt", "Figma Make", "Claude Design", "huashu-design"]
-MATURITY_TERMS = ["Audience", "Structure", "Proof", "Review"]
+MATURITY_TERMS = ["受众", "结构", "证据", "评审"]
+CHINESE_VISIBLE_TERMS = [
+    "同一个模糊需求",
+    "直接生成",
+    "受控基线",
+    "不是命名工具输出",
+    "BriefPilot 强化结果",
+    "受众",
+    "结构",
+    "证据",
+    "评审",
+]
 PRIVATE_TOKENS = ["/" + "Users/", "Desktop/" + "project", "kang" + "jiaqi"]
 
 
@@ -149,6 +160,8 @@ def check_manifest(manifest, root, demo_dir, findings):
     claims = manifest.get("comparison_claims")
     if not isinstance(claims, list) or len([claim for claim in claims if has_text(claim)]) < 4:
         findings.append("comparison_claims must contain at least four concrete claims")
+    elif sum(1 for claim in claims if any(term in claim for term in MATURITY_TERMS)) < 4:
+        findings.append("comparison_claims must describe Chinese maturity terms: 受众, 结构, 证据, 评审")
 
     todo_path = value_at(manifest, "future_real_output_todo_path")
     resolved_todo, invalid_todo_path = resolve_repo_relative_path(
@@ -164,20 +177,27 @@ def check_manifest(manifest, root, demo_dir, findings):
 
 def check_html(html, manifest, findings):
     html_lower = html.lower()
+    if 'lang="zh-cn"' not in html_lower:
+        findings.append('index.html html lang must be "zh-CN"')
+
     required_text = [
         RAW_INPUT,
-        "Direct vague baseline",
-        "BriefPilot-enhanced result",
-        "Controlled baseline example",
-        "not a named-tool output",
+        "直接生成的受控基线",
+        "BriefPilot 强化结果",
+        "受控基线示例",
+        "不是命名工具输出",
     ]
     for text in required_text:
         if text.lower() not in html_lower:
             findings.append(f"index.html missing required text: {text}")
 
     for term in MATURITY_TERMS:
-        if term.lower() not in html_lower:
+        if term not in html:
             findings.append(f"index.html missing maturity difference term: {term}")
+
+    visible_term_count = sum(1 for term in CHINESE_VISIBLE_TERMS if term in html)
+    if visible_term_count < 7:
+        findings.append("index.html must contain visible Chinese-first comparison copy beyond the raw input")
 
     for path in ["visual_mockups.baseline_region", "visual_mockups.enhanced_region"]:
         region = value_at(manifest, path)
@@ -194,7 +214,7 @@ def check_html(html, manifest, findings):
 
 def check_baseline_content(text, findings):
     text_lower = text.lower()
-    if "controlled" not in text_lower or "not captured from a named" not in text_lower:
+    if ("受控" not in text and "controlled" not in text_lower) or ("不是命名工具" not in text and "not captured from a named" not in text_lower):
         findings.append("baseline-controlled.md must label the baseline as controlled and not captured from a named tool")
     for token in NAMED_TOOL_TOKENS:
         if token.lower() in text_lower:
@@ -202,14 +222,14 @@ def check_baseline_content(text, findings):
 
 
 def check_enhanced_content(text, findings):
-    required = ["examples/ai-search-landing", "Enterprise Trust", "source", "review"]
+    required = ["examples/ai-search-landing", "企业信任", "来源", "评审"]
     for token in required:
         if token.lower() not in text.lower():
             findings.append(f"briefpilot-enhanced.md missing grounded detail: {token}")
 
 
 def check_future_todo(text, findings):
-    for token in ["v0", "Lovable", "Bolt", "Figma Make", "Capture date", "Exact prompt", "whether the result was edited"]:
+    for token in ["v0", "Lovable", "Bolt", "Figma Make", "记录日期", "完整提示词", "是否编辑"]:
         if token.lower() not in text.lower():
             findings.append(f"future-real-output-todo.md missing capture detail: {token}")
 

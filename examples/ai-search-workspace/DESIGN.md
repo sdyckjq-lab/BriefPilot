@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: BriefSearch Workspace
-description: Dense, trustworthy product workspace visual system for AI search answer review.
+description: 面向 AI 搜索答案审查的密集、可信、产品工作台视觉系统。
 colors:
   background: "#F8FAFC"
   surface: "#FFFFFF"
@@ -81,58 +81,58 @@ components:
 
 ## Overview
 
-BriefSearch Workspace should feel like a serious research surface, not a marketing page. It must help users understand the query, answer status, confidence, source origin, and recovery path at a glance.
+BriefSearch Workspace 应该像严肃的研究工作台，而不是营销页。界面必须让用户一眼看清查询、答案状态、可信度、来源出处和恢复路径，帮助他们判断 AI 答案是否能被使用。
 
 ## Visual Theme
 
-The theme is a dense but calm enterprise data workspace: compact panels, visible status, strong source hierarchy, restrained blue interactions, semantic state color, and minimal decoration. Every visual choice should help users verify an AI answer.
+主题是密集但冷静的企业数据工作台：紧凑面板、可见状态、强来源层级、克制蓝色交互、语义化状态颜色和极少装饰。每个视觉选择都要服务于核查 AI 答案，而不是制造气氛。
 
 ## Colors
 
-Use `background` for the app canvas, `surface` for answer and source panels, `text` for primary content, `muted_text` for metadata, and `border` for structure. Use `primary_action` for active links, citations, selected source cards, and focus. Use `success` for verified sources, `warning` for low-confidence or partial answers, `danger` for failed answer or permission errors, and `info` for neutral guidance.
+`background` 用于应用画布，`surface` 用于答案和来源面板，`text` 用于主内容，`muted_text` 用于元信息，`border` 用于结构分隔。`primary_action` 用于活动链接、引用标记、选中来源卡片和 focus。`success` 表示已验证来源，`warning` 表示低可信度或部分完成答案，`danger` 表示答案失败或权限错误，`info` 表示中性引导。
 
 ## Typography
 
-Use compact interface typography. `display` is reserved for the query or page title, `title` for answer section headers, `heading` for panel titles, `body` for answer text, `caption` for source metadata, and `label` for badges and controls. Source metadata must remain legible even when dense.
+使用紧凑的界面字体。`display` 用于查询或页面标题，`title` 用于答案区标题，`heading` 用于面板标题，`body` 用于答案正文，`caption` 用于来源元信息，`label` 用于徽标和控件。即使信息密度高，来源元信息也必须保持可读。
 
 ## Layout
 
-Desktop uses a top search area, main answer column, cited source list, and right source-detail panel. Tablet collapses source detail below the source list. Mobile order is search, answer status, answer body, sources, source detail, then save/share actions. Keep query, confidence, answer, and source origin visible in the first screen on desktop.
+桌面端使用顶部搜索区、主答案列、引用来源列表和右侧来源详情面板。平板端把来源详情折叠到来源列表下方。移动端顺序是搜索、答案状态、答案正文、来源、来源详情，然后是保存/分享操作。桌面端首屏要同时保留查询、可信度、答案和来源出处。
 
 ## Elevation & Depth
 
-Use subtle borders more than shadows. Panels should feel stable and workspace-like, with no floating decorative cards. Use elevation only for active overlays, menus, or selected-source detail.
+多用细边框，少用阴影。面板应稳定、工作台化，不使用漂浮装饰卡片。只有活动浮层、菜单或选中来源详情可以使用更明显的层级。
 
 ## Shapes
 
-Use 8px radius as the default and 10px for larger panels. Keep badges compact. Avoid pill-heavy layouts, novelty shapes, decorative blobs, and over-rounded panels.
+默认使用 8px 圆角，大面板可使用 10px。徽标保持紧凑。避免大量胶囊形、特殊异形、装饰色块和过度圆角面板。
 
 ## Components
 
-Search input states: empty, input, submitting, failed, retry, disabled, and focus. Answer panel states: empty, generating, success, partial, low-confidence, failed, and unavailable. Source cards show default, hover, pressed, selected, focus, loading, unavailable, permission-blocked, and error states. Save/share controls show idle, working, success, failed, disabled, and focus states.
+搜索输入状态包括 empty、input、submitting、failed、retry、disabled 和 focus。答案面板状态包括 empty、generating、success、partial、low-confidence、failed 和 unavailable。来源卡片要展示 default、hover、pressed、selected、focus、loading、unavailable、permission-blocked 和 error 状态。保存/分享控件要展示 idle、working、success、failed、disabled 和 focus 状态。
 
 ## Responsive Behavior
 
-Use desktop >= 1024px, tablet 768-1023px, and mobile <= 767px. No horizontal scrolling on mobile. Source cards, citation markers, and save/share controls wrap cleanly. Keyboard order follows search input, submit, answer citations, source cards, source detail actions, then save/share controls. Touch targets are at least 44px on mobile.
+使用桌面端 >= 1024px、平板 768-1023px、移动端 <= 767px。移动端不能横向滚动。来源卡片、引用标记和保存/分享控件要自然换行。键盘顺序依次经过搜索输入、提交、答案引用、来源卡片、来源详情操作，再到保存/分享控件。移动端触控目标至少 44px。
 
 ## Motion & Feedback
 
-Use restrained feedback: answer generation skeleton, source-card loading row, selected-source highlight, save/share progress, and retry feedback. Respect reduced motion by replacing animated loading with static progress labels. State changes must not jump the layout.
+反馈要克制：答案生成 skeleton、来源卡片 loading 行、选中来源高亮、保存/分享进度和 retry 反馈。尊重 reduced motion，用静态进度标签替代动画加载。状态变化不能让布局跳动。
 
 ## Content Voice
 
-Voice is clear, trustworthy, source-forward, and operational. Labels should say what happened and what to do next: "Low confidence, check sources" is better than "AI is thinking." Do not invent customer data, proprietary source names, accuracy metrics, or unsupported claims.
+文案语气清楚、可信、来源优先、偏操作场景。标签要说明发生了什么以及下一步怎么做，比如“低可信度，请先核查来源”优于“AI 正在思考”。不要虚构客户数据、专有来源名称、准确率指标或无依据承诺。
 
 ## Do's and Don'ts
 
-Do show answer provenance, confidence, source citations, selected source detail, keyboard focus, touch-safe controls, low-confidence states, unavailable source states, and permission-blocked recovery. Don't use marketing-first composition, generic AI glow, abstract gradients, hidden sources, identical-looking states, fake source data, or decorative panels that compete with the answer.
+Do：展示答案出处、可信度、来源引用、选中来源详情、keyboard focus、适合触控的控件、低可信度状态、来源不可用状态和权限受限恢复。Don't：使用营销优先构图、泛化 AI 发光、抽象渐变、隐藏来源、看起来完全一样的状态、虚构来源数据，或用装饰面板抢走答案注意力。
 
 ## Reference Direction
 
-Reference direction: `enterprise_data_workspace` - Enterprise data workspace.
+Reference direction: `enterprise_data_workspace` - 企业数据工作台。
 
-Use this direction for data density, source hierarchy, permission states, and repeated-use ergonomics. It is an inspiration boundary only: do not copy third-party brand assets, logos, proprietary fonts, screenshots, full color systems, or complete `DESIGN.md` files.
+只借鉴数据密度、来源层级、权限状态和高频使用的人机工效。这只是灵感边界：do not copy 第三方品牌资产、Logo、专有字体、截图、完整配色系统或完整 `DESIGN.md` 文件。
 
 ## Agent Guidance
 
-Treat front matter tokens as normative. If a needed token is missing, derive from the closest semantic role and record the assumption. Preserve the Dense Research Workspace strategy, source-forward hierarchy, visible low-confidence and permission states, restrained blue interactions, and no-fake-source-data boundary.
+把 front matter tokens 当成强约束。如果缺少必要 token，从最接近的语义角色派生，并记录假设。保留“密集研究工作台”策略、来源优先层级、可见的低可信度和权限状态、克制蓝色交互，以及不虚构来源数据的边界。

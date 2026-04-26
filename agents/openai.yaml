@@ -1,3 +1,3 @@
 display_name: BriefPilot
-short_description: Compile reusable briefs, DESIGN.md, prompts, and post-generation review prompts.
-default_prompt: Turn this product or page request into a reusable design brief, DESIGN.md visual system, target-specific prompts, a review checklist, and review-loop assets when generated results are available.
+short_description: 把模糊设计需求整理成中文优先的 brief、DESIGN.md、提示词和生成后评审提示。
+default_prompt: 将这个产品或页面需求整理成可复用设计 brief、DESIGN.md 视觉系统、目标工具提示词、评审清单；如果已有生成结果，也生成评审和修改提示。用户可见内容默认使用简体中文，技术标识保持英文。

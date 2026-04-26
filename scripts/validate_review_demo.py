@@ -5,6 +5,7 @@ from pathlib import Path
 import check_design_md as design_report
 import export_modification_prompt
 import export_prompt
+import language_checks
 import validate_brief
 import validate_design_md
 import validate_result_review
@@ -38,6 +39,42 @@ REVIEW_FILES = [
     "prompts/revised-generation.txt",
 ]
 
+DEFAULT_CONTENT_LANGUAGE = "zh-CN"
+OUTPUT_LANGUAGE_PHRASE = "Use Simplified Chinese for all user-visible UI copy."
+OUTPUT_LANGUAGE_CHINESE_PHRASE = "用户可见 UI 文案必须使用简体中文"
+REVIEW_MARKDOWN_CHINESE_SECTIONS = [
+    "# 结果评审",
+    "## 来源包",
+    "## 评审证据",
+    "## 保留点",
+    "## 问题",
+    "## 视觉评审",
+    "## 决定",
+    "## 下一轮提示摘要",
+]
+REVIEW_MARKDOWN_ENGLISH_LABELS = [
+    "# Result Review",
+    "## Source Package",
+    "## Reviewed Evidence",
+    "## Strengths",
+    "## Mismatches",
+    "## Visual Review",
+    "## Decision",
+    "## Next Prompt Summary",
+    "| Severity | Brief reference | Issue | Evidence | Recommended change |",
+    "- Selected strategy:",
+    "- Target tool:",
+    "- Evidence kind:",
+    "- Evidence path:",
+    "- Summary:",
+    "- Status:",
+    "- Notes:",
+    "- Decision:",
+    "- Strategy preserved:",
+    "- Prompt intent:",
+    "- Brief revision:",
+]
+
 
 def has_text_value(value):
     return isinstance(value, str) and bool(value.strip())
@@ -60,12 +97,21 @@ def check_base_prompt_exports(example_dir, brief, findings):
         actual = path.read_text(encoding="utf-8")
         if actual != expected:
             findings.append(f"prompts/{target}.txt does not match export_prompt.py output")
+        if OUTPUT_LANGUAGE_PHRASE not in actual or OUTPUT_LANGUAGE_CHINESE_PHRASE not in actual:
+            findings.append(f"prompts/{target}.txt missing Simplified Chinese output-language rule")
+        if not language_checks.is_chinese_first_prompt(actual):
+            findings.append(f"prompts/{target}.txt declares Simplified Chinese but prompt body is not Chinese-first")
 
 
 def check_base_brief(example_dir, brief, findings):
     missing = [field for field in validate_brief.REQUIRED_FIELDS if not validate_brief.has_value(validate_brief.value_at(brief, field))]
     for field in missing:
         findings.append(f"design-brief.json missing field: {field}")
+    language = validate_brief.value_at(brief, "meta.content_language")
+    if language != DEFAULT_CONTENT_LANGUAGE:
+        findings.append(f"design-brief.json meta.content_language must be {DEFAULT_CONTENT_LANGUAGE}")
+    elif not language_checks.is_chinese_first_brief(brief):
+        findings.append("design-brief.json declares zh-CN but brief values are not Chinese-first")
     if not validate_brief.has_value(brief.get("assumptions")) and not validate_brief.has_value(brief.get("open_questions")):
         findings.append("design-brief.json missing assumptions or open_questions")
     design_path = validate_brief.value_at(brief, "design_system.design_md_path")
@@ -109,14 +155,24 @@ def check_design_review_report(example_dir, brief, findings):
 def check_review(review_path, findings):
     review, context, errors = validate_result_review.validate_review(review_path)
     findings.extend(errors)
+    language = validate_brief.value_at(context.get("brief", {}), "meta.content_language")
+    if not errors and language == DEFAULT_CONTENT_LANGUAGE and not language_checks.is_chinese_first_review(review):
+        findings.append(f"{review_path.relative_to(review_path.parents[1])} review guidance is not Chinese-first")
     return review, context
 
 
-def check_review_markdown(markdown_path, review, findings):
+def check_review_markdown(markdown_path, review, context, findings):
     text = markdown_path.read_text(encoding="utf-8")
     text_lower = text.lower()
     relative = markdown_path.relative_to(markdown_path.parents[1])
     evidence = review.get("evidence") if isinstance(review.get("evidence"), dict) else {}
+    language = validate_brief.value_at(context.get("brief", {}), "meta.content_language")
+
+    if language == DEFAULT_CONTENT_LANGUAGE:
+        missing_sections = [phrase for phrase in REVIEW_MARKDOWN_CHINESE_SECTIONS if phrase not in text]
+        english_labels = [phrase for phrase in REVIEW_MARKDOWN_ENGLISH_LABELS if phrase in text]
+        if missing_sections or english_labels:
+            findings.append(f"{relative} review markdown is not Chinese-first")
 
     expected_values = [
         ("decision", review.get("decision")),
@@ -155,20 +211,25 @@ def check_modification_prompt(review_path, target, prompt_path, findings):
     expected = export_modification_prompt.build_prompt(review, context, target, design_text, brief_revision_text)
     if prompt_path.read_text(encoding="utf-8") != expected:
         findings.append(f"{prompt_path.relative_to(review_path.parents[1])} does not match export_modification_prompt.py output")
-    if "DESIGN.md Visual Rules To Preserve" not in prompt_path.read_text(encoding="utf-8"):
+    prompt_text = prompt_path.read_text(encoding="utf-8")
+    if "DESIGN.md Visual Rules To Preserve" not in prompt_text:
         findings.append(f"{prompt_path.relative_to(review_path.parents[1])} is missing DESIGN.md visual guidance")
+    if OUTPUT_LANGUAGE_PHRASE not in prompt_text or OUTPUT_LANGUAGE_CHINESE_PHRASE not in prompt_text:
+        findings.append(f"{prompt_path.relative_to(review_path.parents[1])} missing Simplified Chinese output-language rule")
+    if not language_checks.is_chinese_first_prompt(prompt_text):
+        findings.append(f"{prompt_path.relative_to(review_path.parents[1])} declares Simplified Chinese but prompt body is not Chinese-first")
 
 
 def check_workspace_content(example_dir, findings):
     brief_text = (example_dir / "design-brief.md").read_text(encoding="utf-8")
     brief_json_text = (example_dir / "design-brief.json").read_text(encoding="utf-8")
     required = [
-        "research workspace",
-        "source detail",
-        "low-confidence",
-        "permission-blocked",
-        "save/share",
-        "mobile",
+        "研究工作台",
+        "来源详情",
+        "低可信度",
+        "权限受限",
+        "保存/分享",
+        "移动端",
     ]
     for phrase in required:
         if phrase.lower() not in (brief_text + "\n" + brief_json_text).lower():
@@ -204,10 +265,10 @@ def main(argv):
 
     pasted_review_path = example_dir / "reviews" / "result-review-pasted-summary.json"
     revision_review_path = example_dir / "reviews" / "result-review-brief-revision.json"
-    pasted_review, _ = check_review(pasted_review_path, findings)
-    revision_review, _ = check_review(revision_review_path, findings)
-    check_review_markdown(example_dir / "reviews" / "result-review-pasted-summary.md", pasted_review, findings)
-    check_review_markdown(example_dir / "reviews" / "result-review-brief-revision.md", revision_review, findings)
+    pasted_review, pasted_context = check_review(pasted_review_path, findings)
+    revision_review, revision_context = check_review(revision_review_path, findings)
+    check_review_markdown(example_dir / "reviews" / "result-review-pasted-summary.md", pasted_review, pasted_context, findings)
+    check_review_markdown(example_dir / "reviews" / "result-review-brief-revision.md", revision_review, revision_context, findings)
 
     if pasted_review.get("evidence", {}).get("kind") != "pasted_summary":
         findings.append("pasted summary review must use evidence.kind pasted_summary")

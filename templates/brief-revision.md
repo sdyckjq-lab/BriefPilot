@@ -1,27 +1,27 @@
-# Brief Revision
+# Brief 修订说明
 
-## Source Review
+## 来源评审
 
 - Review JSON: {{result_review_path}}
 - Source brief: {{brief_path}}
-- Selected strategy: {{selected_strategy}}
+- 已选策略：{{selected_strategy}}
 
-## Why The Brief Needs Revision
+## 为什么需要修订 brief
 
 {{reason}}
 
-## Direction Changes
+## 方向变化
 
 - {{direction_change}}
 
-## Guidance To Add Before Regeneration
+## 重生成前需要补充的指导
 
 - {{new_guidance}}
 
-## What Stays The Same
+## 保持不变
 
 - {{unchanged_guidance}}
 
-## Regeneration Notes
+## 重生成说明
 
-Use this note to create the next generation prompt. Do not imply that the full brief has been rewritten unless the updated brief files are actually saved.
+用这份说明创建下一轮生成提示。除非已经实际保存更新后的 brief 文件，否则不要暗示完整 brief 已经被重写。

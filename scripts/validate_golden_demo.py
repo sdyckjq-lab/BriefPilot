@@ -5,6 +5,7 @@ from pathlib import Path
 
 import check_design_md
 import export_prompt
+import language_checks
 
 
 REQUIRED_FILES = [
@@ -26,6 +27,16 @@ PROMPTS = [
     "prompts/claude-design.txt",
     "prompts/huashu-design.txt",
     "prompts/v0.txt",
+]
+
+DEFAULT_CONTENT_LANGUAGE = "zh-CN"
+OUTPUT_LANGUAGE_PHRASE = "Use Simplified Chinese for all user-visible UI copy."
+OUTPUT_LANGUAGE_CHINESE_PHRASE = "用户可见 UI 文案必须使用简体中文"
+DIAGNOSIS_SECTIONS = [
+    ("需求评分", "Brief Score"),
+    ("主要缺口", "Main Gaps"),
+    ("策略选项", "Strategy Options"),
+    ("最终选择", "Final Choice"),
 ]
 
 
@@ -80,10 +91,9 @@ def check_diagnosis(example_dir, raw_input, strategy_names, findings):
     if not path.exists():
         return
     text = path.read_text(encoding="utf-8")
-    required_phrases = ["Brief Score", "Main Gaps", "Strategy Options", "Final Choice"]
-    for phrase in required_phrases:
-        if not has_text(text, phrase):
-            findings.append(f"diagnosis missing section: {phrase}")
+    for primary, legacy in DIAGNOSIS_SECTIONS:
+        if not has_text(text, primary) and not has_text(text, legacy):
+            findings.append(f"diagnosis missing section: {primary}")
     if raw_input and raw_input not in text:
         findings.append("diagnosis does not include the raw input")
     for name in strategy_names:
@@ -91,8 +101,17 @@ def check_diagnosis(example_dir, raw_input, strategy_names, findings):
             findings.append(f"diagnosis missing strategy option: {name}")
 
 
+def check_content_language(brief, findings):
+    meta = brief.get("meta", {}) if isinstance(brief.get("meta"), dict) else {}
+    language = meta.get("content_language")
+    if language != DEFAULT_CONTENT_LANGUAGE:
+        findings.append(f"design-brief.json meta.content_language must be {DEFAULT_CONTENT_LANGUAGE}")
+    elif not language_checks.is_chinese_first_brief(brief):
+        findings.append("design-brief.json declares zh-CN but brief values are not Chinese-first")
+
+
 def check_prompts(example_dir, strategy_names, findings):
-    required_headers = ["Task", "Visual Strategy", "DESIGN.md Visual System", "Review Criteria"]
+    required_headers = ["Task", "Output Language", "Visual Strategy", "DESIGN.md Visual System", "Review Criteria"]
     for relative in PROMPTS:
         path = example_dir / relative
         if not path.exists():
@@ -104,6 +123,10 @@ def check_prompts(example_dir, strategy_names, findings):
         for name in strategy_names:
             if name not in text:
                 findings.append(f"{relative} missing strategy option: {name}")
+        if OUTPUT_LANGUAGE_PHRASE not in text or OUTPUT_LANGUAGE_CHINESE_PHRASE not in text:
+            findings.append(f"{relative} missing Simplified Chinese output-language rule")
+        if not language_checks.is_chinese_first_prompt(text):
+            findings.append(f"{relative} declares Simplified Chinese but prompt body is not Chinese-first")
 
 
 def check_prompt_exports_match(example_dir, brief, findings):
@@ -157,7 +180,7 @@ def check_brief_links(example_dir, brief, findings):
         text = markdown_brief.read_text(encoding="utf-8")
         if "DESIGN.md" not in text:
             findings.append("design-brief.md does not reference DESIGN.md")
-        if "Strategy Options" not in text:
+        if "策略选项" not in text and "Strategy Options" not in text:
             findings.append("design-brief.md does not include strategy options")
 
 
@@ -198,6 +221,7 @@ def main(argv):
     if selected_strategy and selected_strategy not in strategy_names:
         findings.append("selected visual strategy is not present in strategy_options")
 
+    check_content_language(brief, findings)
     check_assumptions(example_dir, brief, findings)
     check_brief_links(example_dir, brief, findings)
     check_interaction_and_accessibility(brief, findings)

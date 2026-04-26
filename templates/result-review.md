@@ -1,51 +1,51 @@
-# Result Review
+# 结果评审
 
-## Source Package
+## 来源包
 
-- Brief: {{brief_path}}
+- Brief：{{brief_path}}
 - DESIGN.md: {{design_md_path}}
-- Selected strategy: {{selected_strategy}}
-- Target tool: {{target_tool}}
+- 已选策略：{{selected_strategy}}
+- 目标工具：{{target_tool}}
 
-## Reviewed Evidence
+## 评审证据
 
-- Evidence kind: {{evidence_kind}}
-- Evidence path or source: {{evidence_source}}
-- Summary: {{evidence_summary}}
+- 证据类型：{{evidence_kind}}
+- 证据路径或来源：{{evidence_source}}
+- 摘要：{{evidence_summary}}
 
-## Strengths
+## 保留点
 
 - {{strength}}
 
-## Mismatches
+## 问题
 
-| Severity | Brief reference | Issue | Evidence | Recommended change |
+| 严重程度 | Brief 依据 | 问题 | 证据 | 建议修改 |
 |---|---|---|---|---|
 | {{severity}} | {{brief_reference}} | {{issue}} | {{evidence}} | {{recommended_change}} |
 
-## Visual Review
+## 视觉评审
 
-- Status: {{visual_review_status}}
-- Source: {{visual_review_source}}
-- Notes: {{visual_review_notes}}
+- 状态：{{visual_review_status}}
+- 来源：{{visual_review_source}}
+- 说明：{{visual_review_notes}}
 
-## Decision
+## 决定
 
-- Decision: {{decision}}
-- Strategy preserved: {{strategy_preserved}}
-- Strategy change reason: {{strategy_change_reason}}
-- Prompt intent: {{prompt_intent}}
+- 决定：{{decision}}
+- 策略是否保留：{{strategy_preserved}}
+- 策略变化原因：{{strategy_change_reason}}
+- 提示意图：{{prompt_intent}}
 
-## Next Prompt Summary
+## 下一轮提示摘要
 
-Keep:
+保留：
 
 - {{keep_item}}
 
-Change:
+修改：
 
 - {{change_item}}
 
-Acceptance checks:
+验收检查：
 
 - {{acceptance_check}}

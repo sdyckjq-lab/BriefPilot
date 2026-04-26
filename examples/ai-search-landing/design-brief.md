@@ -1,122 +1,124 @@
-# AI Search Landing Design Brief
+# BriefSearch AI 搜索产品官网设计 Brief
 
-## Project Overview
+## 项目概览
 
-Create a product-led SaaS landing page for an AI search product that helps knowledge workers and small teams find trusted answers across scattered work documents.
+为 BriefSearch 创建一个产品驱动的 SaaS 官网，帮助知识工作者和小团队理解：这个 AI 搜索产品可以跨分散的工作文档、聊天、工单和网盘找到可信答案。
 
-## Brief Diagnosis
+内容语言：面向用户的 UI 文案使用简体中文 (`zh-CN`)；技术标识、文件名、工具名和 design token keys 保持英文。
 
-- Raw request: `帮我做一个 AI 搜索产品官网`
-- Initial score: 42/100
-- Main gaps: no audience, CTA, product proof, brand direction, or responsive constraints were provided.
-- Recommended mode: quick mode with visible assumptions for the golden demo.
+## 需求诊断
 
-## Target Audience
+- 原始需求：`帮我做一个 AI 搜索产品官网`
+- 初始分数：42/100
+- 主要缺口：原始需求没有说明受众、CTA、产品证明、品牌方向和响应式约束。
+- 推荐模式：黄金样例使用 quick mode，并把关键假设明确写出来。
 
-- Primary: knowledge workers and small teams that search across scattered work documents
-- Secondary: team leads evaluating productivity tools for fast-moving internal teams
-- Context: visitors need to understand whether the product can search across work tools without setup friction
+## 目标受众
 
-## Business Goal
+- 主要受众：需要跨工作资料查找答案的知识工作者和小团队
+- 次要受众：为高速协作团队评估效率工具的团队负责人
+- 使用场景：访问者需要快速判断产品是否能低门槛连接常用工作工具，并给出可核查答案
 
-Drive trial signup, with demo request as the secondary conversion.
+## 业务目标
 
-## Design Goal
+推动试用注册，演示预约作为次要转化路径。
 
-Make the value of cross-workspace AI search clear in the first screen while building enterprise trust.
+## 设计目标
 
-## Core Message
+在首屏讲清跨工作空间 AI 搜索的价值，同时建立企业级信任感。
 
-Find trusted answers across every work document in seconds.
+## 核心信息
 
-## Required Structure
+几秒内，从所有工作资料里找到可信答案。
 
-| Section | Purpose | Required content | Visual anchor |
+## 必要结构
+
+| 区块 | 目的 | 必要内容 | 视觉锚点 |
 |---|---|---|---|
-| Hero | Explain the product promise immediately | Headline, short copy, primary CTA, secondary CTA, product surface mock | Search answer panel with linked source documents |
-| Pain | Name the cost of scattered work knowledge | Three pain points and a plain-language impact statement | Docs, chats, tickets, and drives shown as scattered sources |
-| Solution | Connect AI search to concrete user actions | Cross-tool search, source-backed answers, team knowledge reuse | Three compact product capability blocks |
-| Workflow | Show the path from question to trusted answer | Ask a question, review sourced answer, open source document | Three-step product flow |
-| Integrations | Make search coverage practical without fake claims | Docs, chat, tickets, drives | Generic integration placeholders with labels |
-| Security | Build trust before the final CTA | Permissions-aware search, admin controls, source visibility | Calm trust panel |
-| CTA | Give qualified visitors a clear next step | Trial CTA, demo CTA, short reassurance line | Simple conversion band |
+| 首屏 | 立刻说明产品承诺 | 标题、简短说明、主 CTA、次 CTA、产品界面示意 | 带来源文档链接的搜索答案面板 |
+| 痛点 | 说明工作知识分散造成的成本 | 三个痛点和一句影响说明 | 文档、聊天、工单和网盘分散来源示意 |
+| 解决方案 | 把 AI 搜索连接到具体用户动作 | 跨工具搜索、来源支撑答案、团队知识复用 | 三个紧凑产品能力区块 |
+| 工作流 | 展示从提问到可信答案的路径 | 提问、查看带来源答案、打开来源文档 | 三步产品流程 |
+| 集成范围 | 让搜索覆盖面具体可感，不虚构合作 | 文档、聊天、工单、网盘 | 带标签的通用集成占位 |
+| 安全信任 | 在最终 CTA 前建立信任 | 按权限搜索、管理员控制、来源可见 | 克制的信任说明面板 |
+| 最终 CTA | 给合格访问者明确下一步 | 试用 CTA、演示 CTA、简短放心提示 | 简单直接的转化区 |
 
-## Visual Direction
+## 视觉方向
 
-- Strategy: Enterprise Trust
-- Tone: restrained, credible, product-led, clear, secure
-- References: modern enterprise SaaS landing pages, sourced-answer product surfaces, clean trust patterns
-- Differentiators: real product surface in hero, source attribution UI, security proof before final CTA
+- 策略：企业信任型
+- 语气：克制、可信、产品驱动、清楚、安全
+- 参考：现代企业 SaaS 官网、带来源答案的产品界面、清晰信任结构
+- 差异点：首屏真实产品界面、来源归因 UI、最终 CTA 前的安全证明
 
-## Strategy Options
+## 策略选项
 
-### Enterprise Trust
+### 企业信任型
 
-Selected. Best for a credible SaaS landing page where teams need trust before signup. Lead with value, prove it with a sourced-answer product surface, then cover workflow, integrations, and security.
+已选。适合团队在注册前需要先建立信任的 SaaS 官网。信息顺序是先讲价值，再用带来源答案的产品界面证明，最后补充工作流、集成范围和安全信息。
 
-### Search Copilot Demo
+### 搜索助手演示型
 
-Good when the page should feel more interactive. Lead with an example question and answer, then explain why the answer is trustworthy. Risk: the page may underplay business trust.
+适合页面需要更强交互感时使用。先展示示例问题和答案，再解释答案为什么可信。风险是可能过度强调演示机制，弱化商业信任。
 
-### Founder-Led Launch
+### 创始人发布型
 
-Good when the product is early and needs a sharper narrative. Lead with the pain of scattered knowledge, then introduce the product. Risk: the page may feel less mature for enterprise buyers.
+适合早期产品需要更强问题叙事时使用。先讲工作知识分散的痛点，再介绍产品作为聚焦解法。风险是企业买家可能觉得证明和安全感不足。
 
-## Brand Context
+## 品牌上下文
 
-Brand name is BriefSearch. Use a wordmark placeholder only. No real logo, customer metrics, or customer logos are provided.
+品牌名是 BriefSearch。只使用文字标识占位。没有真实 Logo、客户指标或客户 Logo。
 
-## DESIGN.md Reference
+## DESIGN.md 参考
 
 DESIGN.md
 
-Reference direction: `ai_product_landing_page` - use product proof, conversion clarity, and trust hierarchy as mechanisms only.
+参考方向：`ai_product_landing_page` - 只借鉴产品证明、转化清晰度和信任层级这些机制。
 
-## Asset List
+## 资产
 
-- Available: product surface mock placeholder, integration icon placeholders
-- Missing: real screenshots, customer logos, real metrics, certification badges
-- Placeholders allowed: realistic product UI placeholder and generic integration icon placeholders
+- 可用：产品界面示意占位、集成图标占位
+- 缺失：真实截图、客户 Logo、真实指标、认证徽章
+- 允许占位：可信的产品 UI 占位和通用集成图标占位
 
-## Interaction Requirements
+## 交互要求
 
-- Represent desktop and mobile landing pages.
-- Primary CTA opens a trial signup form or navigates to `/signup`. It needs default, hover, focus, disabled, loading, success, and error states when implemented.
-- Secondary demo CTA opens or scrolls to a product demo section. It stays visually secondary and needs default, hover, focus, and loading states when implemented.
-- Product mock shows a typed question, answer, source chips, and linked documents.
-- Source chips and linked documents are clickable when the target tool supports interactions; otherwise label them as visual-only proof elements.
-- Integration items are non-clickable placeholders unless real integration URLs are provided.
-- Failed signup or unavailable demo states keep the visitor on the page with a clear retry path.
-- Show a simple visitor flow from hero value to workflow proof to trial signup.
+- 需要表现桌面端和移动端官网。
+- 主 CTA 打开试用注册表单或跳转到 `/signup`，实现时包含 default、hover、focus、disabled、loading、success 和 error 状态。
+- 次 CTA 打开或滚动到产品演示区，视觉上保持次级，实现时包含 default、hover、focus 和 loading 状态。
+- 产品示意展示已输入的问题、答案、来源标签和关联文档。
+- 来源标签和关联文档在目标工具支持时可点击；否则要标为视觉证明元素。
+- 集成项默认是不可点击占位，除非提供真实集成链接。
+- 注册失败或演示不可用时，访问者留在当前页面，并看到清楚的重试路径。
+- 展示从首屏价值到工作流证明再到试用注册的简单访问者路径。
 
-## Responsive and Accessibility Requirements
+## 响应式与可访问性要求
 
-- Use desktop >= 1024px, tablet 768-1023px, and mobile <= 767px as target layout bands.
-- On mobile, stack headline, copy, CTAs, and product surface in that order.
-- Keep the primary CTA visible above the fold on mobile or repeat it after the product proof.
-- Product mock must resize without horizontal scrolling and keep answer text, source chips, and linked documents readable.
-- Keyboard tab order follows navigation, primary CTA, secondary CTA, product source links, integrations, security proof, final CTA.
-- Every interactive element has a visible focus state and at least a 44px touch target on mobile.
-- Use semantic heading order and descriptive alt text for product mock, source icons, and integration placeholders.
+- 使用桌面端 >= 1024px、平板 768-1023px、移动端 <= 767px 作为布局断点。
+- 移动端按标题、说明、CTA 和产品界面的顺序堆叠。
+- 主 CTA 要在移动端首屏可见，或在产品证明后重复一次。
+- 产品示意必须缩放良好，不能横向滚动；答案文字、来源标签和文档链接都要可读。
+- 键盘顺序依次经过导航、主 CTA、次 CTA、产品来源链接、集成项、安全证明和最终 CTA。
+- 每个交互元素都有可见 focus，移动端触控目标至少 44px。
+- 使用语义化标题顺序，并为产品示意、来源图标和集成占位提供描述性 alt 文本。
 
-## Constraints
+## 约束
 
-Responsive web landing page. Use HTML prototype, React or Next.js compatible structure, and Tailwind-compatible tokens. Keep contrast readable and focus states clear.
+响应式 Web 官网。可交付 HTML 原型、兼容 React 或 Next.js 的结构，并使用兼容 Tailwind 的 tokens。保持对比度可读，focus 状态清楚。
 
-## Forbidden Directions
+## 禁止方向
 
-Avoid generic AI wording, excessive glow, abstract gradient blobs, fake logos, unsupported metrics, and over-rounded novelty.
+避免泛泛 AI 话术、过量发光、抽象渐变色块、虚构 Logo、无依据指标和过度圆角的新奇风格。
 
-## Success Criteria
+## 成功标准
 
-First-screen clarity, clear CTA, real product surface, no generic AI wording, mobile CTA visibility.
+首屏价值清楚、CTA 明确、产品界面真实可信、没有泛泛 AI 话术、移动端 CTA 可见。
 
-## Open Questions
+## 待确认问题
 
-- Which integrations are confirmed for launch?
-- Are there real screenshots or customer proof points available?
+- 哪些集成已经确认可以发布展示？
+- 是否已有真实截图或客户证明材料？
 
-## Assumptions
+## 假设
 
-- The product is early but credible enough to show a realistic product surface.
-- The first conversion target is trial signup, with demo as secondary.
+- 产品仍处早期，但可信到可以展示真实感产品界面。
+- 第一转化目标是试用注册，演示预约为次要路径。

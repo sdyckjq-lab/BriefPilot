@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "source_path": "examples/ai-search-workspace/DESIGN.md",
-  "source_sha256": "8e390ee70bb79cff995c6b6e8aced2e8d0dfb86e5712ab8fe3cf2a8fb0ee1302",
+  "source_sha256": "91ec3856e75d78446680917497eef94bb5f9ff7e11436ec9d3de68a1447d2207",
   "mode": "briefpilot_fallback",
   "official_tool": {
     "available": false,
@@ -18,18 +18,34 @@
   },
   "summary": {
     "blocking": 0,
-    "warning": 0,
+    "warning": 2,
     "info": 1
   },
   "blocking": false,
   "next_action": "continue",
   "findings": [
     {
+      "severity": "warning",
+      "rule_id": "missing_accessibility_guidance",
+      "location": "Markdown body",
+      "message": "可访问性说明缺少 touch 要求。",
+      "suggested_fix": "补充明确的可访问性要求。",
+      "source": "briefpilot_fallback"
+    },
+    {
+      "severity": "warning",
+      "rule_id": "reference_direction_drift",
+      "location": "drift_checks.data_density",
+      "message": "工作台方向需要说明扫描密度、面板、行或元数据层级。",
+      "suggested_fix": "补充数据密度和信息层级指导，或换成更合适的参考方向。",
+      "source": "briefpilot_fallback"
+    },
+    {
       "severity": "info",
       "rule_id": "optional_official_check",
       "location": "official_tool",
-      "message": "Google official DESIGN.md lint was not run; fallback checks were used.",
-      "suggested_fix": "For stricter checks, provide a safe absolute --official-command path or run the official tool manually.",
+      "message": "未运行 Google 官方 DESIGN.md lint，本报告使用内置 fallback 检查。",
+      "suggested_fix": "如需更严格检查，提供安全的 --official-command 绝对路径，或手动运行官方工具。",
       "source": "briefpilot_fallback"
     }
   ],
