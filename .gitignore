@@ -1,3 +1,9 @@
 .DS_Store
 __pycache__/
 *.py[cod]
+
+# Local-only project memory. These files are restored for maintainer work
+# but must not be published with the Skill package.
+/AGENTS.md
+/docs/
+/需求文档/

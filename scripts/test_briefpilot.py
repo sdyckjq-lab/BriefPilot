@@ -104,6 +104,36 @@ def write_review(path, review):
     return path
 
 
+def init_public_package_repo(tmp, gitignore=None):
+    root = Path(tmp)
+    subprocess.run(["git", "-C", str(root), "init"], text=True, capture_output=True, check=True)
+    (root / ".gitignore").write_text(
+        gitignore
+        if gitignore is not None
+        else "/AGENTS.md\n/docs/\n/需求文档/\n",
+        encoding="utf-8",
+    )
+    (root / "LICENSE").write_text("MIT\n", encoding="utf-8")
+    (root / "README.md").write_text("# BriefPilot\n\nRun `scripts/export_prompt.py`.\n", encoding="utf-8")
+    (root / "SKILL.md").write_text("# BriefPilot Skill\n", encoding="utf-8")
+    subprocess.run(
+        ["git", "-C", str(root), "add", ".gitignore", "LICENSE", "README.md", "SKILL.md"],
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    return root
+
+
+def run_public_package_validator(root):
+    return subprocess.run(
+        [sys.executable, str(VALIDATE_PUBLIC_PACKAGE), "--root", str(root)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+
 class BriefPilotScriptTests(unittest.TestCase):
     def test_style_index_contract_and_docs(self):
         payload = json.loads(STYLE_INDEX.read_text(encoding="utf-8"))
@@ -799,6 +829,126 @@ class BriefPilotScriptTests(unittest.TestCase):
             check=False,
         )
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+
+    def test_public_package_validator_allows_ignored_local_docs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = init_public_package_repo(tmp)
+            (root / "AGENTS.md").write_text("local rules\n", encoding="utf-8")
+            (root / "docs").mkdir()
+            (root / "docs" / "note.md").write_text("local note\n", encoding="utf-8")
+
+            result = run_public_package_validator(root)
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+
+    def test_public_package_validator_rejects_tracked_local_docs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = init_public_package_repo(tmp)
+            (root / "docs").mkdir()
+            (root / "docs" / "note.md").write_text("local note\n", encoding="utf-8")
+            subprocess.run(
+                ["git", "-C", str(root), "add", "-f", "docs/note.md"],
+                text=True,
+                capture_output=True,
+                check=True,
+            )
+
+            result = run_public_package_validator(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("local-only path is tracked", result.stdout)
+
+    def test_public_package_validator_rejects_tracked_root_agent_rules(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = init_public_package_repo(tmp)
+            (root / "AGENTS.md").write_text("local rules\n", encoding="utf-8")
+            subprocess.run(
+                ["git", "-C", str(root), "add", "-f", "AGENTS.md"],
+                text=True,
+                capture_output=True,
+                check=True,
+            )
+
+            result = run_public_package_validator(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("local-only path is tracked", result.stdout)
+
+    def test_public_package_validator_rejects_unignored_local_docs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = init_public_package_repo(tmp, gitignore="/AGENTS.md\n/需求文档/\n")
+            (root / "docs").mkdir()
+            (root / "docs" / "note.md").write_text("local note\n", encoding="utf-8")
+
+            result = run_public_package_validator(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("local-only path is not ignored by git: docs", result.stdout)
+            self.assertIn("local-only path is untracked but not ignored", result.stdout)
+
+    def test_public_package_validator_rejects_old_wrapper_directory(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = init_public_package_repo(tmp)
+            (root / "briefpilot").mkdir()
+            (root / "briefpilot" / "SKILL.md").write_text("# Old wrapper\n", encoding="utf-8")
+
+            result = run_public_package_validator(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("forbidden top-level workspace path exists: briefpilot", result.stdout)
+
+    def test_public_package_validator_rejects_old_source_directory(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = init_public_package_repo(tmp)
+            (root / "需求文档").mkdir()
+            (root / "需求文档" / "note.md").write_text("old source\n", encoding="utf-8")
+
+            result = run_public_package_validator(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("forbidden top-level workspace path exists: 需求文档", result.stdout)
+
+    def test_public_package_validator_rejects_private_source_markers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = init_public_package_repo(tmp)
+            marker = "ClaudeDesign_" + "泄露" + "提示词.md"
+            (root / "README.md").write_text(f"# BriefPilot\n\n{marker}\n", encoding="utf-8")
+            subprocess.run(
+                ["git", "-C", str(root), "add", "README.md"],
+                text=True,
+                capture_output=True,
+                check=True,
+            )
+
+            result = run_public_package_validator(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("private source material marker", result.stdout)
+
+    def test_public_package_validator_rejects_local_home_paths(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = init_public_package_repo(tmp)
+            local_path = "/" + "Users/example/Desktop/" + "project/BriefPilot"
+            (root / "README.md").write_text(f"# BriefPilot\n\n{local_path}\n", encoding="utf-8")
+            subprocess.run(
+                ["git", "-C", str(root), "add", "README.md"],
+                text=True,
+                capture_output=True,
+                check=True,
+            )
+
+            result = run_public_package_validator(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("contains forbidden local text", result.stdout)
+
+    def test_public_package_validator_rejects_old_wrapper_paths(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = init_public_package_repo(tmp)
+            old_path = "brief" + "pilot/scripts/export_prompt.py"
+            (root / "README.md").write_text(f"# BriefPilot\n\n{old_path}\n", encoding="utf-8")
+            subprocess.run(
+                ["git", "-C", str(root), "add", "README.md"],
+                text=True,
+                capture_output=True,
+                check=True,
+            )
+
+            result = run_public_package_validator(root)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("old wrapper path", result.stdout)
 
     def test_result_review_templates_define_contract(self):
         review_template = json.loads((ROOT / "templates" / "result-review.json").read_text(encoding="utf-8"))
