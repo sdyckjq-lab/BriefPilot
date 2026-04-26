@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "raw_input": "帮我做一个 AI 搜索产品官网",
+  "baseline": {
+    "source_type": "controlled",
+    "label": "Controlled direct-generation baseline",
+    "summary": "An authored baseline example that represents common weak output from sending the vague request directly to a design generator.",
+    "weaknesses": [
+      "Generic AI headline with no named audience",
+      "Vague feature cards without product proof",
+      "No sourced-answer product surface",
+      "Unclear trust, security, and review criteria",
+      "No loading, error, empty, or mobile behavior"
+    ]
+  },
+  "enhanced": {
+    "label": "BriefPilot-enhanced result",
+    "source_path": "examples/ai-search-landing",
+    "summary": "A condensed demo view grounded in the verified AI search landing package.",
+    "evidence": [
+      "Audience: knowledge workers and small teams",
+      "Goal: drive trial signup with demo as secondary action",
+      "Strategy: Enterprise Trust",
+      "Proof: sourced-answer product surface and source chips",
+      "Quality bar: first-screen clarity, CTA hierarchy, responsive fit, and trust cues"
+    ]
+  },
+  "page": {
+    "path": "examples/comparison-demo/index.html",
+    "offline_safe": true
+  },
+  "visual_mockups": {
+    "baseline_region": "baseline-mockup",
+    "enhanced_region": "briefpilot-mockup"
+  },
+  "comparison_claims": [
+    "BriefPilot makes the audience and business goal explicit.",
+    "BriefPilot turns a vague page request into a concrete product structure.",
+    "BriefPilot adds product proof instead of relying on generic AI claims.",
+    "BriefPilot carries review criteria and state requirements into the next prompt."
+  ],
+  "future_real_output_todo_path": "examples/comparison-demo/future-real-output-todo.md"
+}

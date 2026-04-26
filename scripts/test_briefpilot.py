@@ -21,7 +21,9 @@ DESIGN_MD = EXAMPLE_DIR / "DESIGN.md"
 WORKSPACE_DIR = ROOT / "examples" / "ai-search-workspace"
 WORKSPACE_EXAMPLE = WORKSPACE_DIR / "design-brief.json"
 WORKSPACE_DESIGN_MD = WORKSPACE_DIR / "DESIGN.md"
+COMPARISON_DIR = ROOT / "examples" / "comparison-demo"
 VALIDATE_REVIEW = ROOT / "scripts" / "validate_result_review.py"
+VALIDATE_COMPARISON = ROOT / "scripts" / "validate_comparison_demo.py"
 EXPORT_MODIFICATION = ROOT / "scripts" / "export_modification_prompt.py"
 STYLE_INDEX = ROOT / "references" / "design-style-index.json"
 CHECK_DESIGN_MD = ROOT / "scripts" / "check_design_md.py"
@@ -128,6 +130,81 @@ def init_public_package_repo(tmp, gitignore=None):
 def run_public_package_validator(root):
     return subprocess.run(
         [sys.executable, str(VALIDATE_PUBLIC_PACKAGE), "--root", str(root)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+
+def write_comparison_demo(root):
+    root = Path(root)
+    demo = root / "examples" / "comparison-demo"
+    demo.mkdir(parents=True)
+    (root / "examples" / "ai-search-landing").mkdir(parents=True)
+    (root / "README.md").write_text(
+        "# BriefPilot\n\nOpen [comparison demo](examples/comparison-demo/index.html).\n",
+        encoding="utf-8",
+    )
+    manifest = {
+        "schema_version": "1.0",
+        "raw_input": "帮我做一个 AI 搜索产品官网",
+        "baseline": {
+            "source_type": "controlled",
+            "label": "Controlled direct-generation baseline",
+            "summary": "Authored baseline.",
+        },
+        "enhanced": {
+            "label": "BriefPilot-enhanced result",
+            "source_path": "examples/ai-search-landing",
+            "summary": "Grounded example.",
+        },
+        "page": {"path": "examples/comparison-demo/index.html", "offline_safe": True},
+        "visual_mockups": {
+            "baseline_region": "baseline-mockup",
+            "enhanced_region": "briefpilot-mockup",
+        },
+        "comparison_claims": [
+            "BriefPilot adds audience.",
+            "BriefPilot adds structure.",
+            "BriefPilot adds proof.",
+            "BriefPilot adds review criteria.",
+        ],
+        "future_real_output_todo_path": "examples/comparison-demo/future-real-output-todo.md",
+    }
+    (demo / "comparison-demo.json").write_text(json.dumps(manifest), encoding="utf-8")
+    (demo / "index.html").write_text(
+        """<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Comparison</title></head>
+<body>
+<h1>Comparison</h1>
+<p>帮我做一个 AI 搜索产品官网</p>
+<section><h2>Direct vague baseline</h2><p>Controlled baseline example, not a named-tool output.</p><div data-demo-region="baseline-mockup">Audience Structure Proof Review</div></section>
+<section><h2>BriefPilot-enhanced result</h2><div data-demo-region="briefpilot-mockup">Audience Structure Proof Review</div></section>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+    (demo / "baseline-controlled.md").write_text(
+        "This is controlled and not captured from a named downstream tool.\n",
+        encoding="utf-8",
+    )
+    (demo / "briefpilot-enhanced.md").write_text(
+        "Grounded in examples/ai-search-landing with Enterprise Trust, source proof, and review criteria.\n",
+        encoding="utf-8",
+    )
+    (demo / "future-real-output-todo.md").write_text(
+        "Targets: v0, Lovable, Bolt, Figma Make. Capture date, exact prompt, and whether the result was edited.\n",
+        encoding="utf-8",
+    )
+    (demo / "README.md").write_text("# Demo\n\nOpen index.html.\n", encoding="utf-8")
+    return demo
+
+
+def run_comparison_validator(root, demo):
+    return subprocess.run(
+        [sys.executable, str(VALIDATE_COMPARISON), str(demo), "--root", str(root)],
         text=True,
         capture_output=True,
         check=False,
@@ -755,6 +832,113 @@ class BriefPilotScriptTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
         self.assertIn("valid", result.stdout.lower())
+
+    def test_validate_comparison_demo(self):
+        result = subprocess.run(
+            [sys.executable, str(VALIDATE_COMPARISON), str(COMPARISON_DIR)],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertIn("valid", result.stdout.lower())
+
+    def test_validate_comparison_demo_rejects_misleading_or_incomplete_package(self):
+        def update_manifest(demo, transform):
+            path = demo / "comparison-demo.json"
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            transform(payload)
+            path.write_text(json.dumps(payload), encoding="utf-8")
+
+        def make_manifest_paths_absolute(root, demo):
+            def transform(payload):
+                payload["enhanced"]["source_path"] = str((root / "examples" / "ai-search-landing").resolve())
+                payload["page"]["path"] = str((demo / "index.html").resolve())
+                payload["future_real_output_todo_path"] = str((demo / "future-real-output-todo.md").resolve())
+
+            update_manifest(demo, transform)
+
+        cases = [
+            (
+                "missing_disclosure",
+                lambda root, demo: (demo / "index.html").write_text(
+                    (demo / "index.html").read_text(encoding="utf-8").replace(
+                        "not a named-tool output",
+                        "tool output",
+                    ),
+                    encoding="utf-8",
+                ),
+                "index.html missing required text",
+            ),
+            (
+                "missing_future_todo",
+                lambda root, demo: (demo / "future-real-output-todo.md").unlink(),
+                "missing required file: future-real-output-todo.md",
+            ),
+            (
+                "invalid_enhanced_path",
+                lambda root, demo: update_manifest(demo, lambda payload: payload["enhanced"].update({"source_path": "examples/missing"})),
+                "enhanced.source_path does not resolve",
+            ),
+            (
+                "absolute_manifest_path",
+                make_manifest_paths_absolute,
+                "must be repo-relative",
+            ),
+            (
+                "named_tool_baseline_claim",
+                lambda root, demo: update_manifest(
+                    demo,
+                    lambda payload: payload["baseline"].update({"source_type": "v0", "summary": "Actual v0 output."}),
+                ),
+                "baseline must not claim a named-tool source",
+            ),
+            (
+                "missing_visual_marker",
+                lambda root, demo: (demo / "index.html").write_text(
+                    (demo / "index.html").read_text(encoding="utf-8").replace(
+                        'data-demo-region="baseline-mockup"',
+                        'data-demo-region="baseline-copy"',
+                    ),
+                    encoding="utf-8",
+                ),
+                "index.html missing visual mockup marker",
+            ),
+            (
+                "remote_dependency",
+                lambda root, demo: (demo / "index.html").write_text(
+                    (demo / "index.html").read_text(encoding="utf-8").replace(
+                        "</head>",
+                        '<script src="https://example.test/app.js"></script></head>',
+                    ),
+                    encoding="utf-8",
+                ),
+                "remote asset",
+            ),
+            (
+                "missing_readme_link",
+                lambda root, demo: (root / "README.md").write_text("# BriefPilot\n", encoding="utf-8"),
+                "README.md must link",
+            ),
+            (
+                "plain_readme_path",
+                lambda root, demo: (root / "README.md").write_text(
+                    "# BriefPilot\n\nOpen examples/comparison-demo/index.html.\n",
+                    encoding="utf-8",
+                ),
+                "README.md must link",
+            ),
+        ]
+
+        with tempfile.TemporaryDirectory() as tmp:
+            for name, mutate, expected in cases:
+                root = Path(tmp) / name
+                demo = write_comparison_demo(root)
+                mutate(root, demo)
+                result = run_comparison_validator(root, demo)
+                self.assertNotEqual(result.returncode, 0, name)
+                self.assertIn("invalid comparison demo", result.stdout)
+                self.assertIn(expected, result.stdout + result.stderr)
 
     def test_export_all_prompt_targets(self):
         with tempfile.TemporaryDirectory() as tmp:
