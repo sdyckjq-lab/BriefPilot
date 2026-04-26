@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BriefPilot Comparison Demo</title>
+  <title>BriefPilot 对比演示</title>
   <link rel="icon" href="data:,">
   <style>
     :root {
@@ -525,16 +525,16 @@
 <body>
   <main>
     <section class="intro" aria-labelledby="page-title">
-      <p class="eyebrow">BriefPilot comparison demo</p>
-      <h1 id="page-title">Same vague request. Different result quality.</h1>
-      <p class="summary">The left side shows a controlled direct-generation baseline. The right side shows the same request after BriefPilot turns it into a concrete product direction.</p>
-      <div class="input-box" aria-label="Shared input">
-        <span>Shared input</span>
+      <p class="eyebrow">BriefPilot 对比演示</p>
+      <h1 id="page-title">同一个模糊需求，生成质量会差很多。</h1>
+      <p class="summary">左侧是直接生成的受控基线，右侧是 BriefPilot 先补齐产品方向、受众、结构、证据和评审标准之后的结果。</p>
+      <div class="input-box" aria-label="同一个输入">
+        <span>同一个输入</span>
         <code>帮我做一个 AI 搜索产品官网</code>
       </div>
-      <div class="preview-grid" aria-label="First-screen visual comparison">
-        <div class="preview-card baseline-preview" data-demo-region="baseline-mockup" aria-label="Baseline page-result mini mockup">
-          <strong>Generic direct output</strong>
+      <div class="preview-grid" aria-label="首屏视觉对比">
+        <div class="preview-card baseline-preview" data-demo-region="baseline-mockup" aria-label="直接生成结果小预览">
+          <strong>直接生成的泛化结果</strong>
           <div class="preview-mock">
             <span class="preview-nav"></span>
             <span class="preview-title"></span>
@@ -542,8 +542,8 @@
             <span class="preview-block"></span>
           </div>
         </div>
-        <div class="preview-card enhanced-preview" data-demo-region="briefpilot-mockup" aria-label="BriefPilot-enhanced page-result mini mockup">
-          <strong>BriefPilot-enhanced output</strong>
+        <div class="preview-card enhanced-preview" data-demo-region="briefpilot-mockup" aria-label="BriefPilot 强化结果小预览">
+          <strong>BriefPilot 强化结果</strong>
           <div class="preview-mock">
             <span class="preview-nav"></span>
             <span class="preview-title"></span>
@@ -554,101 +554,101 @@
       </div>
     </section>
 
-    <section class="comparison-grid" aria-label="Before and after comparison">
+    <section class="comparison-grid" aria-label="前后对比">
       <article class="panel baseline" aria-labelledby="baseline-title">
         <div class="panel-header">
           <div>
-            <h2 id="baseline-title">Direct vague baseline</h2>
-            <p>Controlled baseline example, not a named-tool output.</p>
+            <h2 id="baseline-title">直接生成的受控基线</h2>
+            <p>受控基线示例，不是命名工具输出。</p>
           </div>
-          <span class="tag warn">Controlled</span>
+          <span class="tag warn">受控</span>
         </div>
 
-        <div class="mock-page" aria-label="Generic direct output page mockup">
+        <div class="mock-page" aria-label="直接生成页面示意">
           <div class="mock-nav">
             <span class="brand">AI Search</span>
             <span class="nav-lines" aria-hidden="true"><span class="line"></span><span class="line"></span><span class="line"></span></span>
           </div>
           <div class="mock-hero">
-            <h3 class="mock-title">Search smarter with AI</h3>
-            <p class="mock-copy">A powerful AI search platform that helps everyone find information faster.</p>
+            <h3 class="mock-title">用 AI 更聪明地搜索</h3>
+            <p class="mock-copy">一个强大的 AI 搜索平台，帮助所有人更快找到信息。</p>
             <div class="mock-actions">
-              <span class="button primary">Get started</span>
-              <span class="button">Learn more</span>
+              <span class="button primary">开始使用</span>
+              <span class="button">了解更多</span>
             </div>
           </div>
           <div class="weak-cards">
-            <div class="weak-card">Fast and intelligent search for your team.</div>
-            <div class="weak-card">Simple tools powered by advanced AI.</div>
-            <div class="weak-card">Modern interface with no clear product proof.</div>
+            <div class="weak-card">为团队提供快速、智能的搜索。</div>
+            <div class="weak-card">由先进 AI 驱动的简单工具。</div>
+            <div class="weak-card">界面看起来现代，但缺少清楚的产品证据。</div>
           </div>
         </div>
 
-        <ul class="delta-list" aria-label="Baseline weaknesses">
-          <li>No named audience, conversion goal, or buying context.</li>
-          <li>Generic AI claims replace product-specific proof.</li>
-          <li>No sourced answer surface, trust cues, states, or review bar.</li>
-          <li>Mobile, focus, loading, error, and empty states are unspecified.</li>
+        <ul class="delta-list" aria-label="基线问题">
+          <li>没有明确受众、转化目标和购买场景。</li>
+          <li>泛泛而谈的 AI 口号替代了产品证据。</li>
+          <li>没有带来源的答案界面、信任线索、状态和评审标准。</li>
+          <li>移动端、焦点、加载、错误和空状态都没有说明。</li>
         </ul>
       </article>
 
       <article class="panel enhanced" aria-labelledby="enhanced-title">
         <div class="panel-header">
           <div>
-            <h2 id="enhanced-title">BriefPilot-enhanced result</h2>
-            <p>Grounded in the verified AI search landing package.</p>
+            <h2 id="enhanced-title">BriefPilot 强化结果</h2>
+            <p>基于已经验证过的 AI 搜索官网样例。</p>
           </div>
           <span class="tag good">BriefPilot</span>
         </div>
 
-        <div class="mock-page" aria-label="BriefPilot-enhanced page mockup">
+        <div class="mock-page" aria-label="BriefPilot 强化页面示意">
           <div class="mock-nav">
             <span class="brand">BriefSearch</span>
             <span class="nav-lines" aria-hidden="true"><span class="line"></span><span class="line"></span><span class="line"></span></span>
           </div>
           <div class="mock-hero">
             <div>
-              <h3 class="mock-title">Find trusted answers across every work document in seconds.</h3>
-              <p class="mock-copy">For knowledge workers and small teams that need source-backed answers across docs, chat, tickets, and drives.</p>
+              <h3 class="mock-title">几秒内从所有工作资料里找到可信答案。</h3>
+              <p class="mock-copy">面向需要跨文档、聊天、工单和网盘查找来源答案的知识工作者和小团队。</p>
               <div class="mock-actions">
-                <span class="button primary">Start trial</span>
-                <span class="button">Book demo</span>
+                <span class="button primary">开始试用</span>
+                <span class="button">预约演示</span>
               </div>
             </div>
-            <div class="product-surface" aria-label="Sourced answer product surface">
-              <div class="query">Question: What changed in the launch plan?</div>
-              <div class="answer">Answer drafted from workspace sources, with permission-aware links and source confidence visible.</div>
+            <div class="product-surface" aria-label="带来源答案的产品界面">
+              <div class="query">问题：发布计划有哪些变化？</div>
+              <div class="answer">答案来自工作区资料，并显示权限感知链接、来源和可信度。</div>
               <div class="source-row">
-                <span class="source-chip">Launch doc</span>
-                <span class="source-chip">Support notes</span>
-                <span class="source-chip">Roadmap</span>
+                <span class="source-chip">发布文档</span>
+                <span class="source-chip">支持记录</span>
+                <span class="source-chip">路线图</span>
               </div>
             </div>
           </div>
           <div class="proof-grid">
-            <div class="proof-card"><strong>Workflow</strong>Ask, review sourced answer, open source document.</div>
-            <div class="proof-card"><strong>Trust</strong>Permissions-aware search, admin controls, source visibility.</div>
-            <div class="proof-card"><strong>States</strong>Loading, success, failed signup, unavailable demo, mobile fit.</div>
+            <div class="proof-card"><strong>流程</strong>提问、查看带来源答案、打开来源文档。</div>
+            <div class="proof-card"><strong>信任</strong>权限感知搜索、管理员控制、来源可见。</div>
+            <div class="proof-card"><strong>状态</strong>加载、成功、失败、不可用和移动端适配。</div>
           </div>
         </div>
 
-        <ul class="delta-list" aria-label="BriefPilot improvements">
-          <li>Audience, business goal, and CTA hierarchy are explicit.</li>
-          <li>Hero includes a product surface with source chips and linked documents.</li>
-          <li>Trust, security, workflow, integrations, and final CTA are structured.</li>
-          <li>Review checks define what good output must preserve.</li>
+        <ul class="delta-list" aria-label="BriefPilot 改进点">
+          <li>受众、业务目标和按钮层级都变得明确。</li>
+          <li>首屏有产品界面、来源标签和可追溯资料。</li>
+          <li>信任、安全、工作流、集成和最终转化结构完整。</li>
+          <li>评审标准说明了好结果必须保留什么。</li>
         </ul>
       </article>
     </section>
 
-    <section class="claim-band" aria-label="Comparison claims">
-      <div class="claim"><strong>Audience</strong>From "everyone" to knowledge workers and small teams.</div>
-      <div class="claim"><strong>Structure</strong>From generic cards to hero, pain, solution, workflow, security, and CTA.</div>
-      <div class="claim"><strong>Proof</strong>From vague AI language to a sourced-answer product surface.</div>
-      <div class="claim"><strong>Review</strong>From subjective taste to concrete acceptance checks.</div>
+    <section class="claim-band" aria-label="对比结论">
+      <div class="claim"><strong>受众</strong>从“所有人”变成知识工作者和小团队。</div>
+      <div class="claim"><strong>结构</strong>从泛化卡片变成首屏、痛点、方案、流程、安全和转化。</div>
+      <div class="claim"><strong>证据</strong>从模糊 AI 说法变成带来源答案的产品界面。</div>
+      <div class="claim"><strong>评审</strong>从主观喜好变成具体可检查的验收标准。</div>
     </section>
 
-    <p class="notice">The baseline is controlled for this first public demo. Future versions can add real captured outputs when the prompt, date, tool label, and edit status are recorded.</p>
+    <p class="notice">第一个公开演示使用受控基线。以后可以加入真实工具输出，但必须记录完整提示词、日期、工具名称和是否编辑。</p>
   </main>
 </body>
 </html>

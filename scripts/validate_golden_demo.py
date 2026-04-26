@@ -28,6 +28,10 @@ PROMPTS = [
     "prompts/v0.txt",
 ]
 
+DEFAULT_CONTENT_LANGUAGE = "zh-CN"
+OUTPUT_LANGUAGE_PHRASE = "Use Simplified Chinese for all user-visible UI copy."
+OUTPUT_LANGUAGE_CHINESE_PHRASE = "用户可见 UI 文案必须使用简体中文"
+
 
 def has_text(text, needle):
     return needle.lower() in text.lower()
@@ -91,8 +95,15 @@ def check_diagnosis(example_dir, raw_input, strategy_names, findings):
             findings.append(f"diagnosis missing strategy option: {name}")
 
 
+def check_content_language(brief, findings):
+    meta = brief.get("meta", {}) if isinstance(brief.get("meta"), dict) else {}
+    language = meta.get("content_language")
+    if language != DEFAULT_CONTENT_LANGUAGE:
+        findings.append(f"design-brief.json meta.content_language must be {DEFAULT_CONTENT_LANGUAGE}")
+
+
 def check_prompts(example_dir, strategy_names, findings):
-    required_headers = ["Task", "Visual Strategy", "DESIGN.md Visual System", "Review Criteria"]
+    required_headers = ["Task", "Output Language", "Visual Strategy", "DESIGN.md Visual System", "Review Criteria"]
     for relative in PROMPTS:
         path = example_dir / relative
         if not path.exists():
@@ -104,6 +115,8 @@ def check_prompts(example_dir, strategy_names, findings):
         for name in strategy_names:
             if name not in text:
                 findings.append(f"{relative} missing strategy option: {name}")
+        if OUTPUT_LANGUAGE_PHRASE not in text or OUTPUT_LANGUAGE_CHINESE_PHRASE not in text:
+            findings.append(f"{relative} missing Simplified Chinese output-language rule")
 
 
 def check_prompt_exports_match(example_dir, brief, findings):
@@ -198,6 +211,7 @@ def main(argv):
     if selected_strategy and selected_strategy not in strategy_names:
         findings.append("selected visual strategy is not present in strategy_options")
 
+    check_content_language(brief, findings)
     check_assumptions(example_dir, brief, findings)
     check_brief_links(example_dir, brief, findings)
     check_interaction_and_accessibility(brief, findings)

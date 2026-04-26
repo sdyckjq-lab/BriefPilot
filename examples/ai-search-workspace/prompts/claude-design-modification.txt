@@ -10,6 +10,11 @@ tweak
 Original Strategy
 Dense Research Workspace
 
+Output Language
+用户可见 UI 文案必须使用简体中文（Simplified Chinese / zh-CN）。
+Use Simplified Chinese for all user-visible UI copy.
+代码标识、文件名、组件名、命令示例、design token keys 和工具名保持英文。
+
 Strategy Preservation
 Preserve the selected strategy.
 
@@ -48,6 +53,7 @@ Full Brief JSON
   "meta": {
     "version": "0.1",
     "created_by": "BriefPilot",
+    "content_language": "zh-CN",
     "target_tools": [
       "huashu-design",
       "claude-design",

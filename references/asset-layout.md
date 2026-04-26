@@ -12,6 +12,8 @@ Use `.briefpilot/` by default.
 
 ## Project Assets
 
+Project content is Chinese-first by default. Record the language in `design-brief.json` under `meta.content_language`; keep the file layout and technical filenames in English.
+
 Write project assets to:
 
 ```text

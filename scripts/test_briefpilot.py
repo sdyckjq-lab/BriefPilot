@@ -41,7 +41,7 @@ Use restrained blue accents, dense but readable panels, 8px default radius, clea
         encoding="utf-8",
     )
     brief = {
-        "meta": {"version": "0.1", "created_by": "BriefPilot", "target_tools": ["huashu-design", "claude-design", "v0"]},
+        "meta": {"version": "0.1", "created_by": "BriefPilot", "content_language": "zh-CN", "target_tools": ["huashu-design", "claude-design", "v0"]},
         "project": {"name": "Workspace Detail", "summary": "AI search answer detail app page", "task_type": "app_page", "stage": "test"},
         "audience": {"primary_user": "research teams"},
         "goals": {"business_goal": "increase answer trust", "design_goal": "make answer sources clear"},
@@ -150,13 +150,13 @@ def write_comparison_demo(root):
         "raw_input": "帮我做一个 AI 搜索产品官网",
         "baseline": {
             "source_type": "controlled",
-            "label": "Controlled direct-generation baseline",
-            "summary": "Authored baseline.",
+            "label": "直接生成的受控基线",
+            "summary": "受控基线示例。",
         },
         "enhanced": {
-            "label": "BriefPilot-enhanced result",
+            "label": "BriefPilot 强化结果",
             "source_path": "examples/ai-search-landing",
-            "summary": "Grounded example.",
+            "summary": "基于已验证样例。",
         },
         "page": {"path": "examples/comparison-demo/index.html", "offline_safe": True},
         "visual_mockups": {
@@ -164,38 +164,38 @@ def write_comparison_demo(root):
             "enhanced_region": "briefpilot-mockup",
         },
         "comparison_claims": [
-            "BriefPilot adds audience.",
-            "BriefPilot adds structure.",
-            "BriefPilot adds proof.",
-            "BriefPilot adds review criteria.",
+            "BriefPilot 补齐受众。",
+            "BriefPilot 补齐结构。",
+            "BriefPilot 补齐证据。",
+            "BriefPilot 补齐评审标准。",
         ],
         "future_real_output_todo_path": "examples/comparison-demo/future-real-output-todo.md",
     }
     (demo / "comparison-demo.json").write_text(json.dumps(manifest), encoding="utf-8")
     (demo / "index.html").write_text(
         """<!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head><meta charset="utf-8"><title>Comparison</title></head>
 <body>
-<h1>Comparison</h1>
+<h1>同一个模糊需求，结果质量不同</h1>
 <p>帮我做一个 AI 搜索产品官网</p>
-<section><h2>Direct vague baseline</h2><p>Controlled baseline example, not a named-tool output.</p><div data-demo-region="baseline-mockup">Audience Structure Proof Review</div></section>
-<section><h2>BriefPilot-enhanced result</h2><div data-demo-region="briefpilot-mockup">Audience Structure Proof Review</div></section>
+<section><h2>直接生成的受控基线</h2><p>受控基线示例，不是命名工具输出。</p><div data-demo-region="baseline-mockup">受众 结构 证据 评审 直接生成</div></section>
+<section><h2>BriefPilot 强化结果</h2><div data-demo-region="briefpilot-mockup">受众 结构 证据 评审</div></section>
 </body>
 </html>
 """,
         encoding="utf-8",
     )
     (demo / "baseline-controlled.md").write_text(
-        "This is controlled and not captured from a named downstream tool.\n",
+        "这是受控基线，不是命名工具输出，也不是从某个下游工具截取。\n",
         encoding="utf-8",
     )
     (demo / "briefpilot-enhanced.md").write_text(
-        "Grounded in examples/ai-search-landing with Enterprise Trust, source proof, and review criteria.\n",
+        "基于 examples/ai-search-landing，包含企业信任策略、来源证据和评审标准。\n",
         encoding="utf-8",
     )
     (demo / "future-real-output-todo.md").write_text(
-        "Targets: v0, Lovable, Bolt, Figma Make. Capture date, exact prompt, and whether the result was edited.\n",
+        "待采集：v0、Lovable、Bolt、Figma Make。记录日期、完整提示词和生成后是否编辑。\n",
         encoding="utf-8",
     )
     (demo / "README.md").write_text("# Demo\n\nOpen index.html.\n", encoding="utf-8")
@@ -773,7 +773,7 @@ class BriefPilotScriptTests(unittest.TestCase):
             brief.write_text(
                 json.dumps(
                     {
-                        "meta": {"version": "0.1", "created_by": "BriefPilot"},
+                        "meta": {"version": "0.1", "created_by": "BriefPilot", "content_language": "zh-CN"},
                         "project": {"name": "Missing Design", "summary": "Example", "task_type": "saas_website"},
                         "audience": {"primary_user": "teams"},
                         "goals": {"business_goal": "signup", "design_goal": "clarity"},
@@ -863,12 +863,23 @@ class BriefPilotScriptTests(unittest.TestCase):
                 "missing_disclosure",
                 lambda root, demo: (demo / "index.html").write_text(
                     (demo / "index.html").read_text(encoding="utf-8").replace(
-                        "not a named-tool output",
-                        "tool output",
+                        "不是命名工具输出",
+                        "工具输出",
                     ),
                     encoding="utf-8",
                 ),
                 "index.html missing required text",
+            ),
+            (
+                "english_html_language",
+                lambda root, demo: (demo / "index.html").write_text(
+                    (demo / "index.html").read_text(encoding="utf-8").replace(
+                        'lang="zh-CN"',
+                        'lang="en"',
+                    ),
+                    encoding="utf-8",
+                ),
+                'index.html html lang must be "zh-CN"',
             ),
             (
                 "missing_future_todo",
@@ -964,6 +975,9 @@ class BriefPilotScriptTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
                 text = out.read_text(encoding="utf-8")
                 self.assertIn("Task", text)
+                self.assertIn("Output Language", text)
+                self.assertIn("用户可见 UI 文案必须使用简体中文", text)
+                self.assertIn("Use Simplified Chinese for all user-visible UI copy.", text)
                 self.assertIn("Visual Strategy", text)
                 self.assertIn("DESIGN.md Visual System", text)
                 self.assertIn("Review Criteria", text)
@@ -1147,6 +1161,8 @@ class BriefPilotScriptTests(unittest.TestCase):
         for value in ["targeted_modification", "brief_revision_regeneration", "full_regeneration"]:
             self.assertIn(value, workflow)
         self.assertIn("DESIGN.md Visual Rules To Preserve", prompt_template)
+        self.assertIn("用户可见 UI 文案必须使用简体中文", prompt_template)
+        self.assertIn("Use Simplified Chinese for all user-visible UI copy.", prompt_template)
         self.assertIn("Source Brief Context", prompt_template)
         self.assertIn("What To Keep", prompt_template)
         self.assertIn("What To Change", prompt_template)
@@ -1188,6 +1204,8 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
             text = out.read_text(encoding="utf-8")
             self.assertIn("Dense Research Workspace", text)
+            self.assertIn("用户可见 UI 文案必须使用简体中文", text)
+            self.assertIn("Use Simplified Chinese for all user-visible UI copy.", text)
             self.assertIn("Source Brief Context", text)
             self.assertIn("Primary user: research teams", text)
             self.assertIn("Business goal: increase answer trust", text)

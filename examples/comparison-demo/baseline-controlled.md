@@ -1,24 +1,24 @@
-# Controlled Direct-Generation Baseline
+# 直接生成的受控基线
 
-Shared input:
+同一个输入：
 
 ```text
 帮我做一个 AI 搜索产品官网
 ```
 
-This is an authored baseline example. It is not captured from a named downstream tool.
+这是手工整理的受控基线示例，不是命名工具输出，也不是从某个下游工具直接截取的结果。
 
-## What The Baseline Represents
+## 这个基线代表什么
 
-A direct vague request can produce a plausible page shell, but it often lacks the product decisions that make the page useful.
+把模糊需求直接丢给生成器，可能得到一个看起来像官网的页面壳，但常常缺少真正让页面可用的产品判断。
 
-- Generic headline such as "AI-powered search for everyone"
-- Feature cards that say fast, smart, and simple without explaining the workflow
-- Abstract visual treatment instead of a product surface
-- No clear audience, conversion goal, or trust proof
-- No guidance for loading, error, empty, focus, or mobile states
-- No review checklist for deciding whether the result is good enough
+- 标题容易变成“面向所有人的 AI 搜索”这类泛化说法。
+- 功能卡片会说快速、智能、简单，却不解释具体流程。
+- 视觉上可能只有抽象装饰，没有真实产品界面。
+- 受众、转化目标和信任证据不清楚。
+- 加载、错误、空状态、焦点和移动端状态都没有指导。
+- 没有评审清单来判断结果是否够好。
 
-## Why It Is Useful Here
+## 为什么这里使用受控基线
 
-The baseline is intentionally controlled so the first demo can ship without external accounts or unstable generated outputs. It sets a visible comparison point while the follow-up TODO captures what is needed to replace or supplement it with real captured outputs later.
+第一个演示先用受控基线，避免依赖外部账号或不稳定的生成结果。它提供一个清楚的对照点；以后如果要替换或补充真实工具输出，必须先按 TODO 补齐提示词、日期、工具和编辑状态。

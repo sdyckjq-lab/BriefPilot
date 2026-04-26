@@ -38,6 +38,10 @@ REVIEW_FILES = [
     "prompts/revised-generation.txt",
 ]
 
+DEFAULT_CONTENT_LANGUAGE = "zh-CN"
+OUTPUT_LANGUAGE_PHRASE = "Use Simplified Chinese for all user-visible UI copy."
+OUTPUT_LANGUAGE_CHINESE_PHRASE = "用户可见 UI 文案必须使用简体中文"
+
 
 def has_text_value(value):
     return isinstance(value, str) and bool(value.strip())
@@ -60,12 +64,17 @@ def check_base_prompt_exports(example_dir, brief, findings):
         actual = path.read_text(encoding="utf-8")
         if actual != expected:
             findings.append(f"prompts/{target}.txt does not match export_prompt.py output")
+        if OUTPUT_LANGUAGE_PHRASE not in actual or OUTPUT_LANGUAGE_CHINESE_PHRASE not in actual:
+            findings.append(f"prompts/{target}.txt missing Simplified Chinese output-language rule")
 
 
 def check_base_brief(example_dir, brief, findings):
     missing = [field for field in validate_brief.REQUIRED_FIELDS if not validate_brief.has_value(validate_brief.value_at(brief, field))]
     for field in missing:
         findings.append(f"design-brief.json missing field: {field}")
+    language = validate_brief.value_at(brief, "meta.content_language")
+    if language != DEFAULT_CONTENT_LANGUAGE:
+        findings.append(f"design-brief.json meta.content_language must be {DEFAULT_CONTENT_LANGUAGE}")
     if not validate_brief.has_value(brief.get("assumptions")) and not validate_brief.has_value(brief.get("open_questions")):
         findings.append("design-brief.json missing assumptions or open_questions")
     design_path = validate_brief.value_at(brief, "design_system.design_md_path")
@@ -155,8 +164,11 @@ def check_modification_prompt(review_path, target, prompt_path, findings):
     expected = export_modification_prompt.build_prompt(review, context, target, design_text, brief_revision_text)
     if prompt_path.read_text(encoding="utf-8") != expected:
         findings.append(f"{prompt_path.relative_to(review_path.parents[1])} does not match export_modification_prompt.py output")
-    if "DESIGN.md Visual Rules To Preserve" not in prompt_path.read_text(encoding="utf-8"):
+    prompt_text = prompt_path.read_text(encoding="utf-8")
+    if "DESIGN.md Visual Rules To Preserve" not in prompt_text:
         findings.append(f"{prompt_path.relative_to(review_path.parents[1])} is missing DESIGN.md visual guidance")
+    if OUTPUT_LANGUAGE_PHRASE not in prompt_text or OUTPUT_LANGUAGE_CHINESE_PHRASE not in prompt_text:
+        findings.append(f"{prompt_path.relative_to(review_path.parents[1])} missing Simplified Chinese output-language rule")
 
 
 def check_workspace_content(example_dir, findings):

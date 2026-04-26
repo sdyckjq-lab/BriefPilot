@@ -6,6 +6,8 @@ Create an app-page workflow for an AI search product where a user asks a questio
 
 This is a product workspace screen, not a marketing page.
 
+内容语言：面向用户的 UI 文案使用简体中文 (`zh-CN`)；技术标识保持英文。
+
 ## Brief Diagnosis
 
 Initial score: 58.

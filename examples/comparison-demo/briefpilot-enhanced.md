@@ -1,23 +1,23 @@
-# BriefPilot-Enhanced Result
+# BriefPilot 强化结果
 
-Shared input:
+同一个输入：
 
 ```text
 帮我做一个 AI 搜索产品官网
 ```
 
-The enhanced side is grounded in the verified package at `examples/ai-search-landing`.
+强化结果基于已经验证过的 `examples/ai-search-landing` 样例包。
 
-## What BriefPilot Adds
+## BriefPilot 补齐了什么
 
-- Audience: knowledge workers and small teams searching across scattered work documents
-- Business goal: drive trial signup, with demo request as the secondary action
-- Strategy: Enterprise Trust, a restrained product-led direction for credible SaaS evaluation
-- Structure: hero, pain, solution, workflow, integrations, security, and final CTA
-- Product proof: a sourced-answer search panel with linked source documents
-- Trust cues: permissions-aware search, admin controls, and visible source attribution
-- Review criteria: first-screen clarity, clear CTA, real product surface, no generic AI wording, mobile CTA visibility
+- 受众：需要跨工作资料搜索的知识工作者和小团队。
+- 业务目标：推动试用注册，预约演示作为次要动作。
+- 策略：企业信任型，适合可信 SaaS 评估的克制产品方向。
+- 结构：首屏、痛点、方案、流程、集成、安全和最终转化。
+- 产品证据：带来源答案的搜索面板和可追溯文档。
+- 信任线索：权限感知搜索、管理员控制和来源可见性。
+- 评审标准：首屏清楚、CTA 清楚、真实产品界面、避免泛化 AI 话术、移动端 CTA 可见。
 
-## Claim Boundary
+## 边界说明
 
-BriefPilot does not guarantee a beautiful final page by itself. It gives downstream generators clearer instructions, better constraints, and a sharper review bar so the next output is easier to judge and improve.
+BriefPilot 本身不保证一次生成漂亮成品。它的价值是给下游生成器更清楚的说明、更具体的约束和更明确的评审标准，让下一版更容易判断和修改。

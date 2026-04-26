@@ -30,11 +30,12 @@ Screenshots and gstack reports are evidence the agent records. BriefPilot does n
 
 1. Load `design-brief.json`, the linked `DESIGN.md`, selected strategy, and `review-checklist.md`.
 2. Read the generated-result evidence.
-3. Record visual review availability using `references/visual-review-routing.md`.
-4. Compare the result against the selected strategy, brief goals, page or app structure, `DESIGN.md`, and review checklist.
-5. Separate execution issues from source-brief problems.
-6. Choose the review decision.
-7. Save the review artifacts and export the next prompt when needed.
+3. Preserve the source brief's `meta.content_language` in review reports and next prompts. Current verified examples use `zh-CN` for user-facing content.
+4. Record visual review availability using `references/visual-review-routing.md`.
+5. Compare the result against the selected strategy, brief goals, page or app structure, `DESIGN.md`, and review checklist.
+6. Separate execution issues from source-brief problems.
+7. Choose the review decision.
+8. Save the review artifacts and export the next prompt when needed.
 
 ## Decision Table
 

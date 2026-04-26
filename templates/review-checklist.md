@@ -1,42 +1,42 @@
-# Review Checklist
+# 评审清单
 
-## Audience Fit
+## 受众匹配
 
-- [ ] The design clearly speaks to the primary audience.
-- [ ] The first screen makes the product or offer understandable.
+- [ ] 设计能清楚回应主要受众。
+- [ ] 首屏能让人理解产品或 offer。
 
-## Goal Fit
+## 目标匹配
 
-- [ ] The primary action is visible and specific.
-- [ ] The layout supports the business goal.
+- [ ] 主要行动清楚、可见、具体。
+- [ ] 页面结构服务于业务目标。
 
-## Information Structure
+## 信息结构
 
-- [ ] The most important message appears before supporting details.
-- [ ] Required sections or screens are present.
+- [ ] 最重要的信息出现在补充信息之前。
+- [ ] 必要版块或页面都已出现。
 
-## Brand and Visual Direction
+## 品牌与视觉方向
 
-- [ ] The design follows the chosen strategy.
-- [ ] The design avoids forbidden styles.
-- [ ] The design does not rely on generic AI visuals or empty visual effects.
+- [ ] 设计遵循已选策略。
+- [ ] 设计避开禁止的视觉方向。
+- [ ] 设计不依赖泛化 AI 视觉或空洞特效。
 
-## Content Quality
+## 内容质量
 
-- [ ] Claims are specific.
-- [ ] Proof points, examples, screenshots, or realistic placeholders are included.
+- [ ] 关键说法具体。
+- [ ] 有证据点、例子、截图或可信占位。
 
-## Interaction and Responsiveness
+## 交互与响应式
 
-- [ ] Primary CTA behavior is clear, with default, hover, focus, disabled, loading, success, and error states when implemented.
-- [ ] Secondary demo CTA behavior is clear and visually secondary.
-- [ ] Product source chips and linked documents are either clickable or clearly visual-only.
-- [ ] Desktop, tablet, and mobile layouts preserve the main message and action.
-- [ ] Mobile layout keeps headline, CTAs, and product surface readable without horizontal scrolling.
-- [ ] Keyboard order, visible focus, semantic headings, alt text, and 44px mobile touch targets are covered.
+- [ ] 主要 CTA 行为清楚；实现时覆盖 default、hover、focus、disabled、loading、success 和 error 状态。
+- [ ] 次要 CTA 行为清楚，视觉层级保持次要。
+- [ ] 产品来源标签和链接文档要么可点击，要么明确只是视觉证明元素。
+- [ ] 桌面、平板和移动端都保留主信息和主行动。
+- [ ] 移动端标题、CTA 和产品界面可读，没有横向滚动。
+- [ ] 覆盖键盘顺序、可见焦点、语义标题、alt text 和 44px 移动端触控目标。
 
-## Iteration Notes
+## 迭代记录
 
-- Highest priority fix:
-- Secondary fix:
-- Regenerate or tweak:
+- 最高优先级修正：
+- 次要修正：
+- 重生成或局部修改：

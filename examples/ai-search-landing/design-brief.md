@@ -4,6 +4,8 @@
 
 Create a product-led SaaS landing page for an AI search product that helps knowledge workers and small teams find trusted answers across scattered work documents.
 
+内容语言：面向用户的 UI 文案使用简体中文 (`zh-CN`)；技术标识保持英文。
+
 ## Brief Diagnosis
 
 - Raw request: `帮我做一个 AI 搜索产品官网`

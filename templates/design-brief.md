@@ -1,50 +1,50 @@
-# {{project_name}} Design Brief
+# {{project_name}} 设计 Brief
 
-## Project Overview
+## 项目概览
 
 {{project_summary}}
 
-## Brief Diagnosis
+## 需求诊断
 
-- Raw request: {{raw_request}}
-- Initial score: {{initial_score}}
-- Main gaps: {{main_gaps}}
-- Recommended mode: {{recommended_mode}}
+- 原始需求：{{raw_request}}
+- 初始分数：{{initial_score}}
+- 主要缺口：{{main_gaps}}
+- 推荐模式：{{recommended_mode}}
 
-## Target Audience
+## 目标受众
 
-- Primary: {{primary_user}}
-- Secondary: {{secondary_user}}
-- Context: {{context_of_use}}
+- 主要受众：{{primary_user}}
+- 次要受众：{{secondary_user}}
+- 使用场景：{{context_of_use}}
 
-## Business Goal
+## 业务目标
 
 {{business_goal}}
 
-## Design Goal
+## 设计目标
 
 {{design_goal}}
 
-## Core Message
+## 核心信息
 
 {{core_claim}}
 
-## Required Structure
+## 必要结构
 
 {{required_structure}}
 
-## Visual Direction
+## 视觉方向
 
-- Strategy: {{strategy_name}}
-- Tone: {{tone_keywords}}
-- References: {{references}}
-- Differentiators: {{differentiators}}
+- 策略：{{strategy_name}}
+- 语气：{{tone_keywords}}
+- 参考：{{references}}
+- 差异点：{{differentiators}}
 
-## Strategy Options
+## 策略选项
 
 {{strategy_options}}
 
-## Brand Context
+## 品牌上下文
 
 {{brand_context}}
 
@@ -52,36 +52,36 @@
 
 {{design_md_path}}
 
-## Assets
+## 资产
 
-- Available: {{available_assets}}
-- Missing: {{missing_assets}}
-- Placeholders allowed: {{placeholders_allowed}}
+- 可用：{{available_assets}}
+- 缺失：{{missing_assets}}
+- 允许占位：{{placeholders_allowed}}
 
-## Interaction Requirements
+## 交互要求
 
 {{interaction_requirements}}
 
-## Responsive and Accessibility Requirements
+## 响应式与可访问性要求
 
 {{responsive_accessibility}}
 
-## Constraints
+## 约束
 
 {{constraints}}
 
-## Forbidden Directions
+## 禁止方向
 
 {{must_avoid}}
 
-## Success Criteria
+## 成功标准
 
 {{review_criteria}}
 
-## Open Questions
+## 待确认问题
 
 {{open_questions}}
 
-## Assumptions
+## 假设
 
 {{assumptions}}

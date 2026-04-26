@@ -26,6 +26,12 @@ Conversion goal: convert qualified visitors into trial signups or demo requests
 Primary CTA: Start free trial
 Secondary CTA: Watch product demo
 
+Output Language
+用户可见 UI 文案必须使用简体中文（Simplified Chinese / zh-CN）。
+Use Simplified Chinese for all user-visible UI copy.
+代码标识、文件名、组件名、命令示例、design token keys 和工具名保持英文。
+如果输入里有用户原话引用，除非明确要求翻译，否则保持原文。
+
 Visual Strategy
 Strategy: Enterprise Trust
 Strategy options:
