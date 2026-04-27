@@ -9,6 +9,7 @@ from pathlib import Path
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 VERSION_PATTERN = re.compile(r"^\d+\.\d+\.\d+\.\d+$")
+COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 CHANGELOG_ENTRY_PATTERN = re.compile(r"^## \[(\d+\.\d+\.\d+\.\d+)\] - (\d{4}-\d{2}-\d{2})\s*$")
 ALLOWED_CHANGELOG_SECTIONS = {"Added", "Changed", "Fixed", "Removed"}
 COMMANDS = ("briefpilot", "bp", "briefpilot-upgrade")
@@ -162,8 +163,8 @@ def validate_manifest_payload(payload, expected_version, findings, label="manife
         findings.append(f"{label} source_remote must be {OFFICIAL_SOURCE_REMOTE}")
 
     source_commit = payload.get("source_commit")
-    if not isinstance(source_commit, str) or not source_commit.strip():
-        findings.append(f"{label} source_commit is required")
+    if not isinstance(source_commit, str) or not COMMIT_PATTERN.fullmatch(source_commit):
+        findings.append(f"{label} source_commit must be a full 40-character git commit hash")
 
     generated_at = payload.get("generated_at")
     if not isinstance(generated_at, str) or not generated_at.strip():
@@ -175,8 +176,11 @@ def validate_manifest_payload(payload, expected_version, findings, label="manife
             findings.append(f"{label} generated_at must be ISO-8601")
 
 
-def validate_manifest_set(manifests, expected_version, findings):
-    entries = list(manifests.items()) if isinstance(manifests, dict) else list(manifests)
+def validate_manifest_set(manifests, expected_version, findings, expected_source_commit=None):
+    if not isinstance(manifests, dict):
+        findings.append("command manifests must be passed as a mapping of command to manifest")
+        return
+    entries = list(manifests.items())
     for label, payload in entries:
         validate_manifest_payload(payload, expected_version, findings, label)
 
@@ -188,6 +192,13 @@ def validate_manifest_set(manifests, expected_version, findings):
         }
         if len(values) > 1:
             findings.append(f"command manifests disagree on {field}: {', '.join(sorted(values))}")
+
+    if expected_source_commit:
+        for label, payload in entries:
+            if isinstance(payload, dict) and payload.get("source_commit") != expected_source_commit:
+                findings.append(
+                    f"{label} source_commit {payload.get('source_commit')!r} differs from source commit {expected_source_commit!r}"
+                )
 
 
 def load_manifest(path, findings):

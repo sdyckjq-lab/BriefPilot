@@ -15,11 +15,11 @@ description: Upgrade, repair, or package an installed BriefPilot Skill command b
    - 三个 manifest 都存在，并且 `package_version`、`source_remote`、`source_commit` 一致，才算可比较安装。
    - manifest 缺失、没有 `package_version`，或旧包没有 `VERSION`，要说成“当前版本未知 / 未纳入版本管理”，这是第一次进入版本化升级，不要说成普通升级或精确修复。
    - `source_remote` 只有等于 `https://github.com/sdyckjq-lab/BriefPilot.git` 时，才能自动使用官方来源；非官方来源或三个命令来源不一致时，停止自动修复，要求用户提供本地完整源码或明确确认来源。
-4. 找到完整源码目录：优先使用用户提供的本地 BriefPilot 仓库；否则在来源可信时使用官方仓库；同版本修复优先使用 manifest 里的 `source_commit` 固定来源。没有固定来源时，只能作为刷新或升级处理，先读取源码 `VERSION` 再决定。
+4. 找到完整源码目录：优先使用用户提供的本地 BriefPilot 仓库；否则在来源可信时使用官方仓库；同版本修复优先使用 manifest 里的完整 40 位 `source_commit` 固定来源。没有固定来源时，只能作为刷新或升级处理，先读取源码 `VERSION` 再决定。
 5. 不要把已安装的 `briefpilot` 目录直接当作源码，除非它包含 `companions/`、`evals/`、`.gitignore` 和三个命令包脚本，并且通过源码校验。已安装主 Skill 通常只包含运行资源，不是完整源码。
 6. 在完整源码目录先运行 release metadata 校验和命令包校验。
 7. 读取源码 `VERSION`，用四段数字比较当前版本和目标版本：`0.10.0.0` 大于 `0.2.0.0`，`0.1.0.10` 大于 `0.1.0.2`。
-8. 向用户说明这次操作属于升级、同版本修复、刷新、第一次版本化安装，还是需要人工确认的降级。不要自动降级。
+8. 向用户说明这次操作属于升级、同版本修复、刷新、第一次版本化安装，还是需要人工确认的降级。不要自动降级；只有用户明确要求时，才可以在打包命令里使用 `--allow-downgrade`。
 9. 从源码 `CHANGELOG.md` 展示目标版本的简短变更摘要；如果不能可靠摘要，就指出安装包里的 `CHANGELOG.md` 路径。
 10. 生成新的 `.skill` 安装包。
 11. 如果目标 Skill 目录可写，再修复或刷新已安装的三个 Skill；否则只交付 `.skill` 文件。

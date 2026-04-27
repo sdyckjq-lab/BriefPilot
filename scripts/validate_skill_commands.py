@@ -2,6 +2,7 @@
 import argparse
 import json
 import re
+import subprocess
 import sys
 import tempfile
 import zipfile
@@ -207,7 +208,7 @@ def load_install_manifest(skill_dir, findings):
     return validate_release_metadata.load_manifest(path, findings)
 
 
-def validate_installed(install_dir, expected_version=None):
+def validate_installed(install_dir, expected_version=None, expected_source_commit=None):
     install_dir = Path(install_dir).resolve()
     findings = []
     manifests = {}
@@ -250,9 +251,37 @@ def validate_installed(install_dir, expected_version=None):
         except OSError:
             manifest_expected_version = None
     if manifests:
-        validate_release_metadata.validate_manifest_set(manifests, manifest_expected_version, findings)
+        validate_release_metadata.validate_manifest_set(
+            manifests,
+            manifest_expected_version,
+            findings,
+            expected_source_commit=expected_source_commit,
+        )
 
     return findings
+
+
+def git_commit(root):
+    result = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "HEAD"],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    commit = result.stdout.strip()
+    return commit if re.fullmatch(r"[0-9a-f]{40}", commit) else None
+
+
+def git_commit_exists(root, commit):
+    result = subprocess.run(
+        ["git", "-C", str(root), "cat-file", "-e", f"{commit}^{{commit}}"],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    return result.returncode == 0
 
 
 def validate_archive_member_names(archive_name, command, names):
@@ -276,11 +305,16 @@ def validate_dist(dist_dir, source_root=DEFAULT_ROOT):
     dist_dir = Path(dist_dir).resolve()
     findings = []
     expected_version = None
+    expected_source_commit = None
     if source_root is not None:
         try:
             expected_version = validate_release_metadata.read_version(source_root)
         except OSError:
             expected_version = None
+        expected_source_commit = git_commit(source_root)
+        if expected_source_commit and not git_commit_exists(source_root, expected_source_commit):
+            findings.append(f"source commit does not exist locally: {expected_source_commit}")
+            expected_source_commit = None
     with tempfile.TemporaryDirectory(prefix="briefpilot-skill-validate-") as tmp:
         extracted_root = Path(tmp)
         can_validate_installed = True
@@ -320,7 +354,13 @@ def validate_dist(dist_dir, source_root=DEFAULT_ROOT):
                 can_validate_installed = False
                 continue
         if can_validate_installed:
-            findings.extend(validate_installed(extracted_root, expected_version=expected_version))
+            findings.extend(
+                validate_installed(
+                    extracted_root,
+                    expected_version=expected_version,
+                    expected_source_commit=expected_source_commit,
+                )
+            )
     return findings
 
 

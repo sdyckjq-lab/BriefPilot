@@ -131,3 +131,5 @@ dist/briefpilot-upgrade.skill
 ```
 
 安装包会带上当前版本和更新记录，`/briefpilot-upgrade` 会据此说明是升级、修复、刷新，还是第一次进入版本化安装。
+
+直接修复安装目录时，脚本默认不会把较新的已安装版本替换成旧版本；确实需要降级时必须显式加 `--allow-downgrade`。

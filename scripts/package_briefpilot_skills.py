@@ -63,6 +63,18 @@ def git_value(root, *args):
     return result.stdout.strip() or "unknown"
 
 
+def git_dirty(root):
+    result = subprocess.run(
+        ["git", "-C", str(root), "status", "--porcelain", "--untracked-files=all"],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return False
+    return bool(result.stdout.strip())
+
+
 def build_manifest(root):
     return {
         "schema_version": "1.0",
@@ -70,7 +82,7 @@ def build_manifest(root):
         "commands": list(COMMANDS),
         "package_version": validate_release_metadata.read_version(root),
         "source_remote": OFFICIAL_SOURCE_REMOTE,
-        "source_commit": git_value(root, "rev-parse", "--short", "HEAD"),
+        "source_commit": git_value(root, "rev-parse", "HEAD"),
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
     }
 
@@ -175,6 +187,67 @@ def remove_path(path):
         path.unlink()
 
 
+def valid_version_or_none(version):
+    try:
+        validate_release_metadata.parse_version(version)
+    except ValueError:
+        return None
+    return version
+
+
+def installed_briefpilot_versions(install_dir):
+    install_dir = Path(install_dir)
+    versions = []
+    version_path = install_dir / "briefpilot" / "VERSION"
+    if version_path.exists():
+        version = valid_version_or_none(version_path.read_text(encoding="utf-8").strip())
+        if version:
+            versions.append(version)
+
+    for command in COMMANDS:
+        manifest_path = install_dir / command / "install-manifest.json"
+        if not manifest_path.exists():
+            continue
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        version = manifest.get("package_version")
+        if isinstance(version, str):
+            version = valid_version_or_none(version)
+            if version:
+                versions.append(version)
+    return versions
+
+
+def highest_version(versions):
+    return max(versions, key=validate_release_metadata.parse_version)
+
+
+def downgrade_refusal_message(target_version, current_version):
+    return (
+        "refusing to install older BriefPilot version "
+        f"{target_version} over installed version {current_version}; "
+        "re-run with --allow-downgrade to install anyway."
+    )
+
+
+def downgrade_refusal_for_install(install_dir, target_version, allow_downgrade):
+    installed_versions = installed_briefpilot_versions(install_dir)
+    higher_versions = [
+        version
+        for version in installed_versions
+        if validate_release_metadata.compare_versions(target_version, version) < 0
+    ]
+    current_version = highest_version(higher_versions) if higher_versions else None
+    if (
+        current_version
+        and not allow_downgrade
+    ):
+        return downgrade_refusal_message(target_version, current_version)
+    return None
+
+
 def install_staged(staging_root, install_dir):
     install_dir = Path(install_dir).resolve()
     if not can_write_install_dir(install_dir):
@@ -236,6 +309,7 @@ def parse_args(argv):
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_ROOT / "dist", help="Directory for .skill artifacts.")
     parser.add_argument("--staging-dir", type=Path, help="Optional empty staging directory to keep for inspection.")
     parser.add_argument("--install-dir", type=Path, help="Optional skills directory to repair or refresh.")
+    parser.add_argument("--allow-downgrade", action="store_true", help="Allow --install-dir to replace a newer installed version.")
     parser.add_argument("--dry-run", action="store_true", help="Validate and show planned outputs without writing packages.")
     return parser.parse_args(argv)
 
@@ -244,7 +318,19 @@ def main(argv=None):
     args = parse_args(argv or sys.argv[1:])
     root = args.root.resolve()
 
+    prechecked_staging_root = None
+    if args.staging_dir:
+        try:
+            prechecked_staging_root = ensure_safe_staging_dir(root, args.staging_dir)
+        except ValueError as error:
+            print(error)
+            return 1
+
     findings = validate_skill_commands.validate_source(root)
+    if git_value(root, "rev-parse", "HEAD") == "unknown":
+        findings.append("source git commit is unavailable; commit the release source before packaging")
+    elif git_dirty(root) and not os.environ.get("BRIEFPILOT_ALLOW_DIRTY_PACKAGE"):
+        findings.append("source worktree has uncommitted or untracked files; commit or ignore them before packaging")
     if findings:
         print("invalid BriefPilot source package:")
         for finding in findings:
@@ -253,11 +339,7 @@ def main(argv=None):
 
     staging_context = None
     if args.staging_dir:
-        try:
-            staging_root = ensure_safe_staging_dir(root, args.staging_dir)
-        except ValueError as error:
-            print(error)
-            return 1
+        staging_root = prechecked_staging_root
     else:
         staging_context = tempfile.TemporaryDirectory(prefix="briefpilot-skill-build-")
         staging_root = Path(staging_context.name)
@@ -277,6 +359,18 @@ def main(argv=None):
             return 1
 
         planned = [args.out_dir / f"{command}.skill" for command in COMMANDS]
+        target_version = validate_release_metadata.read_version(root)
+        downgrade_refusal = None
+        if args.install_dir:
+            downgrade_refusal = downgrade_refusal_for_install(
+                args.install_dir,
+                target_version,
+                args.allow_downgrade,
+            )
+        if downgrade_refusal:
+            print(downgrade_refusal)
+            return 1
+
         if args.dry_run:
             print("valid BriefPilot command package")
             print("planned artifacts:")
