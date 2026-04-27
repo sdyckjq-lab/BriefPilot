@@ -66,6 +66,17 @@ def read_text(path, findings, label):
     return ""
 
 
+def resolve_existing_file(raw_path, bases):
+    if not has_text(raw_path):
+        return None
+    candidate = Path(raw_path).expanduser()
+    candidates = [candidate] if candidate.is_absolute() else [base / candidate for base in bases]
+    for entry in candidates:
+        if entry.is_file():
+            return entry.resolve()
+    return None
+
+
 def check_no_private_text(relative, text, findings):
     for token in PRIVATE_TEXT:
         if token in text:
@@ -122,15 +133,129 @@ def check_design_spec(package_dir, text, brief, findings):
         if not language_checks.is_chinese_first_prompt(text):
             findings.append("design-spec.md declares zh-CN but is not Chinese-first")
 
-    design_path = package_dir / "DESIGN.md"
-    if design_path.exists():
+    design_raw_path = value_at(brief, "design_system.design_md_path")
+    design_path = resolve_existing_file(design_raw_path, [package_dir, Path.cwd()])
+    if not design_path:
+        findings.append(f"design_system.design_md_path does not resolve: {design_raw_path}")
+    else:
+        try:
+            design_text = design_path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as error:
+            findings.append(f"DESIGN.md is not readable UTF-8: {error}")
+            return
+        except OSError as error:
+            findings.append(f"DESIGN.md cannot be read: {error}")
+            return
+        design_label = export_design_spec.resolve_design_label_from_brief(
+            brief,
+            package_dir / "design-brief.json",
+            design_path,
+        )
         expected = export_design_spec.render_design_spec(
             brief,
-            design_path.read_text(encoding="utf-8"),
-            design_label=design_path.name,
+            design_text,
+            design_label=design_label,
         )
         if text != expected:
             findings.append("design-spec.md does not match export_design_spec.py output")
+
+
+def normalize_inline_value(value):
+    cleaned = value.strip()
+    while cleaned.startswith("`") and cleaned.endswith("`") and len(cleaned) >= 2:
+        cleaned = cleaned[1:-1].strip()
+    return cleaned
+
+
+def extract_review_section(text, review_name):
+    heading = f"## {review_name}"
+    lines = text.splitlines()
+    start = None
+    for index, line in enumerate(lines):
+        if line.strip() == heading:
+            start = index + 1
+            break
+    if start is None:
+        return ""
+    collected = []
+    for line in lines[start:]:
+        if line.startswith("## "):
+            break
+        collected.append(line)
+    return "\n".join(collected).strip()
+
+
+def parse_review_summary_fields(section):
+    fields = {}
+    for line in section.splitlines():
+        stripped = line.strip()
+        if ":" in stripped:
+            key, value = stripped.split(":", 1)
+            key = key.strip()
+            if key in {"recommended_next_action", "reason", "next_copy_source"}:
+                fields[key] = normalize_inline_value(value)
+        if "：" in stripped:
+            key, value = stripped.split("：", 1)
+            key = key.strip()
+            if key in {"原因", "reason"}:
+                fields["reason"] = normalize_inline_value(value)
+    return fields
+
+
+def parse_review_option_rows(section):
+    rows = {}
+    for line in section.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            continue
+        cells = [normalize_inline_value(cell) for cell in stripped.strip("|").split("|")]
+        if len(cells) != 4:
+            continue
+        action = cells[0]
+        if action in {"action", "---"} or action.startswith("---"):
+            continue
+        rows[action] = {
+            "enabled": cells[1].lower(),
+            "disabled_reason": cells[2],
+            "next_copy_source": cells[3],
+        }
+    return rows
+
+
+def check_review_section_matches_json(review_path, review, section, findings):
+    relative = f"reviews/review-next-actions.md section {review_path.name}"
+    next_actions = review.get("next_actions") if isinstance(review.get("next_actions"), dict) else {}
+    fields = parse_review_summary_fields(section)
+    recommended = next_actions.get("recommended_next_action")
+    if has_text(recommended) and fields.get("recommended_next_action") != recommended:
+        findings.append(f"{relative} recommended_next_action does not match JSON: {recommended}")
+    reason = next_actions.get("reason")
+    if has_text(reason) and fields.get("reason") != reason:
+        findings.append(f"{relative} reason does not match JSON")
+
+    options = next_actions.get("options")
+    if not isinstance(options, list):
+        return
+    rows = parse_review_option_rows(section)
+    for option in options:
+        if not isinstance(option, dict):
+            continue
+        action = option.get("action")
+        if not has_text(action):
+            continue
+        row = rows.get(action)
+        if row is None:
+            findings.append(f"{relative} missing option row: {action}")
+            continue
+        expected_enabled = str(option.get("enabled")).lower()
+        if row["enabled"] != expected_enabled:
+            findings.append(f"{relative} option {action} enabled does not match JSON")
+        expected_disabled_reason = option.get("disabled_reason") or ""
+        if row["disabled_reason"] != expected_disabled_reason:
+            findings.append(f"{relative} option {action} disabled_reason does not match JSON")
+        expected_next_copy_source = option.get("next_copy_source") or ""
+        if row["next_copy_source"] != expected_next_copy_source:
+            findings.append(f"{relative} option {action} next_copy_source does not match JSON")
 
 
 def check_review_next_actions(package_dir, findings):
@@ -150,6 +275,15 @@ def check_review_next_actions(package_dir, findings):
     for review_path in review_jsons:
         if review_path.name not in text:
             findings.append(f"reviews/review-next-actions.md must reference {review_path.name}")
+            continue
+        review = load_json_object(review_path, findings, f"reviews/{review_path.name}")
+        if not review:
+            continue
+        section = extract_review_section(text, review_path.name)
+        if not section:
+            findings.append(f"reviews/review-next-actions.md missing section for {review_path.name}")
+            continue
+        check_review_section_matches_json(review_path, review, section, findings)
 
 
 def validate_package(package_dir, require_review=False):

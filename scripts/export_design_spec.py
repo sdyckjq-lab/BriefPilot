@@ -196,6 +196,29 @@ def render_design_spec(brief, design_text="", design_label=None):
     return "\n".join(lines)
 
 
+def resolve_design_label_from_brief(brief, brief_path, design_path):
+    raw_label = value_at(brief, "design_system.design_md_path", "")
+    brief_dir = Path(brief_path).parent.resolve()
+    resolved_design = Path(design_path).expanduser().resolve()
+
+    if has_text(raw_label):
+        candidate = Path(raw_label).expanduser()
+        candidates = [candidate] if candidate.is_absolute() else [
+            brief_dir / candidate,
+            Path.cwd() / candidate,
+        ]
+        for entry in candidates:
+            if entry.resolve() == resolved_design:
+                if not candidate.is_absolute():
+                    return raw_label.strip()
+                break
+
+    try:
+        return resolved_design.relative_to(brief_dir).as_posix()
+    except ValueError:
+        return resolved_design.name
+
+
 def load_json(path):
     try:
         data = json.loads(Path(path).read_text(encoding="utf-8"))
@@ -223,7 +246,8 @@ def main(argv=None):
         print(f"cannot read DESIGN.md: {error}", file=sys.stderr)
         return 1
 
-    rendered = render_design_spec(brief, design_text, design_label=args.design.name)
+    design_label = resolve_design_label_from_brief(brief, args.brief, args.design)
+    rendered = render_design_spec(brief, design_text, design_label=design_label)
     if args.out:
         try:
             args.out.parent.mkdir(parents=True, exist_ok=True)

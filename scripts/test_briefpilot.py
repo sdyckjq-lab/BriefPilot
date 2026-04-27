@@ -1049,6 +1049,91 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertTrue(out.is_file())
             self.assertIn("BriefSearch AI 搜索产品官网 设计规范", out.read_text(encoding="utf-8"))
 
+    def test_export_design_spec_preserves_nested_design_path_label(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            copied = Path(tmp) / "landing"
+            shutil.copytree(EXAMPLE_DIR, copied)
+            brand_dir = copied / "brand"
+            brand_dir.mkdir()
+            shutil.move(str(copied / "DESIGN.md"), brand_dir / "DESIGN.md")
+
+            brief_path = copied / "design-brief.json"
+            brief = json.loads(brief_path.read_text(encoding="utf-8"))
+            brief["design_system"]["design_md_path"] = "brand/DESIGN.md"
+            brief_path.write_text(json.dumps(brief, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+            out = copied / "exports" / "design-spec.md"
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(EXPORT_DESIGN_SPEC),
+                    "--brief",
+                    str(brief_path),
+                    "--design",
+                    str(brand_dir / "DESIGN.md"),
+                    "--out",
+                    str(out),
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            spec_text = out.read_text(encoding="utf-8")
+            self.assertIn("视觉系统来源：`brand/DESIGN.md`", spec_text)
+            self.assertNotIn("视觉系统来源：`DESIGN.md`", spec_text)
+
+    def test_user_flow_package_rejects_stale_design_spec_for_nested_design_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            copied = Path(tmp) / "landing"
+            shutil.copytree(EXAMPLE_DIR, copied)
+            brand_dir = copied / "brand"
+            brand_dir.mkdir()
+            shutil.move(str(copied / "DESIGN.md"), brand_dir / "DESIGN.md")
+
+            brief_path = copied / "design-brief.json"
+            brief = json.loads(brief_path.read_text(encoding="utf-8"))
+            brief["design_system"]["design_md_path"] = "brand/DESIGN.md"
+            brief_path.write_text(json.dumps(brief, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [sys.executable, str(VALIDATE_USER_FLOW), str(copied)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("design-spec.md does not match export_design_spec.py output", result.stdout + result.stderr)
+
+    def test_user_flow_package_rejects_stale_review_next_actions(self):
+        cases = [
+            (
+                "wrong_recommended_action",
+                lambda text: text.replace("recommended_next_action: `external_prompt`", "recommended_next_action: `direct_repair`", 1),
+                "recommended_next_action does not match JSON",
+            ),
+            (
+                "wrong_next_copy_source",
+                lambda text: text.replace("prompts/huashu-design-modification.txt", "prompts/stale-modification.txt", 1),
+                "option external_prompt next_copy_source does not match JSON",
+            ),
+        ]
+        for name, transform, expected_error in cases:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as tmp:
+                copied = Path(tmp) / "workspace"
+                shutil.copytree(WORKSPACE_DIR, copied)
+                path = copied / "reviews" / "review-next-actions.md"
+                path.write_text(transform(path.read_text(encoding="utf-8")), encoding="utf-8")
+
+                result = subprocess.run(
+                    [sys.executable, str(VALIDATE_USER_FLOW), str(copied), "--require-review"],
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                )
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(expected_error, result.stdout + result.stderr)
+
     def test_golden_demo_accepts_default_package_without_optional_prompt_files(self):
         with tempfile.TemporaryDirectory() as tmp:
             copied = Path(tmp) / "landing"
