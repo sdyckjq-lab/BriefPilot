@@ -29,6 +29,7 @@ COMPARISON_DIR = ROOT / "examples" / "comparison-demo"
 VALIDATE_REVIEW = ROOT / "scripts" / "validate_result_review.py"
 VALIDATE_COMPARISON = ROOT / "scripts" / "validate_comparison_demo.py"
 EXPORT_MODIFICATION = ROOT / "scripts" / "export_modification_prompt.py"
+EXPORT_DESIGN_SPEC = ROOT / "scripts" / "export_design_spec.py"
 STYLE_INDEX = ROOT / "references" / "design-style-index.json"
 CHECK_DESIGN_MD = ROOT / "scripts" / "check_design_md.py"
 VALIDATE_PUBLIC_PACKAGE = ROOT / "scripts" / "validate_public_package.py"
@@ -1024,6 +1025,29 @@ class BriefPilotScriptTests(unittest.TestCase):
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("START_HERE.md missing required guidance phrase", result.stdout + result.stderr)
+
+    def test_export_design_spec_creates_output_parent_directory(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "nested" / "design-spec.md"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(EXPORT_DESIGN_SPEC),
+                    "--brief",
+                    str(EXAMPLE),
+                    "--design",
+                    str(DESIGN_MD),
+                    "--out",
+                    str(out),
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            self.assertTrue(out.is_file())
+            self.assertIn("BriefSearch AI 搜索产品官网 设计规范", out.read_text(encoding="utf-8"))
 
     def test_golden_demo_accepts_default_package_without_optional_prompt_files(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -2756,11 +2780,43 @@ class BriefPilotScriptTests(unittest.TestCase):
                     ],
                 }
             )
+            revision_wrong_next_action = base_review(
+                decision="revise_brief_then_regenerate",
+                brief_revision_path="brief-revision.md",
+                design_spec_revision_path="design-spec-revision.md",
+                prompt_intent="brief_revision_regeneration",
+                next_actions={
+                    "recommended_next_action": "external_prompt",
+                    "reason": "Incorrectly points the user away from the revised spec.",
+                    "next_copy_source": "prompt.txt",
+                    "options": [
+                        {
+                            "action": "direct_repair",
+                            "enabled": False,
+                            "disabled_reason": "The source spec needs revision.",
+                            "next_copy_source": "",
+                        },
+                        {
+                            "action": "external_prompt",
+                            "enabled": True,
+                            "disabled_reason": "",
+                            "next_copy_source": "prompt.txt",
+                        },
+                        {
+                            "action": "revise_spec",
+                            "enabled": False,
+                            "disabled_reason": "Incorrectly disabled.",
+                            "next_copy_source": "",
+                        },
+                    ],
+                },
+            )
 
             cases = [
                 ("bad_decision.json", base_review(decision="polish"), "decision must be one of"),
                 ("missing_next_actions.json", missing_next_actions, "next_actions is required"),
                 ("unsafe_direct_repair.json", unsafe_direct_repair, "direct_repair cannot be enabled"),
+                ("revision_wrong_next_action.json", revision_wrong_next_action, "must recommend revise_spec"),
                 ("missing_local_path.json", base_review(evidence={"kind": "local_file", "summary": "Missing path."}), "evidence.path is required"),
                 ("empty_local_file.json", base_review(evidence={"kind": "local_file", "summary": "Empty file.", "path": "empty.md"}), "non-whitespace content"),
                 ("bad_local_suffix.json", base_review(evidence={"kind": "local_file", "summary": "Bad suffix.", "path": "generated.png"}), "unsupported suffix"),

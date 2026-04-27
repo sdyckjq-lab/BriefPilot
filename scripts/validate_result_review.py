@@ -188,6 +188,7 @@ def validate_next_actions(data, errors, review_path, brief_path):
         return
 
     seen = set()
+    options_by_action = {}
     enabled_recommended = False
     direct_repair_allowed = local_file_direct_repair_allowed(data)
     for index, option in enumerate(options):
@@ -202,6 +203,7 @@ def validate_next_actions(data, errors, review_path, brief_path):
         if action in seen:
             errors.append(f"next_actions.options has duplicate action: {action}")
         seen.add(action)
+        options_by_action[action] = option
         enabled = option.get("enabled")
         if not isinstance(enabled, bool):
             errors.append(f"{prefix}.enabled must be a boolean")
@@ -223,18 +225,33 @@ def validate_next_actions(data, errors, review_path, brief_path):
         errors.append("next_actions.recommended_next_action must name an enabled option")
 
     if decision == "revise_brief_then_regenerate":
-        copy_source = data.get("design_spec_revision_path") or next_actions.get("next_copy_source")
+        if recommended != "revise_spec":
+            errors.append("revise_brief_then_regenerate must recommend revise_spec")
+        revise_option = options_by_action.get("revise_spec") if isinstance(options_by_action.get("revise_spec"), dict) else {}
+        if revise_option.get("enabled") is not True:
+            errors.append("revise_spec must be enabled when decision is revise_brief_then_regenerate")
+
+        revision_bases = [
+            review_path.parent,
+            brief_path.parent if brief_path else review_path.parent.parent,
+            Path.cwd(),
+            repo_root(),
+        ]
+        recommended_sources = [
+            next_actions.get("next_copy_source"),
+            revise_option.get("next_copy_source"),
+        ]
+        copy_source = data.get("design_spec_revision_path") or next((source for source in recommended_sources if has_text(source)), "")
         if not has_text(copy_source):
-            errors.append("design_spec_revision_path or next_actions.next_copy_source is required for revise_brief_then_regenerate")
+            errors.append("design_spec_revision_path or revise_spec next_copy_source is required for revise_brief_then_regenerate")
         else:
-            revision_bases = [
-                review_path.parent,
-                brief_path.parent if brief_path else review_path.parent.parent,
-                Path.cwd(),
-                repo_root(),
-            ]
-            if not resolve_existing_path(copy_source, revision_bases):
+            resolved_copy_source = resolve_existing_path(copy_source, revision_bases)
+            if not resolved_copy_source:
                 errors.append(f"design spec revision source does not resolve: {copy_source} (tried bases: {describe_bases(revision_bases)})")
+            else:
+                for source in recommended_sources:
+                    if has_text(source) and resolve_existing_path(source, revision_bases) != resolved_copy_source:
+                        errors.append("revise_spec next_copy_source must resolve to the design spec revision source")
 
 
 def validate_visual(data, errors):

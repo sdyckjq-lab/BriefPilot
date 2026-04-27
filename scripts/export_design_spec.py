@@ -225,7 +225,12 @@ def main(argv=None):
 
     rendered = render_design_spec(brief, design_text, design_label=args.design.name)
     if args.out:
-        args.out.write_text(rendered, encoding="utf-8")
+        try:
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            args.out.write_text(rendered, encoding="utf-8")
+        except OSError as error:
+            print(f"cannot write design spec: {error}", file=sys.stderr)
+            return 1
         print(f"wrote {args.out}")
     else:
         print(rendered, end="")
