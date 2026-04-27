@@ -165,6 +165,11 @@ def init_git_repo(root):
     subprocess.run(["git", "-C", str(root), "commit", "--allow-empty", "-m", "initial"], text=True, capture_output=True, check=True)
 
 
+def commit_all(root, message):
+    subprocess.run(["git", "-C", str(root), "add", "."], text=True, capture_output=True, check=True)
+    subprocess.run(["git", "-C", str(root), "commit", "-m", message], text=True, capture_output=True, check=True)
+
+
 def copy_committed_package_repo(tmp):
     root = Path(tmp) / "repo"
     shutil.copytree(
@@ -1620,6 +1625,23 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertFalse(payload["ok"])
             self.assertIn("source git commit is unavailable; dist source_commit cannot be verified", "\n".join(payload["findings"]))
 
+    def test_skill_command_validator_json_reports_unreadable_source_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
+            (root / "SKILL.md").write_bytes(b"\xff\xfe\x00")
+            (root / "evals" / "evals.json").write_bytes(b"\xff\xfe\x00")
+            (root / ".gitignore").write_bytes(b"\xff\xfe\x00")
+
+            result = run_skill_command_validator("--root", root, "--format", "json")
+            self.assertNotEqual(result.returncode, 0)
+            self.assertNotIn("Traceback", result.stderr)
+            payload = stdout_json(result)
+            self.assertFalse(payload["ok"])
+            findings = "\n".join(payload["findings"])
+            self.assertIn("SKILL.md is not readable UTF-8", findings)
+            self.assertIn("evals.json is not readable UTF-8", findings)
+            self.assertIn(".gitignore is not readable UTF-8", findings)
+
     def test_skill_command_packager_dry_run_does_not_write_artifacts(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = copy_committed_package_repo(tmp)
@@ -1657,6 +1679,31 @@ class BriefPilotScriptTests(unittest.TestCase):
                 payload["planned_artifacts"],
                 [str((out_dir / f"{command}.skill").resolve()) for command in ["briefpilot", "bp", "briefpilot-upgrade"]],
             )
+            self.assertFalse(out_dir.exists())
+
+    def test_skill_command_packager_json_reports_unreadable_source_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
+            (root / "SKILL.md").write_bytes(b"\xff\xfe\x00")
+            (root / "evals" / "evals.json").write_bytes(b"\xff\xfe\x00")
+            (root / ".gitignore").write_bytes(b"\xff\xfe\x00")
+            commit_all(root, "corrupt source files")
+            out_dir = Path(tmp) / "dist"
+
+            result = subprocess.run(
+                package_args(root, "--dry-run", "--format", "json", "--out-dir", out_dir),
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertNotIn("Traceback", result.stderr)
+            payload = stdout_json(result)
+            self.assertFalse(payload["ok"])
+            findings = "\n".join(payload["findings"])
+            self.assertIn("SKILL.md is not readable UTF-8", findings)
+            self.assertIn("evals.json is not readable UTF-8", findings)
+            self.assertIn(".gitignore is not readable UTF-8", findings)
             self.assertFalse(out_dir.exists())
 
     def test_skill_command_packager_rejects_non_empty_staging_dir_without_deleting(self):

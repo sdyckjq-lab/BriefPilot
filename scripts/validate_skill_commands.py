@@ -38,11 +38,23 @@ def has_cjk(text):
     return any("\u4e00" <= char <= "\u9fff" for char in text)
 
 
+def read_text(path, findings, label):
+    path = Path(path)
+    try:
+        return path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        findings.append(f"missing {label}: {path}")
+    except UnicodeDecodeError:
+        findings.append(f"{path} is not readable UTF-8")
+    except OSError as error:
+        findings.append(f"{path} is not readable: {error}")
+    return None
+
+
 def parse_frontmatter(path, findings):
-    if not path.exists():
-        findings.append(f"missing SKILL.md: {path}")
+    text = read_text(path, findings, "SKILL.md")
+    if text is None:
         return None, ""
-    text = path.read_text(encoding="utf-8")
     match = re.match(r"^---\n(.*?)\n---", text, re.DOTALL)
     if not match:
         findings.append(f"{path} missing YAML frontmatter")
@@ -96,11 +108,11 @@ def validate_skill_file(path, expected_name, required_terms, findings):
 
 
 def load_json(path, findings):
-    if not path.exists():
-        findings.append(f"missing JSON file: {path}")
+    text = read_text(path, findings, "JSON file")
+    if text is None:
         return None
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(text)
     except json.JSONDecodeError as error:
         findings.append(f"{path} is not valid JSON: {error}")
         return None
@@ -189,13 +201,11 @@ def validate_source(root):
             findings.append(f"missing command package script: {required}")
 
     gitignore = root / ".gitignore"
-    if gitignore.exists():
-        text = gitignore.read_text(encoding="utf-8")
+    text = read_text(gitignore, findings, ".gitignore")
+    if text is not None:
         for pattern in ["/dist/", "/briefpilot-skill-workspace/"]:
             if pattern not in text:
                 findings.append(f".gitignore missing generated artifact ignore: {pattern}")
-    else:
-        findings.append(".gitignore missing")
 
     return findings
 
