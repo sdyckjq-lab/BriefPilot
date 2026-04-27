@@ -112,12 +112,25 @@ target modification prompts
 
 仓库根目录是 BriefPilot 主 Skill 源码。当前命令包包含三个可安装 Skill：`briefpilot`、`bp` 和 `briefpilot-upgrade`。
 
+当前版本写在 `VERSION`，更新记录写在 `CHANGELOG.md`。发布前先确认这两个文件一致，再生成安装包。
+
 生成安装包：
 
 ```text
+python3 scripts/validate_release_metadata.py
 python3 scripts/validate_skill_commands.py
 python3 scripts/package_briefpilot_skills.py --out-dir dist
 ```
+
+给自动化或代理读取时，可以显式输出 JSON：
+
+```text
+python3 scripts/validate_release_metadata.py --format json
+python3 scripts/validate_skill_commands.py --format json
+python3 scripts/package_briefpilot_skills.py --dry-run --format json --out-dir <output-dir>
+```
+
+JSON 输出会包含 `ok`、`kind`、`findings` 和 `message`。打包脚本还会给出目标版本、当前安装版本、计划或实际生成的 `.skill` 文件、安装目录和是否完成安装。默认仍是普通文本输出。
 
 生成后会得到：
 
@@ -126,3 +139,9 @@ dist/briefpilot.skill
 dist/bp.skill
 dist/briefpilot-upgrade.skill
 ```
+
+安装包会带上当前版本和更新记录，`/briefpilot-upgrade` 会据此说明是升级、修复、刷新，还是第一次进入版本化安装。
+
+生成正式安装包时，源码目录必须是 BriefPilot 的 Git 仓库根目录，并且工作区必须干净。这样安装包里的提交号才和实际内容一致。
+
+直接修复安装目录时，脚本默认不会把较新的已安装版本替换成旧版本；确实需要降级时必须显式加 `--allow-downgrade`。

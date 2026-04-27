@@ -2,10 +2,13 @@
 import argparse
 import json
 import re
+import subprocess
 import sys
 import tempfile
 import zipfile
 from pathlib import Path, PurePosixPath
+
+import validate_release_metadata
 
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
@@ -17,6 +20,7 @@ COMPANION_ALLOWED_PARTS = {
     ("SKILL.md",),
     ("agents", "openai.yaml"),
     ("evals", "evals.json"),
+    ("install-manifest.json",),
 }
 FORBIDDEN_PACKAGE_PARTS = {
     "AGENTS.md",
@@ -34,11 +38,23 @@ def has_cjk(text):
     return any("\u4e00" <= char <= "\u9fff" for char in text)
 
 
+def read_text(path, findings, label):
+    path = Path(path)
+    try:
+        return path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        findings.append(f"missing {label}: {path}")
+    except UnicodeDecodeError:
+        findings.append(f"{path} is not readable UTF-8")
+    except OSError as error:
+        findings.append(f"{path} is not readable: {error}")
+    return None
+
+
 def parse_frontmatter(path, findings):
-    if not path.exists():
-        findings.append(f"missing SKILL.md: {path}")
+    text = read_text(path, findings, "SKILL.md")
+    if text is None:
         return None, ""
-    text = path.read_text(encoding="utf-8")
     match = re.match(r"^---\n(.*?)\n---", text, re.DOTALL)
     if not match:
         findings.append(f"{path} missing YAML frontmatter")
@@ -92,11 +108,11 @@ def validate_skill_file(path, expected_name, required_terms, findings):
 
 
 def load_json(path, findings):
-    if not path.exists():
-        findings.append(f"missing JSON file: {path}")
+    text = read_text(path, findings, "JSON file")
+    if text is None:
         return None
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(text)
     except json.JSONDecodeError as error:
         findings.append(f"{path} is not valid JSON: {error}")
         return None
@@ -154,6 +170,7 @@ def validate_companion_is_lean(companion_dir, findings):
 def validate_source(root):
     root = Path(root).resolve()
     findings = []
+    findings.extend(validate_release_metadata.validate(root))
     validate_skill_file(root / "SKILL.md", "briefpilot", ["/briefpilot", "DESIGN.md"], findings)
     validate_skill_file(root / "companions" / "bp" / "SKILL.md", "bp", ["/bp", "briefpilot"], findings)
     validate_skill_file(
@@ -175,47 +192,126 @@ def validate_source(root):
     validate_companion_is_lean(root / "companions" / "bp", findings)
     validate_companion_is_lean(root / "companions" / "briefpilot-upgrade", findings)
 
-    for required in ["scripts/package_briefpilot_skills.py", "scripts/validate_skill_commands.py"]:
+    for required in [
+        "scripts/package_briefpilot_skills.py",
+        "scripts/validate_release_metadata.py",
+        "scripts/validate_skill_commands.py",
+    ]:
         if not (root / required).exists():
             findings.append(f"missing command package script: {required}")
 
     gitignore = root / ".gitignore"
-    if gitignore.exists():
-        text = gitignore.read_text(encoding="utf-8")
+    text = read_text(gitignore, findings, ".gitignore")
+    if text is not None:
         for pattern in ["/dist/", "/briefpilot-skill-workspace/"]:
             if pattern not in text:
                 findings.append(f".gitignore missing generated artifact ignore: {pattern}")
-    else:
-        findings.append(".gitignore missing")
 
     return findings
 
 
-def validate_installed(install_dir):
+def load_install_manifest(skill_dir, findings):
+    path = Path(skill_dir) / "install-manifest.json"
+    if not path.exists():
+        findings.append(f"installed command missing install manifest: {Path(skill_dir).name}")
+        return None
+    return validate_release_metadata.load_manifest(path, findings)
+
+
+def validate_installed(install_dir, expected_version=None, expected_source_commit=None):
     install_dir = Path(install_dir).resolve()
     findings = []
+    manifests = {}
     for command in COMMANDS:
         skill_dir = install_dir / command
         if not skill_dir.is_dir():
             findings.append(f"installed command missing: {command}")
             continue
         validate_skill_file(skill_dir / "SKILL.md", command, [command], findings)
+        manifest = load_install_manifest(skill_dir, findings)
+        if manifest is not None:
+            manifests[command] = manifest
 
     main_dir = install_dir / "briefpilot"
     if main_dir.exists():
         for part in FORBIDDEN_PACKAGE_PARTS:
             if (main_dir / part).exists():
                 findings.append(f"installed briefpilot contains forbidden package part: {part}")
-        for required in ["SKILL.md", "references", "templates", "scripts", "examples"]:
+        for required in ["SKILL.md", "VERSION", "CHANGELOG.md", "references", "templates", "scripts", "examples"]:
             if not (main_dir / required).exists():
                 findings.append(f"installed briefpilot missing required part: {required}")
+        release_findings = validate_release_metadata.validate(main_dir)
+        findings.extend(f"installed briefpilot {finding}" for finding in release_findings)
+        if expected_version and (main_dir / "VERSION").exists():
+            try:
+                installed_version = validate_release_metadata.read_version(main_dir)
+                if installed_version != expected_version:
+                    findings.append(
+                        f"installed briefpilot VERSION {installed_version!r} differs from root VERSION {expected_version!r}"
+                    )
+            except (OSError, UnicodeDecodeError) as error:
+                findings.append(f"installed briefpilot VERSION is not readable: {error}")
 
     for command in ("bp", "briefpilot-upgrade"):
         skill_dir = install_dir / command
         if skill_dir.exists():
             validate_companion_is_lean(skill_dir, findings)
 
+    manifest_expected_version = expected_version
+    if manifest_expected_version is None and (main_dir / "VERSION").exists():
+        try:
+            manifest_expected_version = validate_release_metadata.read_version(main_dir)
+        except (OSError, UnicodeDecodeError):
+            manifest_expected_version = None
+    if manifests:
+        validate_release_metadata.validate_manifest_set(
+            manifests,
+            manifest_expected_version,
+            findings,
+            expected_source_commit=expected_source_commit,
+        )
+
     return findings
+
+
+def git_commit(root):
+    root = Path(root).resolve()
+    top_level = git_root(root)
+    if top_level != root:
+        return None
+    result = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "HEAD"],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    commit = result.stdout.strip()
+    return commit if re.fullmatch(r"[0-9a-f]{40}", commit) else None
+
+
+def git_root(root):
+    result = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "--show-toplevel"],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    value = result.stdout.strip()
+    return Path(value).resolve() if value else None
+
+
+def git_commit_exists(root, commit):
+    result = subprocess.run(
+        ["git", "-C", str(root), "cat-file", "-e", f"{commit}^{{commit}}"],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    return result.returncode == 0
 
 
 def validate_archive_member_names(archive_name, command, names):
@@ -235,9 +331,26 @@ def validate_archive_member_names(archive_name, command, names):
     return findings
 
 
-def validate_dist(dist_dir):
+def validate_dist(dist_dir, source_root=DEFAULT_ROOT):
     dist_dir = Path(dist_dir).resolve()
     findings = []
+    expected_version = None
+    expected_source_commit = None
+    if source_root is not None:
+        source_root = Path(source_root).resolve()
+        try:
+            expected_version = validate_release_metadata.read_version(source_root)
+        except (OSError, UnicodeDecodeError):
+            expected_version = None
+        source_git_root = git_root(source_root)
+        if source_git_root is None:
+            findings.append("source git commit is unavailable; dist source_commit cannot be verified")
+        elif source_git_root != source_root:
+            findings.append(f"source root must be the git repository root: {source_root}")
+        expected_source_commit = git_commit(source_root)
+        if expected_source_commit and not git_commit_exists(source_root, expected_source_commit):
+            findings.append(f"source commit does not exist locally: {expected_source_commit}")
+            expected_source_commit = None
     with tempfile.TemporaryDirectory(prefix="briefpilot-skill-validate-") as tmp:
         extracted_root = Path(tmp)
         can_validate_installed = True
@@ -277,25 +390,69 @@ def validate_dist(dist_dir):
                 can_validate_installed = False
                 continue
         if can_validate_installed:
-            findings.extend(validate_installed(extracted_root))
+            findings.extend(
+                validate_installed(
+                    extracted_root,
+                    expected_version=expected_version,
+                    expected_source_commit=expected_source_commit,
+                )
+            )
     return findings
+
+
+def emit_json(payload):
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
+def result_payload(args, root, findings):
+    ok = not findings
+    message = "valid BriefPilot command package" if ok else "invalid BriefPilot command package"
+    return {
+        "ok": ok,
+        "kind": "validate_skill_commands",
+        "root": str(Path(root).resolve()) if root else None,
+        "installed_dir": str(Path(args.installed_dir).resolve()) if args.installed_dir else None,
+        "dist_dir": str(Path(args.dist_dir).resolve()) if args.dist_dir else None,
+        "findings": findings,
+        "message": message,
+    }
 
 
 def parse_args(argv):
     parser = argparse.ArgumentParser(description="Validate BriefPilot command Skill packaging.")
-    parser.add_argument("--root", type=Path, default=DEFAULT_ROOT, help="Repository root to validate.")
+    parser.add_argument("--root", type=Path, help="Repository root to validate.")
     parser.add_argument("--installed-dir", type=Path, help="Validate an installed skills directory.")
     parser.add_argument("--dist-dir", type=Path, help="Validate generated .skill artifacts.")
+    parser.add_argument(
+        "--format",
+        choices=("text", "json"),
+        default="text",
+        dest="output_format",
+        help="Output format. Defaults to text.",
+    )
     return parser.parse_args(argv)
 
 
 def main(argv=None):
     args = parse_args(argv or sys.argv[1:])
-    findings = validate_source(args.root)
+    root = args.root.resolve() if args.root else DEFAULT_ROOT
+    validate_source_root = args.root is not None or args.dist_dir or not args.installed_dir
+    findings = validate_source(root) if validate_source_root else []
     if args.installed_dir:
-        findings.extend(validate_installed(args.installed_dir))
+        expected_version = None
+        if validate_source_root:
+            try:
+                expected_version = validate_release_metadata.read_version(root)
+            except (OSError, UnicodeDecodeError):
+                expected_version = None
+        findings.extend(validate_installed(args.installed_dir, expected_version=expected_version))
     if args.dist_dir:
-        findings.extend(validate_dist(args.dist_dir))
+        findings.extend(validate_dist(args.dist_dir, root))
+
+    payload = result_payload(args, root if validate_source_root or args.root else None, findings)
+    if args.output_format == "json":
+        emit_json(payload)
+        return 0 if payload["ok"] else 1
 
     if findings:
         print("invalid BriefPilot command package:")
