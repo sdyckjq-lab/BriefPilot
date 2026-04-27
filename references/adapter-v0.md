@@ -2,7 +2,9 @@
 
 ## Use When
 
-Exporting to v0 for React or Next.js UI generation.
+The user has already chosen v0, or `START_HERE.md` recommends v0 because the desired result is runnable React or Next.js UI code.
+
+If the user is unsure, do not export this first. Tell them to copy `design-spec.md`.
 
 ## Emphasize
 

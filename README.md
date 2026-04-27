@@ -1,6 +1,6 @@
 # BriefPilot
 
-BriefPilot 把模糊的产品页、官网或应用页面需求，整理成可复用的设计 brief、`DESIGN.md` 视觉系统、面向 huashu-design / Claude Design / v0 的提示词，以及生成结果后的评审和修改提示。
+BriefPilot 把模糊的产品页、官网或应用页面需求，整理成一个好复制的 `design-spec.md`、`DESIGN.md` 视觉系统、可选的平台提示词，以及生成结果后的安全评审和下一步建议。
 
 BriefPilot 默认中文优先。技术文件名、命令、JSON keys 和工具名保留英文。
 
@@ -14,14 +14,16 @@ BriefPilot 默认中文优先。技术文件名、命令、JSON keys 和工具�
 - 缺口诊断
 - 聚焦问题或明确假设
 - 三个设计策略方向
+- `START_HERE.md`
+- 可直接复制的 `design-spec.md`
 - Markdown 版设计 brief
 - JSON 版设计 brief，包含 `meta.content_language`
 - Google-style DESIGN.md 视觉系统
 - 内置 DESIGN.md 质量报告；用户提供安全本地命令时，可选接入 Google 官方 lint
-- 面向 huashu-design、Claude Design 和 v0 的提示词
+- 面向 huashu-design、Claude Design 和 v0 的可选提示词
 - 评审清单
 - 生成结果评审报告
-- 对未通过结果的修改或重生成提示
+- 对未通过结果的下一步建议：直接修复、外部工具修改提示，或修订 spec 后重新生成
 
 ## 默认语言
 
@@ -47,9 +49,19 @@ BriefPilot 默认中文优先。技术文件名、命令、JSON keys 和工具�
 /briefpilot-upgrade
 ```
 
-agent 会诊断需求、补充假设或提问、选择策略，并在发送给设计生成工具前保存一套可复用的 brief 资产。
+agent 会诊断需求、补充假设或提问、选择策略，并保存一套可复用资产。普通用户先打开 `START_HERE.md`，然后完整复制 `design-spec.md` 到目标设计工具。
 
-设计工具生成结果后，可以用同一套 brief 资产检查粘贴摘要或本地生成文件；如果结果需要调整，再导出下一轮修改提示。
+如果已经知道目标工具，可以再导出平台提示词：
+
+- `v0`：适合 React / Next.js 界面代码。
+- `huashu-design`：适合高保真 HTML 原型。
+- `Claude Design`：适合视觉探索、多版方向和迭代。
+
+不确定时不要选提示词，直接复制 `design-spec.md`。
+
+设计工具生成结果后，可以用同一套 brief 资产检查粘贴摘要、本地生成文件、截图说明或已有视觉评审。只说“评审”“看看”“检查”时，BriefPilot 默认只保存评审报告和下一步建议，不会改 brief、`design-spec.md`、生成结果文件或本地代码。
+
+需要直接修本地文件时，BriefPilot 必须先列出准备修改的文件，并等用户明确确认。截图、图片、Figma 导出、外部平台草稿和纯粘贴摘要不能直接修复，只能评审、给外部工具修改提示，或修订 `design-spec.md` 后重新生成。
 
 BriefPilot 的内置 `DESIGN.md` 检查不需要 Node/npm。Google 官方 `@google/design.md` lint 路径是 optional，并且 BriefPilot never silently installs npm packages、never automatically runs `npx`。
 
@@ -92,11 +104,13 @@ Brief Score
 3 个设计策略
 diagnosis-and-strategies.md
 assumptions.md
+START_HERE.md
+design-spec.md
 design-brief.md
 design-brief.json
 DESIGN.md
-target prompts
 review-checklist.md
+可选平台提示词
 ```
 
 评审闭环产出：
@@ -104,8 +118,10 @@ review-checklist.md
 ```text
 result-review.md
 result-review.json
+review-next-actions.md
 必要时生成 brief-revision.md
-target modification prompts
+必要时生成 design-spec-revision.md
+可选平台修改提示词
 ```
 
 ## Skill 包

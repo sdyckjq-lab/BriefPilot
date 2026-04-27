@@ -1,6 +1,6 @@
 ---
 name: bp
-description: Short command alias for BriefPilot. Use for /bp whenever the user wants the same Chinese-first design brief compiler, DESIGN.md visual system, target-tool prompts, review checklist, or generated-result review workflow provided by /briefpilot. This skill should delegate to the installed briefpilot skill rather than creating a separate workflow.
+description: Short command alias for BriefPilot. Use for /bp whenever the user wants the same Chinese-first START_HERE.md, design-spec.md, DESIGN.md visual system, optional target-tool prompts, review checklist, or generated-result review workflow provided by /briefpilot. This skill should delegate to the installed briefpilot skill rather than creating a separate workflow.
 ---
 
 # /bp

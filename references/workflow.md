@@ -4,7 +4,7 @@
 
 A BriefPilot run is complete when the reusable brief package is saved to disk. Chat-only output is a blocked fallback for environments without filesystem access; record that blocker and do not mark the run fully complete.
 
-For post-generation result review, use `result-review-workflow.md`. A review run is complete only when the review artifacts are saved and every non-accepted decision has a next prompt.
+For post-generation result review, use `result-review-workflow.md`. A review run is complete only when review artifacts are saved and every non-accepted decision has a conditionally enabled next action.
 
 ## Step 1: Diagnose
 
@@ -70,13 +70,26 @@ Default user-facing content is Simplified Chinese (`zh-CN`) unless the user asks
 
 Write:
 
+- `START_HERE.md`
+- `design-spec.md`
 - `diagnosis-and-strategies.md`
 - `design-brief.md`
 - `design-brief.json`
 - `DESIGN.md` when no usable project or brand `DESIGN.md` exists
-- target prompts
 - `review-checklist.md`
 - `assumptions.md` when assumptions were used
+
+`START_HERE.md` is the first file ordinary users read. It must name one primary next action, tell the user to copy the entire `design-spec.md`, and explain what to bring back for review.
+
+`design-spec.md` is the default copy source for downstream tools. It combines the user-facing brief, useful `DESIGN.md` rules, required content, interaction states, responsive/accessibility obligations, review criteria, and forbidden generic patterns.
+
+Platform prompts are optional exports:
+
+- `v0`: React or Next.js UI code.
+- `huashu-design`: high-fidelity HTML prototype.
+- `Claude Design`: visual exploration and iteration.
+
+Do not expose `generic` as a first-run prompt target. If the user is unsure, have them copy `design-spec.md`.
 
 ## Step 7: Validate
 
@@ -86,7 +99,9 @@ Run `scripts/validate_design_md.py` on generated `DESIGN.md` when scripts can be
 
 Run `scripts/check_design_md.py` when a saved `design-md-review.md` and `design-md-review.json` report is needed.
 
-Run `scripts/export_prompt.py` for at least one adapter when scripts can be executed.
+Run `scripts/validate_user_flow_package.py` for packages that include the new user-facing flow.
+
+Run `scripts/export_prompt.py` only when checking optional adapter exports or when the user explicitly asks for a platform-specific prompt.
 
 Run `scripts/validate_golden_demo.py` when checking the included golden example or a full example package.
 

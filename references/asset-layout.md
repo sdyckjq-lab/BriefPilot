@@ -20,7 +20,14 @@ Write project assets to:
 .briefpilot/projects/<project-slug>/
 ```
 
-Required files:
+Core user-facing files:
+
+```text
+START_HERE.md
+design-spec.md
+```
+
+Supporting files:
 
 ```text
 diagnosis-and-strategies.md
@@ -29,12 +36,26 @@ design-brief.json
 DESIGN.md
 design-md-quality-proof.md
 review-checklist.md
-prompts/huashu-design.txt
-prompts/claude-design.txt
-prompts/v0.txt
 reviews/design-md-review.md
 reviews/design-md-review.json
 ```
+
+Internal or automation-facing files:
+
+```text
+design-brief.json
+reviews/design-md-review.json
+```
+
+Optional platform exports:
+
+```text
+prompts/huashu-design.txt
+prompts/claude-design.txt
+prompts/v0.txt
+```
+
+Do not present optional prompt exports as the ordinary user's first step. If the user is unsure, they copy `design-spec.md`.
 
 Write `assumptions.md` when quick mode or unresolved assumptions are used.
 
@@ -49,11 +70,15 @@ When reviewing a downstream generated result, write review artifacts beside the 
 ```text
 reviews/result-review.md
 reviews/result-review.json
+reviews/review-next-actions.md
 reviews/brief-revision.md
+reviews/design-spec-revision.md
 prompts/<target>-modification.txt
 ```
 
-`brief-revision.md` is required only when the decision is `revise_brief_then_regenerate`. `accept` saves the review report but does not require a modification prompt. `tweak` keeps the selected strategy and exports a targeted modification prompt. `regenerate_from_scratch` exports a full regeneration prompt.
+`brief-revision.md` is required only when the decision is `revise_brief_then_regenerate`. `design-spec-revision.md` is required when the next usable copy source should not be the old `design-spec.md`. `accept` saves the review report but does not require a modification prompt. `tweak` may recommend direct repair after confirmation or an external modification prompt. `regenerate_from_scratch` may export a full regeneration prompt.
+
+Review-only requests may save review artifacts and `review-next-actions.md`, but must not edit source package files, generated result files, or local code until the user confirms direct repair with a concrete file list.
 
 ## Brand Assets
 

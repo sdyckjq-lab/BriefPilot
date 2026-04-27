@@ -167,6 +167,24 @@ def validate_companion_is_lean(companion_dir, findings):
             findings.append(f"{companion_dir} must not duplicate main {forbidden}/ resources")
 
 
+def validate_briefpilot_flow_terms(root, findings):
+    skill_text = read_text(root / "SKILL.md", findings, "SKILL.md") or ""
+    readme_text = read_text(root / "README.md", findings, "README.md") if (root / "README.md").exists() else ""
+    readme_text = readme_text or ""
+    eval_text = json.dumps(load_json(root / "evals" / "evals.json", findings) or {}, ensure_ascii=False)
+    bp_eval_text = json.dumps(load_json(root / "companions" / "bp" / "evals" / "evals.json", findings) or {}, ensure_ascii=False)
+    combined = "\n".join([skill_text, readme_text, eval_text, bp_eval_text])
+    for term in ["START_HERE.md", "design-spec.md", "review-next-actions.md"]:
+        if term not in combined:
+            findings.append(f"command workflow docs/evals missing new flow term: {term}")
+    if "可选" not in combined or "optional" not in combined.lower():
+        findings.append("command workflow docs/evals must describe platform prompts as optional exports")
+    if "generic" not in skill_text or "首轮平台提示词" not in skill_text:
+        findings.append("SKILL.md must state generic is not a first-run prompt target")
+    if "不改" not in combined and "does not edit" not in combined:
+        findings.append("command workflow docs/evals must enforce review-only safety")
+
+
 def validate_source(root):
     root = Path(root).resolve()
     findings = []
@@ -191,6 +209,7 @@ def validate_source(root):
 
     validate_companion_is_lean(root / "companions" / "bp", findings)
     validate_companion_is_lean(root / "companions" / "briefpilot-upgrade", findings)
+    validate_briefpilot_flow_terms(root, findings)
 
     for required in [
         "scripts/package_briefpilot_skills.py",

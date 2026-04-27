@@ -16,6 +16,8 @@ DECISION_PROMPT_INTENTS = {
 VISUAL_STATUSES = {"available_model_image", "available_gstack", "not_provided", "unavailable"}
 SEVERITIES = {"low", "medium", "high"}
 LOCAL_FILE_SUFFIXES = {".txt", ".md", ".html", ".json"}
+NEXT_ACTIONS = {"accept", "direct_repair", "external_prompt", "revise_spec", "regenerate_from_spec"}
+REQUIRED_NON_ACCEPT_ACTIONS = {"direct_repair", "external_prompt", "revise_spec"}
 
 
 def repo_root():
@@ -143,6 +145,113 @@ def validate_prompt(data, errors):
         return
     for field in ["keep", "change", "acceptance_checks"]:
         validate_text_list(prompt.get(field), f"prompt.{field}", errors)
+
+
+def local_file_direct_repair_allowed(data):
+    evidence = data.get("evidence") if isinstance(data.get("evidence"), dict) else {}
+    if evidence.get("kind") != "local_file":
+        return False
+    path = evidence.get("path")
+    if not has_text(path):
+        return False
+    return Path(path).suffix in LOCAL_FILE_SUFFIXES
+
+
+def validate_next_actions(data, errors, review_path, brief_path):
+    decision = data.get("decision")
+    next_actions = data.get("next_actions")
+
+    if decision == "accept":
+        if next_actions is None:
+            return
+        if not isinstance(next_actions, dict):
+            errors.append("next_actions must be an object when present")
+            return
+        recommended = next_actions.get("recommended_next_action")
+        if has_text(recommended) and recommended != "accept":
+            errors.append("next_actions.recommended_next_action must be accept when decision is accept")
+        return
+
+    if not isinstance(next_actions, dict):
+        errors.append("next_actions is required for non-accept decisions")
+        return
+
+    recommended = next_actions.get("recommended_next_action")
+    if recommended not in NEXT_ACTIONS - {"accept"}:
+        errors.append(f"next_actions.recommended_next_action must be one of {sorted(NEXT_ACTIONS - {'accept'})}")
+    if not has_text(next_actions.get("reason")):
+        errors.append("next_actions.reason is required")
+
+    options = next_actions.get("options")
+    if not isinstance(options, list) or not options:
+        errors.append("next_actions.options must be a non-empty array")
+        return
+
+    seen = set()
+    options_by_action = {}
+    enabled_recommended = False
+    direct_repair_allowed = local_file_direct_repair_allowed(data)
+    for index, option in enumerate(options):
+        prefix = f"next_actions.options[{index}]"
+        if not isinstance(option, dict):
+            errors.append(f"{prefix} must be an object")
+            continue
+        action = option.get("action")
+        if action not in NEXT_ACTIONS - {"accept"}:
+            errors.append(f"{prefix}.action must be one of {sorted(NEXT_ACTIONS - {'accept'})}")
+            continue
+        if action in seen:
+            errors.append(f"next_actions.options has duplicate action: {action}")
+        seen.add(action)
+        options_by_action[action] = option
+        enabled = option.get("enabled")
+        if not isinstance(enabled, bool):
+            errors.append(f"{prefix}.enabled must be a boolean")
+            enabled = False
+        if enabled and action == recommended:
+            enabled_recommended = True
+        if not enabled and not has_text(option.get("disabled_reason")):
+            errors.append(f"{prefix}.disabled_reason is required when disabled")
+        if action == "direct_repair" and enabled and not direct_repair_allowed:
+            errors.append("direct_repair cannot be enabled without supported editable local_file evidence")
+        if action in {"external_prompt", "revise_spec", "regenerate_from_spec"} and enabled:
+            if not has_text(option.get("next_copy_source")):
+                errors.append(f"{prefix}.next_copy_source is required when enabled")
+
+    missing = REQUIRED_NON_ACCEPT_ACTIONS - seen
+    for action in sorted(missing):
+        errors.append(f"next_actions.options missing action: {action}")
+    if recommended and not enabled_recommended:
+        errors.append("next_actions.recommended_next_action must name an enabled option")
+
+    if decision == "revise_brief_then_regenerate":
+        if recommended != "revise_spec":
+            errors.append("revise_brief_then_regenerate must recommend revise_spec")
+        revise_option = options_by_action.get("revise_spec") if isinstance(options_by_action.get("revise_spec"), dict) else {}
+        if revise_option.get("enabled") is not True:
+            errors.append("revise_spec must be enabled when decision is revise_brief_then_regenerate")
+
+        revision_bases = [
+            review_path.parent,
+            brief_path.parent if brief_path else review_path.parent.parent,
+            Path.cwd(),
+            repo_root(),
+        ]
+        recommended_sources = [
+            next_actions.get("next_copy_source"),
+            revise_option.get("next_copy_source"),
+        ]
+        copy_source = data.get("design_spec_revision_path") or next((source for source in recommended_sources if has_text(source)), "")
+        if not has_text(copy_source):
+            errors.append("design_spec_revision_path or revise_spec next_copy_source is required for revise_brief_then_regenerate")
+        else:
+            resolved_copy_source = resolve_existing_path(copy_source, revision_bases)
+            if not resolved_copy_source:
+                errors.append(f"design spec revision source does not resolve: {copy_source} (tried bases: {describe_bases(revision_bases)})")
+            else:
+                for source in recommended_sources:
+                    if has_text(source) and resolve_existing_path(source, revision_bases) != resolved_copy_source:
+                        errors.append("revise_spec next_copy_source must resolve to the design spec revision source")
 
 
 def validate_visual(data, errors):
@@ -278,6 +387,7 @@ def validate_review(path):
     validate_findings(data, errors)
     validate_prompt(data, errors)
     validate_visual(data, errors)
+    validate_next_actions(data, errors, review_path, brief_path)
 
     if decision == "revise_brief_then_regenerate":
         revision_bases = [

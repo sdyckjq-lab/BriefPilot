@@ -3,12 +3,13 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "/bp 帮我做一个 AI 搜索产品官网，先别直接写页面，帮我整理成可复用 brief、DESIGN.md 和给设计工具用的提示词。",
-      "expected_output": "The agent treats /bp as the short form of /briefpilot and routes the original request into the full BriefPilot workflow.",
+      "prompt": "/bp 帮我做一个 AI 搜索产品官网，先别直接写页面，帮我整理成 START_HERE.md、design-spec.md、DESIGN.md，提示词有需要再导出。",
+      "expected_output": "The agent treats /bp as the short form of /briefpilot and routes the original request into the full BriefPilot design collaboration workflow.",
       "files": [],
       "expectations": [
         "The response states that /bp uses the same BriefPilot workflow as /briefpilot.",
         "The original AI search landing page request is preserved.",
+        "The response points ordinary users to design-spec.md first and treats platform prompts as optional exports.",
         "The agent does not invent a separate bp-only workflow.",
         "The user-facing plan or output remains Chinese-first."
       ]
@@ -16,11 +17,12 @@
     {
       "id": 2,
       "prompt": "/bp 我已经有生成结果，帮我按之前 brief 看看哪里要改",
-      "expected_output": "The agent routes a generated-result review request through BriefPilot's result-review workflow.",
+      "expected_output": "The agent routes a generated-result review request through BriefPilot's review-only result-review workflow.",
       "files": [],
       "expectations": [
         "The response asks for or uses the source brief package before formal review.",
         "The response recognizes this as a generated-result review task.",
+        "The response mentions review-next-actions.md and does not edit files without explicit confirmation.",
         "The response does not generate a new page directly.",
         "The user-facing guidance is Chinese-first."
       ]
