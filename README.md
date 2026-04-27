@@ -122,6 +122,16 @@ python3 scripts/validate_skill_commands.py
 python3 scripts/package_briefpilot_skills.py --out-dir dist
 ```
 
+给自动化或代理读取时，可以显式输出 JSON：
+
+```text
+python3 scripts/validate_release_metadata.py --format json
+python3 scripts/validate_skill_commands.py --format json
+python3 scripts/package_briefpilot_skills.py --dry-run --format json --out-dir <output-dir>
+```
+
+JSON 输出会包含 `ok`、`kind`、`findings` 和 `message`。打包脚本还会给出目标版本、当前安装版本、计划或实际生成的 `.skill` 文件、安装目录和是否完成安装。默认仍是普通文本输出。
+
 生成后会得到：
 
 ```text

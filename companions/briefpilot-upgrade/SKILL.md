@@ -45,6 +45,16 @@ python3 scripts/validate_skill_commands.py
 python3 scripts/package_briefpilot_skills.py --out-dir dist
 ```
 
+如果需要让代理或脚本读取结果，显式加 JSON 输出：
+
+```text
+python3 scripts/validate_release_metadata.py --format json
+python3 scripts/validate_skill_commands.py --format json
+python3 scripts/package_briefpilot_skills.py --dry-run --format json --out-dir <output-dir>
+```
+
+JSON 里的 `ok` 表示成功或失败，`findings` 列出失败原因。打包脚本还会报告目标版本、当前安装版本、计划产物、实际产物、安装目录和是否完成安装。
+
 需要修复某个 Skill 目录时，先在临时目录验证，再使用：
 
 ```text

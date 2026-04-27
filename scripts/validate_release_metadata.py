@@ -211,15 +211,43 @@ def load_manifest(path, findings):
     return None
 
 
+def emit_json(payload):
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
+def result_payload(root, findings):
+    ok = not findings
+    message = "valid BriefPilot release metadata" if ok else "invalid BriefPilot release metadata"
+    return {
+        "ok": ok,
+        "kind": "validate_release_metadata",
+        "root": str(Path(root).resolve()),
+        "findings": findings,
+        "message": message,
+    }
+
+
 def parse_args(argv):
     parser = argparse.ArgumentParser(description="Validate BriefPilot release metadata.")
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT, help="BriefPilot repository root.")
+    parser.add_argument(
+        "--format",
+        choices=("text", "json"),
+        default="text",
+        dest="output_format",
+        help="Output format. Defaults to text.",
+    )
     return parser.parse_args(argv)
 
 
 def main(argv=None):
     args = parse_args(argv or sys.argv[1:])
     findings = validate(args.root)
+    payload = result_payload(args.root, findings)
+    if args.output_format == "json":
+        emit_json(payload)
+        return 0 if payload["ok"] else 1
+
     if findings:
         print("invalid BriefPilot release metadata:")
         for finding in findings:

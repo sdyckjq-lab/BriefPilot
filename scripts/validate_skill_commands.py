@@ -364,11 +364,36 @@ def validate_dist(dist_dir, source_root=DEFAULT_ROOT):
     return findings
 
 
+def emit_json(payload):
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
+def result_payload(args, findings):
+    ok = not findings
+    message = "valid BriefPilot command package" if ok else "invalid BriefPilot command package"
+    return {
+        "ok": ok,
+        "kind": "validate_skill_commands",
+        "root": str(Path(args.root).resolve()),
+        "installed_dir": str(Path(args.installed_dir).resolve()) if args.installed_dir else None,
+        "dist_dir": str(Path(args.dist_dir).resolve()) if args.dist_dir else None,
+        "findings": findings,
+        "message": message,
+    }
+
+
 def parse_args(argv):
     parser = argparse.ArgumentParser(description="Validate BriefPilot command Skill packaging.")
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT, help="Repository root to validate.")
     parser.add_argument("--installed-dir", type=Path, help="Validate an installed skills directory.")
     parser.add_argument("--dist-dir", type=Path, help="Validate generated .skill artifacts.")
+    parser.add_argument(
+        "--format",
+        choices=("text", "json"),
+        default="text",
+        dest="output_format",
+        help="Output format. Defaults to text.",
+    )
     return parser.parse_args(argv)
 
 
@@ -384,6 +409,11 @@ def main(argv=None):
         findings.extend(validate_installed(args.installed_dir, expected_version=expected_version))
     if args.dist_dir:
         findings.extend(validate_dist(args.dist_dir, args.root))
+
+    payload = result_payload(args, findings)
+    if args.output_format == "json":
+        emit_json(payload)
+        return 0 if payload["ok"] else 1
 
     if findings:
         print("invalid BriefPilot command package:")

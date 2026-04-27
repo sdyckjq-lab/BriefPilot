@@ -248,6 +248,11 @@ def downgrade_refusal_for_install(install_dir, target_version, allow_downgrade):
     return None
 
 
+def current_installed_version(install_dir):
+    installed_versions = installed_briefpilot_versions(install_dir)
+    return highest_version(installed_versions) if installed_versions else None
+
+
 def install_staged(staging_root, install_dir):
     install_dir = Path(install_dir).resolve()
     if not can_write_install_dir(install_dir):
@@ -303,6 +308,69 @@ def install_staged(staging_root, install_dir):
         return False
 
 
+def output_mode(args):
+    if args.dry_run:
+        return "dry_run"
+    if args.install_dir:
+        return "install"
+    return "package"
+
+
+def optional_path(path):
+    return str(Path(path).resolve()) if path else None
+
+
+def path_list(paths):
+    return [str(Path(path).resolve()) for path in paths]
+
+
+def safe_target_version(root):
+    try:
+        return validate_release_metadata.read_version(root)
+    except OSError:
+        return None
+
+
+def package_result_payload(
+    args,
+    ok,
+    message,
+    findings=None,
+    target_version=None,
+    current_version=None,
+    installed=False,
+    artifacts=None,
+    planned_artifacts=None,
+):
+    return {
+        "ok": ok,
+        "kind": "package_briefpilot_skills",
+        "mode": output_mode(args),
+        "target_version": target_version,
+        "current_version": current_version,
+        "downgrade_allowed": bool(args.allow_downgrade),
+        "installed": bool(installed),
+        "install_dir": optional_path(args.install_dir),
+        "artifacts": path_list(artifacts or []),
+        "planned_artifacts": path_list(planned_artifacts or []),
+        "findings": findings or [],
+        "message": message,
+    }
+
+
+def emit_json(payload):
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
+def emit_result(args, payload, text_lines):
+    if args.output_format == "json":
+        emit_json(payload)
+    else:
+        for line in text_lines:
+            print(line)
+    return 0 if payload["ok"] else 1
+
+
 def parse_args(argv):
     parser = argparse.ArgumentParser(description="Package BriefPilot command Skills.")
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT, help="BriefPilot repository root.")
@@ -311,20 +379,37 @@ def parse_args(argv):
     parser.add_argument("--install-dir", type=Path, help="Optional skills directory to repair or refresh.")
     parser.add_argument("--allow-downgrade", action="store_true", help="Allow --install-dir to replace a newer installed version.")
     parser.add_argument("--dry-run", action="store_true", help="Validate and show planned outputs without writing packages.")
+    parser.add_argument(
+        "--format",
+        choices=("text", "json"),
+        default="text",
+        dest="output_format",
+        help="Output format. Defaults to text.",
+    )
     return parser.parse_args(argv)
 
 
 def main(argv=None):
     args = parse_args(argv or sys.argv[1:])
     root = args.root.resolve()
+    target_version = safe_target_version(root)
+    current_version = current_installed_version(args.install_dir) if args.install_dir else None
 
     prechecked_staging_root = None
     if args.staging_dir:
         try:
             prechecked_staging_root = ensure_safe_staging_dir(root, args.staging_dir)
         except ValueError as error:
-            print(error)
-            return 1
+            message = str(error)
+            payload = package_result_payload(
+                args,
+                ok=False,
+                message=message,
+                findings=[message],
+                target_version=target_version,
+                current_version=current_version,
+            )
+            return emit_result(args, payload, [message])
 
     findings = validate_skill_commands.validate_source(root)
     if git_value(root, "rev-parse", "HEAD") == "unknown":
@@ -332,10 +417,16 @@ def main(argv=None):
     elif git_dirty(root) and not os.environ.get("BRIEFPILOT_ALLOW_DIRTY_PACKAGE"):
         findings.append("source worktree has uncommitted or untracked files; commit or ignore them before packaging")
     if findings:
-        print("invalid BriefPilot source package:")
-        for finding in findings:
-            print(f"- {finding}")
-        return 1
+        message = "invalid BriefPilot source package"
+        payload = package_result_payload(
+            args,
+            ok=False,
+            message=message,
+            findings=findings,
+            target_version=target_version,
+            current_version=current_version,
+        )
+        return emit_result(args, payload, [f"{message}:", *[f"- {finding}" for finding in findings]])
 
     staging_context = None
     if args.staging_dir:
@@ -348,18 +439,31 @@ def main(argv=None):
         try:
             stage_skills(root, staging_root)
         except ValueError as error:
-            print(error)
-            return 1
+            message = str(error)
+            payload = package_result_payload(
+                args,
+                ok=False,
+                message=message,
+                findings=[message],
+                target_version=target_version,
+                current_version=current_version,
+            )
+            return emit_result(args, payload, [message])
 
         installed_findings = validate_skill_commands.validate_installed(staging_root)
         if installed_findings:
-            print("invalid staged BriefPilot command package:")
-            for finding in installed_findings:
-                print(f"- {finding}")
-            return 1
+            message = "invalid staged BriefPilot command package"
+            payload = package_result_payload(
+                args,
+                ok=False,
+                message=message,
+                findings=installed_findings,
+                target_version=target_version,
+                current_version=current_version,
+            )
+            return emit_result(args, payload, [f"{message}:", *[f"- {finding}" for finding in installed_findings]])
 
         planned = [args.out_dir / f"{command}.skill" for command in COMMANDS]
-        target_version = validate_release_metadata.read_version(root)
         downgrade_refusal = None
         if args.install_dir:
             downgrade_refusal = downgrade_refusal_for_install(
@@ -368,45 +472,87 @@ def main(argv=None):
                 args.allow_downgrade,
             )
         if downgrade_refusal:
-            print(downgrade_refusal)
-            return 1
+            payload = package_result_payload(
+                args,
+                ok=False,
+                message=downgrade_refusal,
+                findings=[downgrade_refusal],
+                target_version=target_version,
+                current_version=current_version,
+                planned_artifacts=planned,
+            )
+            return emit_result(args, payload, [downgrade_refusal])
 
         if args.dry_run:
-            print("valid BriefPilot command package")
-            print("planned artifacts:")
-            for path in planned:
-                print(f"- {path}")
+            message = "valid BriefPilot command package"
+            text_lines = [message, "planned artifacts:", *[f"- {path}" for path in planned]]
             if args.install_dir:
-                print(f"planned install dir: {args.install_dir}")
-            return 0
+                text_lines.append(f"planned install dir: {args.install_dir}")
+            payload = package_result_payload(
+                args,
+                ok=True,
+                message=message,
+                target_version=target_version,
+                current_version=current_version,
+                planned_artifacts=planned,
+            )
+            return emit_result(args, payload, text_lines)
 
         archives = package_staged(staging_root, args.out_dir)
         dist_findings = validate_skill_commands.validate_dist(args.out_dir, root)
         if dist_findings:
-            print("invalid generated .skill artifacts:")
-            for finding in dist_findings:
-                print(f"- {finding}")
-            return 1
+            message = "invalid generated .skill artifacts"
+            payload = package_result_payload(
+                args,
+                ok=False,
+                message=message,
+                findings=dist_findings,
+                target_version=target_version,
+                current_version=current_version,
+                artifacts=archives,
+            )
+            return emit_result(args, payload, [f"{message}:", *[f"- {finding}" for finding in dist_findings]])
 
         installed = False
+        install_fallback_message = None
         if args.install_dir:
             installed = install_staged(staging_root, args.install_dir)
             if installed:
                 install_findings = validate_skill_commands.validate_installed(args.install_dir)
                 if install_findings:
-                    print("invalid repaired install:")
-                    for finding in install_findings:
-                        print(f"- {finding}")
-                    return 1
+                    message = "invalid repaired install"
+                    payload = package_result_payload(
+                        args,
+                        ok=False,
+                        message=message,
+                        findings=install_findings,
+                        target_version=target_version,
+                        current_version=current_version,
+                        installed=True,
+                        artifacts=archives,
+                    )
+                    return emit_result(args, payload, [f"{message}:", *[f"- {finding}" for finding in install_findings]])
             else:
-                print("install dir is not writable or not safely replaceable; generated .skill artifacts instead")
+                install_fallback_message = "install dir is not writable or not safely replaceable; generated .skill artifacts instead"
 
-        print("packaged BriefPilot command Skills:")
-        for archive in archives:
-            print(f"- {archive}")
+        message = install_fallback_message or "packaged BriefPilot command Skills"
+        text_lines = []
+        if install_fallback_message:
+            text_lines.append(install_fallback_message)
+        text_lines.append("packaged BriefPilot command Skills:")
+        text_lines.extend(f"- {archive}" for archive in archives)
         if args.install_dir and installed:
-            print(f"installed command Skills to: {args.install_dir}")
-        return 0
+            text_lines.append(f"installed command Skills to: {args.install_dir}")
+        payload = package_result_payload(
+            args,
+            ok=True,
+            message=message,
+            target_version=target_version,
+            current_version=current_version,
+            installed=installed,
+            artifacts=archives,
+        )
+        return emit_result(args, payload, text_lines)
     finally:
         if staging_context is not None:
             staging_context.cleanup()
