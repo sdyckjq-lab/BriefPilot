@@ -30,11 +30,37 @@
     "notes": ""
   },
   "brief_revision_path": "",
+  "design_spec_revision_path": "",
   "prompt_intent": "targeted_modification",
   "prompt": {
     "keep": [],
     "change": [],
     "do_not_change": [],
     "acceptance_checks": []
+  },
+  "next_actions": {
+    "recommended_next_action": "external_prompt",
+    "reason": "",
+    "next_copy_source": "",
+    "options": [
+      {
+        "action": "direct_repair",
+        "enabled": false,
+        "disabled_reason": "",
+        "next_copy_source": ""
+      },
+      {
+        "action": "external_prompt",
+        "enabled": true,
+        "disabled_reason": "",
+        "next_copy_source": ""
+      },
+      {
+        "action": "revise_spec",
+        "enabled": false,
+        "disabled_reason": "",
+        "next_copy_source": ""
+      }
+    ]
   }
 }

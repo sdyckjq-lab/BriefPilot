@@ -2,7 +2,9 @@
 
 ## Use When
 
-Exporting to Claude Design for visual artifacts, variants, and iterative tweak work.
+The user has already chosen Claude Design, or `START_HERE.md` recommends Claude Design because the desired result is visual exploration, variants, or iterative direction work.
+
+If the user is unsure, do not export this first. Tell them to copy `design-spec.md`.
 
 ## Emphasize
 

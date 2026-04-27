@@ -6,21 +6,21 @@ from pathlib import Path
 import check_design_md
 import export_prompt
 import language_checks
+import validate_user_flow_package
 
 
 REQUIRED_FILES = [
     "input.txt",
+    "START_HERE.md",
     "diagnosis-and-strategies.md",
     "assumptions.md",
+    "design-spec.md",
     "design-brief.md",
     "design-brief.json",
     "DESIGN.md",
     "review-checklist.md",
     "reviews/design-md-review.md",
     "reviews/design-md-review.json",
-    "prompts/claude-design.txt",
-    "prompts/huashu-design.txt",
-    "prompts/v0.txt",
 ]
 
 PROMPTS = [
@@ -222,6 +222,7 @@ def main(argv):
         findings.append("selected visual strategy is not present in strategy_options")
 
     check_content_language(brief, findings)
+    findings.extend(validate_user_flow_package.validate_package(example_dir))
     check_assumptions(example_dir, brief, findings)
     check_brief_links(example_dir, brief, findings)
     check_interaction_and_accessibility(brief, findings)

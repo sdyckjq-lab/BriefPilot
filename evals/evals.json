@@ -4,24 +4,26 @@
     {
       "id": 1,
       "prompt": "/briefpilot 帮我做一个 AI 搜索产品官网",
-      "expected_output": "The agent uses BriefPilot to structure a reusable Chinese-first design brief workflow rather than directly generating the final website.",
+      "expected_output": "The agent uses BriefPilot to structure a reusable Chinese-first design collaboration package with START_HERE.md and design-spec.md rather than directly generating the final website.",
       "files": [],
       "expectations": [
         "The response starts from diagnosis, assumptions or focused questions, and design strategy.",
-        "The response plans or creates design-brief.md, design-brief.json, DESIGN.md, target prompts, and review-checklist.md.",
+        "The response plans or creates START_HERE.md, design-spec.md, design-brief.md, design-brief.json, DESIGN.md, and review-checklist.md.",
+        "The response says ordinary users should copy design-spec.md first, with platform prompts as optional exports.",
         "The response keeps user-visible content Chinese-first.",
         "The response does not jump straight to final HTML unless the user explicitly asks."
       ]
     },
     {
       "id": 2,
-      "prompt": "/briefpilot 我把生成结果摘要贴给你：页面像普通 SaaS 官网，来源证据和可信度不明显。请按之前 brief 评审并给修改提示。",
-      "expected_output": "The agent recognizes generated-result review mode and asks for or uses the source brief package before producing formal review artifacts.",
+      "prompt": "/briefpilot 我把生成结果摘要贴给你：页面像普通 SaaS 官网，来源证据和可信度不明显。请按之前 brief 评审，先不要改文件。",
+      "expected_output": "The agent recognizes generated-result review mode, keeps the request review-only, and asks for or uses the source brief package before producing formal review artifacts.",
       "files": [],
       "expectations": [
         "The response identifies this as post-generation result review.",
-        "The response requires design-brief.json and the linked DESIGN.md before a formal report.",
-        "The response mentions result-review.md, result-review.json, and modification prompts as expected outputs.",
+        "The response requires design-brief.json, design-spec.md when available, and the linked DESIGN.md before a formal report.",
+        "The response mentions result-review.md, result-review.json, and review-next-actions.md as expected outputs.",
+        "The response does not edit local files or source package files for a review-only request.",
         "The response remains Chinese-first."
       ]
     },
@@ -32,8 +34,8 @@
       "files": [],
       "expectations": [
         "The response asks for or reads the existing DESIGN.md.",
-        "The response says the new brief should reference the existing visual system.",
-        "The response still produces a reusable brief package and target prompts.",
+        "The response says the new brief and design-spec.md should reference the existing visual system.",
+        "The response still produces a reusable package with START_HERE.md and design-spec.md, while target prompts remain optional.",
         "The response keeps technical identifiers in English and visible copy in Simplified Chinese."
       ]
     }

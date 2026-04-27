@@ -2,7 +2,9 @@
 
 ## Use When
 
-Exporting to huashu-design for high-fidelity HTML design work.
+The user has already chosen huashu-design, or `START_HERE.md` recommends huashu-design because the desired result is a high-fidelity standalone HTML prototype.
+
+If the user is unsure, do not export this first. Tell them to copy `design-spec.md`.
 
 ## Emphasize
 

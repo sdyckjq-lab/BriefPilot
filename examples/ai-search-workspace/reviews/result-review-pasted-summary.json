@@ -70,5 +70,30 @@
       "选中来源详情面板有清楚的活动状态。",
       "所有修改继续遵循 DESIGN.md 的颜色、间距、圆角和来源卡片规则。"
     ]
+  },
+  "next_actions": {
+    "recommended_next_action": "external_prompt",
+    "reason": "本次证据只有粘贴摘要，没有可直接编辑的本地生成文件；最安全的下一步是复制一份外部工具修改提示。",
+    "next_copy_source": "prompts/huashu-design-modification.txt",
+    "options": [
+      {
+        "action": "direct_repair",
+        "enabled": false,
+        "disabled_reason": "本次只提供粘贴摘要，没有可编辑本地文件路径。",
+        "next_copy_source": ""
+      },
+      {
+        "action": "external_prompt",
+        "enabled": true,
+        "disabled_reason": "",
+        "next_copy_source": "prompts/huashu-design-modification.txt"
+      },
+      {
+        "action": "revise_spec",
+        "enabled": false,
+        "disabled_reason": "问题主要来自生成执行偏差，原始 design-spec.md 不需要先修订。",
+        "next_copy_source": ""
+      }
+    ]
   }
 }

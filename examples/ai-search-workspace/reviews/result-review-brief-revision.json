@@ -47,6 +47,7 @@
     "notes": "本地文件评审没有提供视觉证据；判断依据是 HTML 内容和已保存 brief 包。"
   },
   "brief_revision_path": "brief-revision.md",
+  "design_spec_revision_path": "reviews/design-spec-revision.md",
   "prompt_intent": "brief_revision_regeneration",
   "prompt": {
     "keep": [
@@ -70,6 +71,31 @@
       "来源卡片展示新鲜度或冲突状态。",
       "来源详情面板解释争议证据，并提供恢复路径。",
       "重新生成结果仍然遵循 DESIGN.md 视觉规则。"
+    ]
+  },
+  "next_actions": {
+    "recommended_next_action": "revise_spec",
+    "reason": "生成结果暴露的是源 brief/spec 缺口；先复制修订后的设计规范重新生成，避免继续复制旧指导。",
+    "next_copy_source": "reviews/design-spec-revision.md",
+    "options": [
+      {
+        "action": "direct_repair",
+        "enabled": false,
+        "disabled_reason": "虽然有本地 HTML 证据，但问题根源是 brief/spec 缺失，直接修 HTML 会掩盖下一轮生成风险。",
+        "next_copy_source": ""
+      },
+      {
+        "action": "external_prompt",
+        "enabled": true,
+        "disabled_reason": "",
+        "next_copy_source": "prompts/revised-generation.txt"
+      },
+      {
+        "action": "revise_spec",
+        "enabled": true,
+        "disabled_reason": "",
+        "next_copy_source": "reviews/design-spec-revision.md"
+      }
     ]
   }
 }

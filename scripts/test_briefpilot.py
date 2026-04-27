@@ -15,6 +15,7 @@ import check_design_md as design_md_report
 import language_checks
 import validate_golden_demo
 import validate_release_metadata
+import validate_user_flow_package
 
 
 ROOT = SCRIPTS_DIR.parents[0]
@@ -31,6 +32,7 @@ EXPORT_MODIFICATION = ROOT / "scripts" / "export_modification_prompt.py"
 STYLE_INDEX = ROOT / "references" / "design-style-index.json"
 CHECK_DESIGN_MD = ROOT / "scripts" / "check_design_md.py"
 VALIDATE_PUBLIC_PACKAGE = ROOT / "scripts" / "validate_public_package.py"
+VALIDATE_USER_FLOW = ROOT / "scripts" / "validate_user_flow_package.py"
 VALIDATE_RELEASE_METADATA = ROOT / "scripts" / "validate_release_metadata.py"
 VALIDATE_SKILL_COMMANDS = ROOT / "scripts" / "validate_skill_commands.py"
 PACKAGE_BRIEFPILOT_SKILLS = ROOT / "scripts" / "package_briefpilot_skills.py"
@@ -65,6 +67,7 @@ Use restrained blue accents, dense but readable panels, 8px default radius, clea
     (package / "empty.md").write_text("   ", encoding="utf-8")
     (package / "generated.png").write_text("not really an image", encoding="utf-8")
     (package / "brief-revision.md").write_text("# Brief Revision\n\nAdd source disagreement recovery.", encoding="utf-8")
+    (package / "design-spec-revision.md").write_text("# Design Spec Revision\n\nAdd source disagreement recovery.", encoding="utf-8")
     (package / "other-DESIGN.md").write_text("# Other DESIGN.md\n\nWrong package.", encoding="utf-8")
     return package
 
@@ -101,6 +104,31 @@ def base_review(**overrides):
             "change": ["Make source cards visible and clickable."],
             "do_not_change": ["Do not change the approved visual system."],
             "acceptance_checks": ["Source cards are visible without competing with the answer."],
+        },
+        "next_actions": {
+            "recommended_next_action": "external_prompt",
+            "reason": "Only pasted evidence was provided, so an external modification prompt is the safe next step.",
+            "next_copy_source": "prompt.txt",
+            "options": [
+                {
+                    "action": "direct_repair",
+                    "enabled": False,
+                    "disabled_reason": "No editable local result file was provided.",
+                    "next_copy_source": "",
+                },
+                {
+                    "action": "external_prompt",
+                    "enabled": True,
+                    "disabled_reason": "",
+                    "next_copy_source": "prompt.txt",
+                },
+                {
+                    "action": "revise_spec",
+                    "enabled": False,
+                    "disabled_reason": "The source spec does not need revision for this finding.",
+                    "next_copy_source": "",
+                },
+            ],
         },
     }
     for key, value in overrides.items():
@@ -962,6 +990,61 @@ class BriefPilotScriptTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
         self.assertIn("valid", result.stdout.lower())
 
+    def test_user_flow_package_validator_accepts_examples(self):
+        for example_dir in [EXAMPLE_DIR, WORKSPACE_DIR]:
+            result = subprocess.run(
+                [sys.executable, str(VALIDATE_USER_FLOW), str(example_dir)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, example_dir.name + result.stderr + result.stdout)
+            self.assertFalse(validate_user_flow_package.validate_package(example_dir))
+
+        result = subprocess.run(
+            [sys.executable, str(VALIDATE_USER_FLOW), str(WORKSPACE_DIR), "--require-review"],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+
+    def test_user_flow_package_rejects_missing_copy_guidance(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            copied = Path(tmp) / "landing"
+            shutil.copytree(EXAMPLE_DIR, copied)
+            start = copied / "START_HERE.md"
+            start.write_text(start.read_text(encoding="utf-8").replace("复制整个", "阅读"), encoding="utf-8")
+
+            result = subprocess.run(
+                [sys.executable, str(VALIDATE_USER_FLOW), str(copied)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("START_HERE.md missing required guidance phrase", result.stdout + result.stderr)
+
+    def test_golden_demo_accepts_default_package_without_optional_prompt_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            copied = Path(tmp) / "landing"
+            shutil.copytree(EXAMPLE_DIR, copied)
+            report = design_md_report.build_report((copied / "DESIGN.md").resolve(), requested_mode="fallback", official_command=None)
+            design_md_report.write_report(
+                report,
+                copied / "reviews" / "design-md-review.md",
+                copied / "reviews" / "design-md-review.json",
+            )
+            shutil.rmtree(copied / "prompts")
+
+            result = subprocess.run(
+                [sys.executable, str(ROOT / "scripts" / "validate_golden_demo.py"), str(copied)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+
     def test_validate_workspace_brief_and_design_md(self):
         result = subprocess.run(
             [sys.executable, str(ROOT / "scripts" / "validate_brief.py"), str(WORKSPACE_EXAMPLE)],
@@ -1307,6 +1390,7 @@ class BriefPilotScriptTests(unittest.TestCase):
 
         self.assertIn("references/result-review-workflow.md", skill)
         self.assertIn("references/visual-review-routing.md", skill)
+        self.assertIn("references/capability-boundaries.md", skill)
         for decision in ["accept", "tweak", "revise_brief_then_regenerate", "regenerate_from_scratch"]:
             self.assertIn(decision, workflow)
         self.assertIn("pasted_summary", workflow)
@@ -1315,6 +1399,7 @@ class BriefPilotScriptTests(unittest.TestCase):
         self.assertIn("available_gstack", visual)
         self.assertIn("not block text or file review", visual)
         self.assertIn("reviews/result-review.json", asset_layout)
+        self.assertIn("reviews/review-next-actions.md", asset_layout)
         self.assertIn("prompts/<target>-modification.txt", asset_layout)
 
     def test_docs_describe_design_md_checks_without_silent_install(self):
@@ -2448,7 +2533,20 @@ class BriefPilotScriptTests(unittest.TestCase):
 
         self.assertIn("## DESIGN.md 参考", brief_template)
         self.assertNotIn("## DESIGN.md Reference", brief_template)
-        for field in ["schema_version", "source", "target_tool", "evidence", "decision", "selected_strategy", "strategy_preserved", "findings", "visual_review", "prompt"]:
+        for field in [
+            "schema_version",
+            "source",
+            "target_tool",
+            "evidence",
+            "decision",
+            "selected_strategy",
+            "strategy_preserved",
+            "findings",
+            "visual_review",
+            "prompt",
+            "next_actions",
+            "design_spec_revision_path",
+        ]:
             self.assertIn(field, review_template)
         for value in ["pasted_summary", "local_file", "screenshot_reference", "gstack_report"]:
             self.assertIn(value, workflow)
@@ -2462,6 +2560,10 @@ class BriefPilotScriptTests(unittest.TestCase):
         self.assertIn("What To Change", prompt_template)
         self.assertIn("What Not To Change", prompt_template)
         self.assertIn("除非已经实际保存更新后的 brief 文件，否则不要暗示完整 brief 已经被重写", revision_template)
+        self.assertIn("review-next-actions.md", workflow)
+        self.assertIn("direct_repair", workflow)
+        self.assertIn("external_prompt", workflow)
+        self.assertIn("revise_spec", workflow)
 
     def test_validate_pasted_summary_review_and_export_prompt(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -2519,12 +2621,38 @@ class BriefPilotScriptTests(unittest.TestCase):
                 },
                 decision="revise_brief_then_regenerate",
                 brief_revision_path="brief-revision.md",
+                design_spec_revision_path="design-spec-revision.md",
                 prompt_intent="brief_revision_regeneration",
                 prompt={
                     "keep": ["Keep dense answer and source layout."],
                     "change": ["Add source disagreement and expired-source recovery guidance."],
                     "do_not_change": ["Do not change the visual system."],
                     "acceptance_checks": ["Conflicting sources have a visible explanation path."],
+                },
+                next_actions={
+                    "recommended_next_action": "revise_spec",
+                    "reason": "The source spec needs new disagreement handling before regeneration.",
+                    "next_copy_source": "design-spec-revision.md",
+                    "options": [
+                        {
+                            "action": "direct_repair",
+                            "enabled": False,
+                            "disabled_reason": "The defect is a source spec gap, not only a local HTML issue.",
+                            "next_copy_source": "",
+                        },
+                        {
+                            "action": "external_prompt",
+                            "enabled": True,
+                            "disabled_reason": "",
+                            "next_copy_source": "prompt.txt",
+                        },
+                        {
+                            "action": "revise_spec",
+                            "enabled": True,
+                            "disabled_reason": "",
+                            "next_copy_source": "design-spec-revision.md",
+                        },
+                    ],
                 },
                 visual_review={"status": "not_provided", "notes": "No visual evidence was supplied."},
             )
@@ -2544,6 +2672,7 @@ class BriefPilotScriptTests(unittest.TestCase):
             )
             accept.pop("prompt_intent")
             accept.pop("prompt")
+            accept.pop("next_actions")
             accept_path = write_review(package / "accept.json", accept)
             result = subprocess.run(
                 [sys.executable, str(VALIDATE_REVIEW), str(accept_path)],
@@ -2598,9 +2727,40 @@ class BriefPilotScriptTests(unittest.TestCase):
             (package / "brief-without-strategy.json").write_text(json.dumps(missing_strategy_brief), encoding="utf-8")
             (package / "array-brief.json").write_text("[]", encoding="utf-8")
             (package / "bad-encoding.md").write_bytes(b"\xff")
+            missing_next_actions = base_review()
+            missing_next_actions.pop("next_actions")
+            unsafe_direct_repair = base_review(
+                next_actions={
+                    "recommended_next_action": "direct_repair",
+                    "reason": "Try to edit without local source.",
+                    "next_copy_source": "",
+                    "options": [
+                        {
+                            "action": "direct_repair",
+                            "enabled": True,
+                            "disabled_reason": "",
+                            "next_copy_source": "",
+                        },
+                        {
+                            "action": "external_prompt",
+                            "enabled": True,
+                            "disabled_reason": "",
+                            "next_copy_source": "prompt.txt",
+                        },
+                        {
+                            "action": "revise_spec",
+                            "enabled": False,
+                            "disabled_reason": "No spec gap.",
+                            "next_copy_source": "",
+                        },
+                    ],
+                }
+            )
 
             cases = [
                 ("bad_decision.json", base_review(decision="polish"), "decision must be one of"),
+                ("missing_next_actions.json", missing_next_actions, "next_actions is required"),
+                ("unsafe_direct_repair.json", unsafe_direct_repair, "direct_repair cannot be enabled"),
                 ("missing_local_path.json", base_review(evidence={"kind": "local_file", "summary": "Missing path."}), "evidence.path is required"),
                 ("empty_local_file.json", base_review(evidence={"kind": "local_file", "summary": "Empty file.", "path": "empty.md"}), "non-whitespace content"),
                 ("bad_local_suffix.json", base_review(evidence={"kind": "local_file", "summary": "Bad suffix.", "path": "generated.png"}), "unsupported suffix"),

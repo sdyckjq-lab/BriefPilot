@@ -35,7 +35,17 @@
 - 决定：tweak
 - 策略是否保留：true
 - 提示意图：targeted_modification
+- 推荐下一步：external_prompt
+- 下一步原因：本次证据只有粘贴摘要，没有可直接编辑的本地生成文件；最安全的下一步是复制一份外部工具修改提示。
 
 ## 下一轮提示摘要
 
 保留“密集研究工作台”和 DESIGN.md 视觉系统。加强来源可见性、引用到来源的连接关系，以及选中来源反馈。
+
+## 下一步选项
+
+| 动作 | 是否可用 | 不可用原因 | 下一步复制来源 |
+|---|---:|---|---|
+| direct_repair | false | 本次只提供粘贴摘要，没有可编辑本地文件路径。 |  |
+| external_prompt | true |  | `prompts/huashu-design-modification.txt` |
+| revise_spec | false | 问题主要来自生成执行偏差，原始 design-spec.md 不需要先修订。 |  |

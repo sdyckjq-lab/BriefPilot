@@ -35,6 +35,8 @@
 - 策略是否保留：{{strategy_preserved}}
 - 策略变化原因：{{strategy_change_reason}}
 - 提示意图：{{prompt_intent}}
+- 推荐下一步：{{recommended_next_action}}
+- 下一步原因：{{next_action_reason}}
 
 ## 下一轮提示摘要
 
@@ -49,3 +51,11 @@
 验收检查：
 
 - {{acceptance_check}}
+
+## 下一步选项
+
+| 动作 | 是否可用 | 不可用原因 | 下一步复制来源 |
+|---|---:|---|---|
+| direct_repair | {{direct_repair_enabled}} | {{direct_repair_disabled_reason}} | {{direct_repair_copy_source}} |
+| external_prompt | {{external_prompt_enabled}} | {{external_prompt_disabled_reason}} | {{external_prompt_copy_source}} |
+| revise_spec | {{revise_spec_enabled}} | {{revise_spec_disabled_reason}} | {{revise_spec_copy_source}} |

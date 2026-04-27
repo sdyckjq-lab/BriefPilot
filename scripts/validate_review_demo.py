@@ -9,34 +9,32 @@ import language_checks
 import validate_brief
 import validate_design_md
 import validate_result_review
+import validate_user_flow_package
 
 
 BASE_FILES = [
     "input.txt",
+    "START_HERE.md",
     "diagnosis-and-strategies.md",
     "assumptions.md",
+    "design-spec.md",
     "design-brief.md",
     "design-brief.json",
     "DESIGN.md",
     "review-checklist.md",
     "reviews/design-md-review.md",
     "reviews/design-md-review.json",
-    "prompts/huashu-design.txt",
-    "prompts/claude-design.txt",
-    "prompts/v0.txt",
 ]
 
 REVIEW_FILES = [
     "generated-results/brief-revision-case.html",
+    "reviews/review-next-actions.md",
     "reviews/result-review-pasted-summary.md",
     "reviews/result-review-pasted-summary.json",
     "reviews/result-review-brief-revision.md",
     "reviews/result-review-brief-revision.json",
     "reviews/brief-revision.md",
-    "prompts/huashu-design-modification.txt",
-    "prompts/claude-design-modification.txt",
-    "prompts/v0-modification.txt",
-    "prompts/revised-generation.txt",
+    "reviews/design-spec-revision.md",
 ]
 
 DEFAULT_CONTENT_LANGUAGE = "zh-CN"
@@ -181,6 +179,9 @@ def check_review_markdown(markdown_path, review, context, findings):
         ("prompt intent", review.get("prompt_intent")),
         ("brief revision", review.get("brief_revision_path")),
     ]
+    next_actions = review.get("next_actions") if isinstance(review.get("next_actions"), dict) else {}
+    if has_text_value(next_actions.get("recommended_next_action")):
+        expected_values.append(("recommended next action", next_actions.get("recommended_next_action")))
     for label, value in expected_values:
         if has_text_value(value) and value.lower() not in text_lower:
             findings.append(f"{relative} markdown {label} does not match JSON: {value}")
@@ -195,6 +196,8 @@ def check_review_markdown(markdown_path, review, context, findings):
 
 
 def check_modification_prompt(review_path, target, prompt_path, findings):
+    if not prompt_path.exists():
+        return
     review, context, errors = validate_result_review.validate_review(review_path)
     if errors:
         findings.extend(errors)
@@ -257,6 +260,7 @@ def main(argv):
         return 1
 
     brief = validate_result_review.load_json_object(example_dir / "design-brief.json", findings, "design-brief.json")
+    findings.extend(validate_user_flow_package.validate_package(example_dir, require_review=True))
     check_base_brief(example_dir, brief, findings)
     check_design_md(example_dir, findings)
     check_design_review_report(example_dir, brief, findings)
