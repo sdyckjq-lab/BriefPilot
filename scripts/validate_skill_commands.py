@@ -233,11 +233,14 @@ def validate_installed(install_dir, expected_version=None, expected_source_commi
         release_findings = validate_release_metadata.validate(main_dir)
         findings.extend(f"installed briefpilot {finding}" for finding in release_findings)
         if expected_version and (main_dir / "VERSION").exists():
-            installed_version = validate_release_metadata.read_version(main_dir)
-            if installed_version != expected_version:
-                findings.append(
-                    f"installed briefpilot VERSION {installed_version!r} differs from root VERSION {expected_version!r}"
-                )
+            try:
+                installed_version = validate_release_metadata.read_version(main_dir)
+                if installed_version != expected_version:
+                    findings.append(
+                        f"installed briefpilot VERSION {installed_version!r} differs from root VERSION {expected_version!r}"
+                    )
+            except (OSError, UnicodeDecodeError) as error:
+                findings.append(f"installed briefpilot VERSION is not readable: {error}")
 
     for command in ("bp", "briefpilot-upgrade"):
         skill_dir = install_dir / command
@@ -248,7 +251,7 @@ def validate_installed(install_dir, expected_version=None, expected_source_commi
     if manifest_expected_version is None and (main_dir / "VERSION").exists():
         try:
             manifest_expected_version = validate_release_metadata.read_version(main_dir)
-        except OSError:
+        except (OSError, UnicodeDecodeError):
             manifest_expected_version = None
     if manifests:
         validate_release_metadata.validate_manifest_set(
@@ -262,6 +265,10 @@ def validate_installed(install_dir, expected_version=None, expected_source_commi
 
 
 def git_commit(root):
+    root = Path(root).resolve()
+    top_level = git_root(root)
+    if top_level != root:
+        return None
     result = subprocess.run(
         ["git", "-C", str(root), "rev-parse", "HEAD"],
         text=True,
@@ -272,6 +279,19 @@ def git_commit(root):
         return None
     commit = result.stdout.strip()
     return commit if re.fullmatch(r"[0-9a-f]{40}", commit) else None
+
+
+def git_root(root):
+    result = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "--show-toplevel"],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    value = result.stdout.strip()
+    return Path(value).resolve() if value else None
 
 
 def git_commit_exists(root, commit):
@@ -307,10 +327,16 @@ def validate_dist(dist_dir, source_root=DEFAULT_ROOT):
     expected_version = None
     expected_source_commit = None
     if source_root is not None:
+        source_root = Path(source_root).resolve()
         try:
             expected_version = validate_release_metadata.read_version(source_root)
-        except OSError:
+        except (OSError, UnicodeDecodeError):
             expected_version = None
+        source_git_root = git_root(source_root)
+        if source_git_root is None:
+            findings.append("source git commit is unavailable; dist source_commit cannot be verified")
+        elif source_git_root != source_root:
+            findings.append(f"source root must be the git repository root: {source_root}")
         expected_source_commit = git_commit(source_root)
         if expected_source_commit and not git_commit_exists(source_root, expected_source_commit):
             findings.append(f"source commit does not exist locally: {expected_source_commit}")
@@ -368,13 +394,13 @@ def emit_json(payload):
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
-def result_payload(args, findings):
+def result_payload(args, root, findings):
     ok = not findings
     message = "valid BriefPilot command package" if ok else "invalid BriefPilot command package"
     return {
         "ok": ok,
         "kind": "validate_skill_commands",
-        "root": str(Path(args.root).resolve()),
+        "root": str(Path(root).resolve()) if root else None,
         "installed_dir": str(Path(args.installed_dir).resolve()) if args.installed_dir else None,
         "dist_dir": str(Path(args.dist_dir).resolve()) if args.dist_dir else None,
         "findings": findings,
@@ -384,7 +410,7 @@ def result_payload(args, findings):
 
 def parse_args(argv):
     parser = argparse.ArgumentParser(description="Validate BriefPilot command Skill packaging.")
-    parser.add_argument("--root", type=Path, default=DEFAULT_ROOT, help="Repository root to validate.")
+    parser.add_argument("--root", type=Path, help="Repository root to validate.")
     parser.add_argument("--installed-dir", type=Path, help="Validate an installed skills directory.")
     parser.add_argument("--dist-dir", type=Path, help="Validate generated .skill artifacts.")
     parser.add_argument(
@@ -399,18 +425,21 @@ def parse_args(argv):
 
 def main(argv=None):
     args = parse_args(argv or sys.argv[1:])
-    findings = validate_source(args.root)
+    root = args.root.resolve() if args.root else DEFAULT_ROOT
+    validate_source_root = args.root is not None or args.dist_dir or not args.installed_dir
+    findings = validate_source(root) if validate_source_root else []
     if args.installed_dir:
         expected_version = None
-        try:
-            expected_version = validate_release_metadata.read_version(args.root)
-        except OSError:
-            expected_version = None
+        if validate_source_root:
+            try:
+                expected_version = validate_release_metadata.read_version(root)
+            except (OSError, UnicodeDecodeError):
+                expected_version = None
         findings.extend(validate_installed(args.installed_dir, expected_version=expected_version))
     if args.dist_dir:
-        findings.extend(validate_dist(args.dist_dir, args.root))
+        findings.extend(validate_dist(args.dist_dir, root))
 
-    payload = result_payload(args, findings)
+    payload = result_payload(args, root if validate_source_root or args.root else None, findings)
     if args.output_format == "json":
         emit_json(payload)
         return 0 if payload["ok"] else 1

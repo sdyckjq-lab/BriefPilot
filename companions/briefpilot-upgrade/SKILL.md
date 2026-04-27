@@ -18,6 +18,8 @@ description: Upgrade, repair, or package an installed BriefPilot Skill command b
 4. 找到完整源码目录：优先使用用户提供的本地 BriefPilot 仓库；否则在来源可信时使用官方仓库；同版本修复优先使用 manifest 里的完整 40 位 `source_commit` 固定来源。没有固定来源时，只能作为刷新或升级处理，先读取源码 `VERSION` 再决定。
 5. 不要把已安装的 `briefpilot` 目录直接当作源码，除非它包含 `companions/`、`evals/`、`.gitignore` 和三个命令包脚本，并且通过源码校验。已安装主 Skill 通常只包含运行资源，不是完整源码。
 6. 在完整源码目录先运行 release metadata 校验和命令包校验。
+   - 源码目录必须是 BriefPilot 的 Git 仓库根目录，不能是另一个仓库里的子目录。
+   - 正式打包前工作区必须干净，不能把未提交内容写进带提交号的安装包。
 7. 读取源码 `VERSION`，用四段数字比较当前版本和目标版本：`0.10.0.0` 大于 `0.2.0.0`，`0.1.0.10` 大于 `0.1.0.2`。
 8. 向用户说明这次操作属于升级、同版本修复、刷新、第一次版本化安装，还是需要人工确认的降级。不要自动降级；只有用户明确要求时，才可以在打包命令里使用 `--allow-downgrade`。
 9. 从源码 `CHANGELOG.md` 展示目标版本的简短变更摘要；如果不能可靠摘要，就指出安装包里的 `CHANGELOG.md` 路径。

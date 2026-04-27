@@ -2,6 +2,7 @@
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -63,6 +64,36 @@ def git_value(root, *args):
     return result.stdout.strip() or "unknown"
 
 
+def git_root(root):
+    value = git_value(root, "rev-parse", "--show-toplevel")
+    if value == "unknown":
+        return None
+    return Path(value).resolve()
+
+
+def source_commit(root):
+    value = git_value(root, "rev-parse", "HEAD")
+    if not re.fullmatch(r"[0-9a-f]{40}", value):
+        return None
+    return value
+
+
+def validate_git_source(root):
+    root = Path(root).resolve()
+    findings = []
+    top_level = git_root(root)
+    if top_level is None:
+        findings.append("source git commit is unavailable; commit the release source before packaging")
+        return findings
+    if top_level != root:
+        findings.append(f"source root must be the git repository root: {root}")
+    if source_commit(root) is None:
+        findings.append("source git commit is unavailable; commit the release source before packaging")
+    if git_dirty(root):
+        findings.append("source worktree has uncommitted or untracked files; commit or ignore them before packaging")
+    return findings
+
+
 def git_dirty(root):
     result = subprocess.run(
         ["git", "-C", str(root), "status", "--porcelain", "--untracked-files=all"],
@@ -82,7 +113,7 @@ def build_manifest(root):
         "commands": list(COMMANDS),
         "package_version": validate_release_metadata.read_version(root),
         "source_remote": OFFICIAL_SOURCE_REMOTE,
-        "source_commit": git_value(root, "rev-parse", "HEAD"),
+        "source_commit": source_commit(root) or "unknown",
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
     }
 
@@ -195,12 +226,21 @@ def valid_version_or_none(version):
     return version
 
 
-def installed_briefpilot_versions(install_dir):
+def installed_briefpilot_versions(install_dir, findings=None):
     install_dir = Path(install_dir)
     versions = []
     version_path = install_dir / "briefpilot" / "VERSION"
     if version_path.exists():
-        version = valid_version_or_none(version_path.read_text(encoding="utf-8").strip())
+        try:
+            version = valid_version_or_none(version_path.read_text(encoding="utf-8").strip())
+        except UnicodeDecodeError:
+            if findings is not None:
+                findings.append(f"{version_path} is not readable UTF-8")
+            version = None
+        except OSError as error:
+            if findings is not None:
+                findings.append(f"{version_path} is not readable: {error}")
+            version = None
         if version:
             versions.append(version)
 
@@ -210,7 +250,21 @@ def installed_briefpilot_versions(install_dir):
             continue
         try:
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except UnicodeDecodeError:
+            if findings is not None:
+                findings.append(f"{manifest_path} is not readable UTF-8")
+            continue
+        except OSError as error:
+            if findings is not None:
+                findings.append(f"{manifest_path} is not readable: {error}")
+            continue
         except json.JSONDecodeError:
+            if findings is not None:
+                findings.append(f"{manifest_path} is not valid JSON")
+            continue
+        if not isinstance(manifest, dict):
+            if findings is not None:
+                findings.append(f"{manifest_path} must be a JSON object")
             continue
         version = manifest.get("package_version")
         if isinstance(version, str):
@@ -248,8 +302,8 @@ def downgrade_refusal_for_install(install_dir, target_version, allow_downgrade):
     return None
 
 
-def current_installed_version(install_dir):
-    installed_versions = installed_briefpilot_versions(install_dir)
+def current_installed_version(install_dir, findings=None):
+    installed_versions = installed_briefpilot_versions(install_dir, findings=findings)
     return highest_version(installed_versions) if installed_versions else None
 
 
@@ -327,7 +381,7 @@ def path_list(paths):
 def safe_target_version(root):
     try:
         return validate_release_metadata.read_version(root)
-    except OSError:
+    except (OSError, UnicodeDecodeError):
         return None
 
 
@@ -392,8 +446,9 @@ def parse_args(argv):
 def main(argv=None):
     args = parse_args(argv or sys.argv[1:])
     root = args.root.resolve()
+    installed_metadata_findings = []
     target_version = safe_target_version(root)
-    current_version = current_installed_version(args.install_dir) if args.install_dir else None
+    current_version = current_installed_version(args.install_dir, installed_metadata_findings) if args.install_dir else None
 
     prechecked_staging_root = None
     if args.staging_dir:
@@ -412,10 +467,8 @@ def main(argv=None):
             return emit_result(args, payload, [message])
 
     findings = validate_skill_commands.validate_source(root)
-    if git_value(root, "rev-parse", "HEAD") == "unknown":
-        findings.append("source git commit is unavailable; commit the release source before packaging")
-    elif git_dirty(root) and not os.environ.get("BRIEFPILOT_ALLOW_DIRTY_PACKAGE"):
-        findings.append("source worktree has uncommitted or untracked files; commit or ignore them before packaging")
+    findings.extend(validate_git_source(root))
+    findings.extend(installed_metadata_findings)
     if findings:
         message = "invalid BriefPilot source package"
         payload = package_result_payload(

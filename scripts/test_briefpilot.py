@@ -35,7 +35,7 @@ VALIDATE_RELEASE_METADATA = ROOT / "scripts" / "validate_release_metadata.py"
 VALIDATE_SKILL_COMMANDS = ROOT / "scripts" / "validate_skill_commands.py"
 PACKAGE_BRIEFPILOT_SKILLS = ROOT / "scripts" / "package_briefpilot_skills.py"
 DESIGN_MD_FIXTURES = ROOT / "examples" / "design-md-fixtures"
-PACKAGE_TEST_ENV = {**os.environ, "BRIEFPILOT_ALLOW_DIRTY_PACKAGE": "1"}
+PACKAGE_TEST_ENV = {**os.environ}
 
 
 def write_review_package(tmp):
@@ -155,6 +155,35 @@ def run_skill_command_validator(*args):
         capture_output=True,
         check=False,
     )
+
+
+def init_git_repo(root):
+    subprocess.run(["git", "-C", str(root), "init"], text=True, capture_output=True, check=True)
+    subprocess.run(["git", "-C", str(root), "config", "user.email", "test@example.com"], text=True, capture_output=True, check=True)
+    subprocess.run(["git", "-C", str(root), "config", "user.name", "BriefPilot Test"], text=True, capture_output=True, check=True)
+    subprocess.run(["git", "-C", str(root), "add", "."], text=True, capture_output=True, check=True)
+    subprocess.run(["git", "-C", str(root), "commit", "--allow-empty", "-m", "initial"], text=True, capture_output=True, check=True)
+
+
+def copy_committed_package_repo(tmp):
+    root = Path(tmp) / "repo"
+    shutil.copytree(
+        ROOT,
+        root,
+        ignore=shutil.ignore_patterns(".git", "dist", "__pycache__", "AGENTS.md", "docs"),
+    )
+    init_git_repo(root)
+    return root
+
+
+def package_args(root, *args):
+    return [
+        sys.executable,
+        str(Path(root) / "scripts" / "package_briefpilot_skills.py"),
+        "--root",
+        str(root),
+        *map(str, args),
+    ]
 
 
 def stdout_json(result):
@@ -1351,6 +1380,50 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertTrue(payload["findings"])
             self.assertIn("VERSION invalid", "\n".join(payload["findings"]))
 
+    def test_release_metadata_json_reports_unreadable_utf8_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "VERSION").write_text("0.1.0.0\n", encoding="utf-8")
+            (root / "CHANGELOG.md").write_bytes(b"\xff\xfe\x00")
+
+            result = subprocess.run(
+                [sys.executable, str(VALIDATE_RELEASE_METADATA), "--root", str(root), "--format", "json"],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            payload = stdout_json(result)
+            self.assertFalse(payload["ok"])
+            self.assertIn("CHANGELOG.md is not readable UTF-8", "\n".join(payload["findings"]))
+
+    def test_command_scripts_default_to_text_not_json(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
+            out_dir = Path(tmp) / "dist"
+            commands = [
+                [sys.executable, str(VALIDATE_RELEASE_METADATA)],
+                [sys.executable, str(VALIDATE_SKILL_COMMANDS)],
+                package_args(root, "--dry-run", "--out-dir", out_dir),
+            ]
+
+            first_lines = [
+                "valid BriefPilot release metadata",
+                "valid BriefPilot command package",
+                "valid BriefPilot command package",
+            ]
+            for command, first_line in zip(commands, first_lines):
+                result = subprocess.run(
+                    command,
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+                self.assertEqual(result.stdout.splitlines()[0], first_line)
+                with self.assertRaises(json.JSONDecodeError):
+                    json.loads(result.stdout)
+
     def test_release_metadata_rejects_bad_version_and_empty_changelog_entry(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -1394,25 +1467,18 @@ class BriefPilotScriptTests(unittest.TestCase):
         self.assertIn("valid BriefPilot command package", result.stdout)
 
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             out_dir = Path(tmp) / "dist"
             install_dir = Path(tmp) / "skills"
             package = subprocess.run(
-                [
-                    sys.executable,
-                    str(PACKAGE_BRIEFPILOT_SKILLS),
-                    "--out-dir",
-                    str(out_dir),
-                    "--install-dir",
-                    str(install_dir),
-                ],
+                package_args(root, "--out-dir", out_dir, "--install-dir", install_dir),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
 
-            result = run_skill_command_validator("--dist-dir", out_dir, "--installed-dir", install_dir)
+            result = run_skill_command_validator("--root", root, "--dist-dir", out_dir, "--installed-dir", install_dir)
             self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
             for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
                 self.assertTrue((out_dir / f"{command}.skill").exists())
@@ -1428,7 +1494,7 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertIn(f"{main_root}/CHANGELOG.md", names)
             self.assertIn(f"{main_root}/references/workflow.md", names)
             self.assertIn(f"{main_root}/install-manifest.json", names)
-            self.assertEqual(manifest["package_version"], validate_release_metadata.read_version(ROOT))
+            self.assertEqual(manifest["package_version"], validate_release_metadata.read_version(root))
             self.assertRegex(manifest["source_commit"], r"^[0-9a-f]{40}$")
             for forbidden in [
                 f"{main_root}/AGENTS.md",
@@ -1441,7 +1507,51 @@ class BriefPilotScriptTests(unittest.TestCase):
                 names = set(archive.namelist())
                 manifest = json.loads(archive.read("bp/install-manifest.json"))
             self.assertEqual(names, {"bp/SKILL.md", "bp/install-manifest.json"})
-            self.assertEqual(manifest["package_version"], validate_release_metadata.read_version(ROOT))
+            self.assertEqual(manifest["package_version"], validate_release_metadata.read_version(root))
+
+    def test_installed_command_validator_can_self_check_without_source_root(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
+            out_dir = Path(tmp) / "dist"
+            install_dir = Path(tmp) / "skills"
+            package = subprocess.run(
+                package_args(root, "--out-dir", out_dir, "--install-dir", install_dir),
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
+
+            installed_validator = install_dir / "briefpilot" / "scripts" / "validate_skill_commands.py"
+            result = subprocess.run(
+                [sys.executable, str(installed_validator), "--installed-dir", str(install_dir), "--format", "json"],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            payload = stdout_json(result)
+            self.assertTrue(payload["ok"])
+            self.assertIsNone(payload["root"])
+            self.assertEqual(payload["installed_dir"], str(install_dir.resolve()))
+
+    def test_skill_command_validator_rejects_missing_install_manifest_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
+            out_dir = Path(tmp) / "dist"
+            install_dir = Path(tmp) / "skills"
+            package = subprocess.run(
+                package_args(root, "--out-dir", out_dir, "--install-dir", install_dir),
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
+            (install_dir / "bp" / "install-manifest.json").unlink()
+
+            result = run_skill_command_validator("--root", root, "--installed-dir", install_dir)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("installed command missing install manifest: bp", result.stdout)
 
     def test_skill_command_validator_json_output_reports_source_and_dist_results(self):
         result = run_skill_command_validator("--format", "json")
@@ -1455,13 +1565,13 @@ class BriefPilotScriptTests(unittest.TestCase):
         self.assertEqual(payload["findings"], [])
 
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             out_dir = Path(tmp) / "dist"
             package = subprocess.run(
-                [sys.executable, str(PACKAGE_BRIEFPILOT_SKILLS), "--out-dir", str(out_dir)],
+                package_args(root, "--out-dir", out_dir),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
             for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
@@ -1471,7 +1581,7 @@ class BriefPilotScriptTests(unittest.TestCase):
                     lambda manifest: manifest.__setitem__("source_commit", "0" * 40),
                 )
 
-            failed = run_skill_command_validator("--dist-dir", out_dir, "--format", "json")
+            failed = run_skill_command_validator("--root", root, "--dist-dir", out_dir, "--format", "json")
             self.assertNotEqual(failed.returncode, 0)
             payload = stdout_json(failed)
             self.assertFalse(payload["ok"])
@@ -1479,21 +1589,46 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertTrue(payload["findings"])
             self.assertIn("differs from source commit", "\n".join(payload["findings"]))
 
-    def test_skill_command_packager_dry_run_does_not_write_artifacts(self):
+    def test_skill_command_validator_rejects_dist_when_source_commit_is_unavailable(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             out_dir = Path(tmp) / "dist"
-            result = subprocess.run(
-                [
-                    sys.executable,
-                    str(PACKAGE_BRIEFPILOT_SKILLS),
-                    "--dry-run",
-                    "--out-dir",
-                    str(out_dir),
-                ],
+            package = subprocess.run(
+                package_args(root, "--out-dir", out_dir),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
+            )
+            self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
+
+            source_without_git = Path(tmp) / "source-without-git"
+            shutil.copytree(
+                root,
+                source_without_git,
+                ignore=shutil.ignore_patterns(".git", "dist", "__pycache__"),
+            )
+            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+                rewrite_zip_json_member(
+                    out_dir / f"{command}.skill",
+                    f"{command}/install-manifest.json",
+                    lambda manifest: manifest.__setitem__("source_commit", "0" * 40),
+                )
+
+            result = run_skill_command_validator("--root", source_without_git, "--dist-dir", out_dir, "--format", "json")
+            self.assertNotEqual(result.returncode, 0)
+            payload = stdout_json(result)
+            self.assertFalse(payload["ok"])
+            self.assertIn("source git commit is unavailable; dist source_commit cannot be verified", "\n".join(payload["findings"]))
+
+    def test_skill_command_packager_dry_run_does_not_write_artifacts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
+            out_dir = Path(tmp) / "dist"
+            result = subprocess.run(
+                package_args(root, "--dry-run", "--out-dir", out_dir),
+                text=True,
+                capture_output=True,
+                check=False,
             )
             self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
             self.assertIn("planned artifacts", result.stdout)
@@ -1501,28 +1636,20 @@ class BriefPilotScriptTests(unittest.TestCase):
 
     def test_skill_command_packager_json_dry_run_does_not_write_artifacts(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             out_dir = Path(tmp) / "dist"
             result = subprocess.run(
-                [
-                    sys.executable,
-                    str(PACKAGE_BRIEFPILOT_SKILLS),
-                    "--dry-run",
-                    "--format",
-                    "json",
-                    "--out-dir",
-                    str(out_dir),
-                ],
+                package_args(root, "--dry-run", "--format", "json", "--out-dir", out_dir),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
             payload = stdout_json(result)
             self.assertTrue(payload["ok"])
             self.assertEqual(payload["kind"], "package_briefpilot_skills")
             self.assertEqual(payload["mode"], "dry_run")
-            self.assertEqual(payload["target_version"], validate_release_metadata.read_version(ROOT))
+            self.assertEqual(payload["target_version"], validate_release_metadata.read_version(root))
             self.assertIsNone(payload["current_version"])
             self.assertFalse(payload["installed"])
             self.assertEqual(payload["artifacts"], [])
@@ -1534,6 +1661,7 @@ class BriefPilotScriptTests(unittest.TestCase):
 
     def test_skill_command_packager_rejects_non_empty_staging_dir_without_deleting(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             staging_dir = Path(tmp) / "stage"
             staging_dir.mkdir()
             sentinel = staging_dir / "sentinel.txt"
@@ -1541,19 +1669,10 @@ class BriefPilotScriptTests(unittest.TestCase):
             out_dir = Path(tmp) / "dist"
 
             result = subprocess.run(
-                [
-                    sys.executable,
-                    str(PACKAGE_BRIEFPILOT_SKILLS),
-                    "--dry-run",
-                    "--staging-dir",
-                    str(staging_dir),
-                    "--out-dir",
-                    str(out_dir),
-                ],
+                package_args(root, "--dry-run", "--staging-dir", staging_dir, "--out-dir", out_dir),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("staging dir must be empty or absent", result.stdout)
@@ -1562,24 +1681,16 @@ class BriefPilotScriptTests(unittest.TestCase):
 
     def test_skill_command_packager_rejects_project_root_as_staging_dir(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             result = subprocess.run(
-                [
-                    sys.executable,
-                    str(PACKAGE_BRIEFPILOT_SKILLS),
-                    "--dry-run",
-                    "--staging-dir",
-                    str(ROOT),
-                    "--out-dir",
-                    str(Path(tmp) / "dist"),
-                ],
+                package_args(root, "--dry-run", "--staging-dir", root, "--out-dir", Path(tmp) / "dist"),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("refusing unsafe staging dir", result.stdout)
-            self.assertTrue((ROOT / ".git").exists())
+            self.assertTrue((root / ".git").exists())
 
     def test_skill_command_packager_rejects_project_internal_staging_dir_without_creating(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1636,23 +1747,16 @@ class BriefPilotScriptTests(unittest.TestCase):
 
     def test_skill_command_packager_falls_back_when_install_dir_is_not_writable(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             out_dir = Path(tmp) / "dist"
             blocked_install_target = Path(tmp) / "not-a-directory"
             blocked_install_target.write_text("file blocks install dir\n", encoding="utf-8")
 
             result = subprocess.run(
-                [
-                    sys.executable,
-                    str(PACKAGE_BRIEFPILOT_SKILLS),
-                    "--out-dir",
-                    str(out_dir),
-                    "--install-dir",
-                    str(blocked_install_target),
-                ],
+                package_args(root, "--out-dir", out_dir, "--install-dir", blocked_install_target),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
             self.assertIn("generated .skill artifacts instead", result.stdout)
@@ -1661,25 +1765,16 @@ class BriefPilotScriptTests(unittest.TestCase):
 
     def test_skill_command_packager_json_reports_install_fallback(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             out_dir = Path(tmp) / "dist"
             blocked_install_target = Path(tmp) / "not-a-directory"
             blocked_install_target.write_text("file blocks install dir\n", encoding="utf-8")
 
             result = subprocess.run(
-                [
-                    sys.executable,
-                    str(PACKAGE_BRIEFPILOT_SKILLS),
-                    "--format",
-                    "json",
-                    "--out-dir",
-                    str(out_dir),
-                    "--install-dir",
-                    str(blocked_install_target),
-                ],
+                package_args(root, "--format", "json", "--out-dir", out_dir, "--install-dir", blocked_install_target),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
             payload = stdout_json(result)
@@ -1697,6 +1792,7 @@ class BriefPilotScriptTests(unittest.TestCase):
 
     def test_skill_command_packager_does_not_partially_replace_blocked_install(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             install_dir = Path(tmp) / "skills"
             old_main = install_dir / "briefpilot"
             old_main.mkdir(parents=True)
@@ -1707,18 +1803,10 @@ class BriefPilotScriptTests(unittest.TestCase):
             out_dir = Path(tmp) / "dist"
 
             result = subprocess.run(
-                [
-                    sys.executable,
-                    str(PACKAGE_BRIEFPILOT_SKILLS),
-                    "--out-dir",
-                    str(out_dir),
-                    "--install-dir",
-                    str(install_dir),
-                ],
+                package_args(root, "--out-dir", out_dir, "--install-dir", install_dir),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
             self.assertIn("generated .skill artifacts instead", result.stdout)
@@ -1835,6 +1923,36 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertIn("source git commit is unavailable", result.stdout)
             self.assertFalse(out_dir.exists())
 
+    def test_skill_command_packager_rejects_source_nested_in_parent_git_repo(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            outer = Path(tmp) / "outer"
+            outer.mkdir()
+            init_git_repo(outer)
+            root = outer / "nested-briefpilot"
+            shutil.copytree(
+                ROOT,
+                root,
+                ignore=shutil.ignore_patterns(".git", "dist", "__pycache__", "AGENTS.md", "docs"),
+            )
+            out_dir = Path(tmp) / "dist"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(root / "scripts" / "package_briefpilot_skills.py"),
+                    "--root",
+                    str(root),
+                    "--out-dir",
+                    str(out_dir),
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("source root must be the git repository root", result.stdout)
+            self.assertFalse(out_dir.exists())
+
     def test_skill_command_packager_rejects_dirty_source_tree(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "repo"
@@ -1868,15 +1986,42 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertIn("source worktree has uncommitted or untracked files", result.stdout)
             self.assertFalse(out_dir.exists())
 
-    def test_skill_command_validator_rejects_stale_dist_manifest_version(self):
+    def test_skill_command_packager_json_reports_corrupt_installed_metadata(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
+            install_dir = Path(tmp) / "skills"
+            old_main = install_dir / "briefpilot"
+            old_main.mkdir(parents=True)
+            (old_main / "VERSION").write_bytes(b"\xff\xfe\x00")
+            bp_dir = install_dir / "bp"
+            bp_dir.mkdir()
+            (bp_dir / "install-manifest.json").write_text("[\"not\", \"object\"]\n", encoding="utf-8")
             out_dir = Path(tmp) / "dist"
-            package = subprocess.run(
-                [sys.executable, str(PACKAGE_BRIEFPILOT_SKILLS), "--out-dir", str(out_dir)],
+
+            result = subprocess.run(
+                package_args(root, "--format", "json", "--out-dir", out_dir, "--install-dir", install_dir),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            payload = stdout_json(result)
+            self.assertFalse(payload["ok"])
+            self.assertFalse(payload["installed"])
+            findings = "\n".join(payload["findings"])
+            self.assertIn("VERSION is not readable UTF-8", findings)
+            self.assertIn("install-manifest.json must be a JSON object", findings)
+            self.assertFalse(out_dir.exists())
+
+    def test_skill_command_validator_rejects_stale_dist_manifest_version(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
+            out_dir = Path(tmp) / "dist"
+            package = subprocess.run(
+                package_args(root, "--out-dir", out_dir),
+                text=True,
+                capture_output=True,
+                check=False,
             )
             self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
 
@@ -1887,19 +2032,19 @@ class BriefPilotScriptTests(unittest.TestCase):
                     lambda manifest: manifest.__setitem__("package_version", "0.0.9.0"),
                 )
 
-            result = run_skill_command_validator("--dist-dir", out_dir)
+            result = run_skill_command_validator("--root", root, "--dist-dir", out_dir)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("differs from root VERSION", result.stdout)
 
     def test_skill_command_validator_rejects_unpinned_or_disagreeing_source_commit(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             out_dir = Path(tmp) / "dist"
             package = subprocess.run(
-                [sys.executable, str(PACKAGE_BRIEFPILOT_SKILLS), "--out-dir", str(out_dir)],
+                package_args(root, "--out-dir", out_dir),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
             rewrite_zip_json_member(
@@ -1908,20 +2053,20 @@ class BriefPilotScriptTests(unittest.TestCase):
                 lambda manifest: manifest.__setitem__("source_commit", "unknown"),
             )
 
-            result = run_skill_command_validator("--dist-dir", out_dir)
+            result = run_skill_command_validator("--root", root, "--dist-dir", out_dir)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("source_commit must be a full 40-character git commit hash", result.stdout)
             self.assertIn("command manifests disagree on source_commit", result.stdout)
 
     def test_skill_command_validator_rejects_forged_matching_source_commit(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             out_dir = Path(tmp) / "dist"
             package = subprocess.run(
-                [sys.executable, str(PACKAGE_BRIEFPILOT_SKILLS), "--out-dir", str(out_dir)],
+                package_args(root, "--out-dir", out_dir),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
             for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
@@ -1931,12 +2076,13 @@ class BriefPilotScriptTests(unittest.TestCase):
                     lambda manifest: manifest.__setitem__("source_commit", "0" * 40),
                 )
 
-            result = run_skill_command_validator("--dist-dir", out_dir)
+            result = run_skill_command_validator("--root", root, "--dist-dir", out_dir)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("differs from source commit", result.stdout)
 
     def test_skill_command_packager_refuses_implicit_downgrade(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             install_dir = Path(tmp) / "skills"
             old_main = install_dir / "briefpilot"
             old_main.mkdir(parents=True)
@@ -1946,18 +2092,10 @@ class BriefPilotScriptTests(unittest.TestCase):
             out_dir = Path(tmp) / "dist"
 
             result = subprocess.run(
-                [
-                    sys.executable,
-                    str(PACKAGE_BRIEFPILOT_SKILLS),
-                    "--out-dir",
-                    str(out_dir),
-                    "--install-dir",
-                    str(install_dir),
-                ],
+                package_args(root, "--out-dir", out_dir, "--install-dir", install_dir),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("refusing to install older BriefPilot version", result.stdout)
@@ -1966,6 +2104,7 @@ class BriefPilotScriptTests(unittest.TestCase):
 
     def test_skill_command_packager_json_reports_downgrade_refusal(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             install_dir = Path(tmp) / "skills"
             old_main = install_dir / "briefpilot"
             old_main.mkdir(parents=True)
@@ -1973,26 +2112,16 @@ class BriefPilotScriptTests(unittest.TestCase):
             out_dir = Path(tmp) / "dist"
 
             result = subprocess.run(
-                [
-                    sys.executable,
-                    str(PACKAGE_BRIEFPILOT_SKILLS),
-                    "--format",
-                    "json",
-                    "--out-dir",
-                    str(out_dir),
-                    "--install-dir",
-                    str(install_dir),
-                ],
+                package_args(root, "--format", "json", "--out-dir", out_dir, "--install-dir", install_dir),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertNotEqual(result.returncode, 0)
             payload = stdout_json(result)
             self.assertFalse(payload["ok"])
             self.assertEqual(payload["mode"], "install")
-            self.assertEqual(payload["target_version"], validate_release_metadata.read_version(ROOT))
+            self.assertEqual(payload["target_version"], validate_release_metadata.read_version(root))
             self.assertEqual(payload["current_version"], "9.0.0.0")
             self.assertFalse(payload["downgrade_allowed"])
             self.assertFalse(payload["installed"])
@@ -2000,8 +2129,47 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertIn("refusing to install older BriefPilot version", "\n".join(payload["findings"]))
             self.assertFalse(out_dir.exists())
 
+    def test_skill_command_packager_allows_explicit_downgrade(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
+            install_dir = Path(tmp) / "skills"
+            old_main = install_dir / "briefpilot"
+            old_main.mkdir(parents=True)
+            (old_main / "VERSION").write_text("9.0.0.0\n", encoding="utf-8")
+            sentinel = old_main / "old.txt"
+            sentinel.write_text("newer install replaced\n", encoding="utf-8")
+            out_dir = Path(tmp) / "dist"
+
+            result = subprocess.run(
+                package_args(
+                    root,
+                    "--format",
+                    "json",
+                    "--allow-downgrade",
+                    "--out-dir",
+                    out_dir,
+                    "--install-dir",
+                    install_dir,
+                ),
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            payload = stdout_json(result)
+            self.assertTrue(payload["ok"])
+            self.assertTrue(payload["downgrade_allowed"])
+            self.assertTrue(payload["installed"])
+            self.assertEqual(payload["current_version"], "9.0.0.0")
+            self.assertEqual((install_dir / "briefpilot" / "VERSION").read_text(encoding="utf-8").strip(), validate_release_metadata.read_version(root))
+            self.assertFalse(sentinel.exists())
+
+            validation = run_skill_command_validator("--root", root, "--installed-dir", install_dir)
+            self.assertEqual(validation.returncode, 0, validation.stderr + validation.stdout)
+
     def test_skill_command_packager_refuses_manifest_only_downgrade(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             install_dir = Path(tmp) / "skills"
             bp_dir = install_dir / "bp"
             bp_dir.mkdir(parents=True)
@@ -2022,18 +2190,10 @@ class BriefPilotScriptTests(unittest.TestCase):
             out_dir = Path(tmp) / "dist"
 
             result = subprocess.run(
-                [
-                    sys.executable,
-                    str(PACKAGE_BRIEFPILOT_SKILLS),
-                    "--out-dir",
-                    str(out_dir),
-                    "--install-dir",
-                    str(install_dir),
-                ],
+                package_args(root, "--out-dir", out_dir, "--install-dir", install_dir),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("refusing to install older BriefPilot version", result.stdout)
@@ -2041,6 +2201,7 @@ class BriefPilotScriptTests(unittest.TestCase):
 
     def test_skill_command_packager_dry_run_refuses_implicit_downgrade(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             install_dir = Path(tmp) / "skills"
             old_main = install_dir / "briefpilot"
             old_main.mkdir(parents=True)
@@ -2048,19 +2209,10 @@ class BriefPilotScriptTests(unittest.TestCase):
             out_dir = Path(tmp) / "dist"
 
             result = subprocess.run(
-                [
-                    sys.executable,
-                    str(PACKAGE_BRIEFPILOT_SKILLS),
-                    "--dry-run",
-                    "--out-dir",
-                    str(out_dir),
-                    "--install-dir",
-                    str(install_dir),
-                ],
+                package_args(root, "--dry-run", "--out-dir", out_dir, "--install-dir", install_dir),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("refusing to install older BriefPilot version", result.stdout)
@@ -2068,13 +2220,13 @@ class BriefPilotScriptTests(unittest.TestCase):
 
     def test_skill_command_validator_rejects_nonofficial_manifest_source(self):
         with tempfile.TemporaryDirectory() as tmp:
+            root = copy_committed_package_repo(tmp)
             out_dir = Path(tmp) / "dist"
             package = subprocess.run(
-                [sys.executable, str(PACKAGE_BRIEFPILOT_SKILLS), "--out-dir", str(out_dir)],
+                package_args(root, "--out-dir", out_dir),
                 text=True,
                 capture_output=True,
                 check=False,
-                env=PACKAGE_TEST_ENV,
             )
             self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
             rewrite_zip_json_member(
@@ -2083,7 +2235,7 @@ class BriefPilotScriptTests(unittest.TestCase):
                 lambda manifest: manifest.__setitem__("source_remote", "https://github.com/example/private.git"),
             )
 
-            result = run_skill_command_validator("--dist-dir", out_dir)
+            result = run_skill_command_validator("--root", root, "--dist-dir", out_dir)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("source_remote must be https://github.com/sdyckjq-lab/BriefPilot.git", result.stdout)
             self.assertIn("command manifests disagree on source_remote", result.stdout)

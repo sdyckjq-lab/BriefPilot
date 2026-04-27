@@ -37,13 +37,24 @@ def read_version(root):
     return (Path(root) / "VERSION").read_text(encoding="utf-8").strip()
 
 
+def read_text_for_validation(path, findings, label):
+    try:
+        return Path(path).read_text(encoding="utf-8")
+    except FileNotFoundError:
+        findings.append(f"missing {label}")
+    except UnicodeDecodeError:
+        findings.append(f"{label} is not readable UTF-8")
+    except OSError as error:
+        findings.append(f"{label} is not readable: {error}")
+    return None
+
+
 def validate_version_file(root, findings):
     path = Path(root) / "VERSION"
-    if not path.exists():
-        findings.append("missing VERSION")
+    raw = read_text_for_validation(path, findings, "VERSION")
+    if raw is None:
         return None
 
-    raw = path.read_text(encoding="utf-8")
     value = raw.strip()
     if not value:
         findings.append("VERSION is empty")
@@ -85,11 +96,11 @@ def newest_changelog_entry(text):
 
 def validate_changelog(root, expected_version, findings):
     path = Path(root) / "CHANGELOG.md"
-    if not path.exists():
-        findings.append("missing CHANGELOG.md")
+    text = read_text_for_validation(path, findings, "CHANGELOG.md")
+    if text is None:
         return
 
-    entry = newest_changelog_entry(path.read_text(encoding="utf-8"))
+    entry = newest_changelog_entry(text)
     if entry is None:
         findings.append("CHANGELOG.md missing newest entry shaped as ## [X.Y.Z.W] - YYYY-MM-DD")
         return
@@ -206,6 +217,10 @@ def load_manifest(path, findings):
         return json.loads(Path(path).read_text(encoding="utf-8"))
     except FileNotFoundError:
         findings.append(f"missing install manifest: {path}")
+    except UnicodeDecodeError:
+        findings.append(f"{path} is not readable UTF-8")
+    except OSError as error:
+        findings.append(f"{path} is not readable: {error}")
     except json.JSONDecodeError as error:
         findings.append(f"{path} is not valid JSON: {error}")
     return None
