@@ -7,6 +7,8 @@ import tempfile
 import zipfile
 from pathlib import Path, PurePosixPath
 
+import validate_release_metadata
+
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 COMMANDS = ("briefpilot", "bp", "briefpilot-upgrade")
@@ -17,6 +19,7 @@ COMPANION_ALLOWED_PARTS = {
     ("SKILL.md",),
     ("agents", "openai.yaml"),
     ("evals", "evals.json"),
+    ("install-manifest.json",),
 }
 FORBIDDEN_PACKAGE_PARTS = {
     "AGENTS.md",
@@ -154,6 +157,7 @@ def validate_companion_is_lean(companion_dir, findings):
 def validate_source(root):
     root = Path(root).resolve()
     findings = []
+    findings.extend(validate_release_metadata.validate(root))
     validate_skill_file(root / "SKILL.md", "briefpilot", ["/briefpilot", "DESIGN.md"], findings)
     validate_skill_file(root / "companions" / "bp" / "SKILL.md", "bp", ["/bp", "briefpilot"], findings)
     validate_skill_file(
@@ -175,7 +179,11 @@ def validate_source(root):
     validate_companion_is_lean(root / "companions" / "bp", findings)
     validate_companion_is_lean(root / "companions" / "briefpilot-upgrade", findings)
 
-    for required in ["scripts/package_briefpilot_skills.py", "scripts/validate_skill_commands.py"]:
+    for required in [
+        "scripts/package_briefpilot_skills.py",
+        "scripts/validate_release_metadata.py",
+        "scripts/validate_skill_commands.py",
+    ]:
         if not (root / required).exists():
             findings.append(f"missing command package script: {required}")
 
@@ -191,29 +199,58 @@ def validate_source(root):
     return findings
 
 
-def validate_installed(install_dir):
+def load_install_manifest(skill_dir, findings):
+    path = Path(skill_dir) / "install-manifest.json"
+    if not path.exists():
+        findings.append(f"installed command missing install manifest: {Path(skill_dir).name}")
+        return None
+    return validate_release_metadata.load_manifest(path, findings)
+
+
+def validate_installed(install_dir, expected_version=None):
     install_dir = Path(install_dir).resolve()
     findings = []
+    manifests = {}
     for command in COMMANDS:
         skill_dir = install_dir / command
         if not skill_dir.is_dir():
             findings.append(f"installed command missing: {command}")
             continue
         validate_skill_file(skill_dir / "SKILL.md", command, [command], findings)
+        manifest = load_install_manifest(skill_dir, findings)
+        if manifest is not None:
+            manifests[command] = manifest
 
     main_dir = install_dir / "briefpilot"
     if main_dir.exists():
         for part in FORBIDDEN_PACKAGE_PARTS:
             if (main_dir / part).exists():
                 findings.append(f"installed briefpilot contains forbidden package part: {part}")
-        for required in ["SKILL.md", "references", "templates", "scripts", "examples"]:
+        for required in ["SKILL.md", "VERSION", "CHANGELOG.md", "references", "templates", "scripts", "examples"]:
             if not (main_dir / required).exists():
                 findings.append(f"installed briefpilot missing required part: {required}")
+        release_findings = validate_release_metadata.validate(main_dir)
+        findings.extend(f"installed briefpilot {finding}" for finding in release_findings)
+        if expected_version and (main_dir / "VERSION").exists():
+            installed_version = validate_release_metadata.read_version(main_dir)
+            if installed_version != expected_version:
+                findings.append(
+                    f"installed briefpilot VERSION {installed_version!r} differs from root VERSION {expected_version!r}"
+                )
 
     for command in ("bp", "briefpilot-upgrade"):
         skill_dir = install_dir / command
         if skill_dir.exists():
             validate_companion_is_lean(skill_dir, findings)
+
+    manifest_expected_version = expected_version
+    if manifest_expected_version is None and (main_dir / "VERSION").exists():
+        try:
+            manifest_expected_version = validate_release_metadata.read_version(main_dir)
+        except OSError:
+            manifest_expected_version = None
+    if manifests:
+        validate_release_metadata.validate_manifest_set(manifests, manifest_expected_version, findings)
 
     return findings
 
@@ -235,9 +272,15 @@ def validate_archive_member_names(archive_name, command, names):
     return findings
 
 
-def validate_dist(dist_dir):
+def validate_dist(dist_dir, source_root=DEFAULT_ROOT):
     dist_dir = Path(dist_dir).resolve()
     findings = []
+    expected_version = None
+    if source_root is not None:
+        try:
+            expected_version = validate_release_metadata.read_version(source_root)
+        except OSError:
+            expected_version = None
     with tempfile.TemporaryDirectory(prefix="briefpilot-skill-validate-") as tmp:
         extracted_root = Path(tmp)
         can_validate_installed = True
@@ -277,7 +320,7 @@ def validate_dist(dist_dir):
                 can_validate_installed = False
                 continue
         if can_validate_installed:
-            findings.extend(validate_installed(extracted_root))
+            findings.extend(validate_installed(extracted_root, expected_version=expected_version))
     return findings
 
 
@@ -293,9 +336,14 @@ def main(argv=None):
     args = parse_args(argv or sys.argv[1:])
     findings = validate_source(args.root)
     if args.installed_dir:
-        findings.extend(validate_installed(args.installed_dir))
+        expected_version = None
+        try:
+            expected_version = validate_release_metadata.read_version(args.root)
+        except OSError:
+            expected_version = None
+        findings.extend(validate_installed(args.installed_dir, expected_version=expected_version))
     if args.dist_dir:
-        findings.extend(validate_dist(args.dist_dir))
+        findings.extend(validate_dist(args.dist_dir, args.root))
 
     if findings:
         print("invalid BriefPilot command package:")

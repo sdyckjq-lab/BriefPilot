@@ -11,12 +11,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import validate_skill_commands
+import validate_release_metadata
 
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 COMMANDS = ("briefpilot", "bp", "briefpilot-upgrade")
 OFFICIAL_SOURCE_REMOTE = "https://github.com/sdyckjq-lab/BriefPilot.git"
-MAIN_FILES = ("SKILL.md", "LICENSE")
+MAIN_FILES = ("SKILL.md", "LICENSE", "VERSION", "CHANGELOG.md")
 MAIN_DIRS = ("agents", "references", "templates", "scripts", "examples")
 EXCLUDED_NAMES = {
     ".DS_Store",
@@ -67,6 +68,7 @@ def build_manifest(root):
         "schema_version": "1.0",
         "package": "BriefPilot",
         "commands": list(COMMANDS),
+        "package_version": validate_release_metadata.read_version(root),
         "source_remote": OFFICIAL_SOURCE_REMOTE,
         "source_commit": git_value(root, "rev-parse", "--short", "HEAD"),
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
@@ -98,6 +100,10 @@ def stage_companion(root, staging_root, command):
         item = source / relative
         if item.exists():
             copy_filtered(item, target / relative)
+    (target / "install-manifest.json").write_text(
+        json.dumps(build_manifest(root), ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
 
 def ensure_safe_staging_dir(root, staging_root):
@@ -281,7 +287,7 @@ def main(argv=None):
             return 0
 
         archives = package_staged(staging_root, args.out_dir)
-        dist_findings = validate_skill_commands.validate_dist(args.out_dir)
+        dist_findings = validate_skill_commands.validate_dist(args.out_dir, root)
         if dist_findings:
             print("invalid generated .skill artifacts:")
             for finding in dist_findings:

@@ -112,9 +112,12 @@ target modification prompts
 
 仓库根目录是 BriefPilot 主 Skill 源码。当前命令包包含三个可安装 Skill：`briefpilot`、`bp` 和 `briefpilot-upgrade`。
 
+当前版本写在 `VERSION`，更新记录写在 `CHANGELOG.md`。发布前先确认这两个文件一致，再生成安装包。
+
 生成安装包：
 
 ```text
+python3 scripts/validate_release_metadata.py
 python3 scripts/validate_skill_commands.py
 python3 scripts/package_briefpilot_skills.py --out-dir dist
 ```
@@ -126,3 +129,5 @@ dist/briefpilot.skill
 dist/bp.skill
 dist/briefpilot-upgrade.skill
 ```
+
+安装包会带上当前版本和更新记录，`/briefpilot-upgrade` 会据此说明是升级、修复、刷新，还是第一次进入版本化安装。

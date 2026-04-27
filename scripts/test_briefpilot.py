@@ -14,6 +14,7 @@ sys.path.insert(0, str(SCRIPTS_DIR))
 import check_design_md as design_md_report
 import language_checks
 import validate_golden_demo
+import validate_release_metadata
 
 
 ROOT = SCRIPTS_DIR.parents[0]
@@ -30,6 +31,7 @@ EXPORT_MODIFICATION = ROOT / "scripts" / "export_modification_prompt.py"
 STYLE_INDEX = ROOT / "references" / "design-style-index.json"
 CHECK_DESIGN_MD = ROOT / "scripts" / "check_design_md.py"
 VALIDATE_PUBLIC_PACKAGE = ROOT / "scripts" / "validate_public_package.py"
+VALIDATE_RELEASE_METADATA = ROOT / "scripts" / "validate_release_metadata.py"
 VALIDATE_SKILL_COMMANDS = ROOT / "scripts" / "validate_skill_commands.py"
 PACKAGE_BRIEFPILOT_SKILLS = ROOT / "scripts" / "package_briefpilot_skills.py"
 DESIGN_MD_FIXTURES = ROOT / "examples" / "design-md-fixtures"
@@ -122,8 +124,13 @@ def init_public_package_repo(tmp, gitignore=None):
     (root / "LICENSE").write_text("MIT\n", encoding="utf-8")
     (root / "README.md").write_text("# BriefPilot\n\nRun `scripts/export_prompt.py`.\n", encoding="utf-8")
     (root / "SKILL.md").write_text("# BriefPilot Skill\n", encoding="utf-8")
+    (root / "VERSION").write_text("0.1.0.0\n", encoding="utf-8")
+    (root / "CHANGELOG.md").write_text(
+        "# CHANGELOG\n\nBriefPilot 版本记录使用 `MAJOR.MINOR.PATCH.MICRO`。\n\n每条记录按 `YYYY-MM-DD` 标注。\n\n## [0.1.0.0] - 2026-04-27\n### Added\n- 初始版本。\n",
+        encoding="utf-8",
+    )
     subprocess.run(
-        ["git", "-C", str(root), "add", ".gitignore", "LICENSE", "README.md", "SKILL.md"],
+        ["git", "-C", str(root), "add", ".gitignore", "CHANGELOG.md", "LICENSE", "README.md", "SKILL.md", "VERSION"],
         text=True,
         capture_output=True,
         check=True,
@@ -219,6 +226,11 @@ def write_minimal_command_package(root):
     root = Path(root)
     (root / ".gitignore").write_text("/dist/\n/briefpilot-skill-workspace/\n", encoding="utf-8")
     (root / "SKILL.md").write_text((ROOT / "SKILL.md").read_text(encoding="utf-8"), encoding="utf-8")
+    (root / "VERSION").write_text("0.1.0.0\n", encoding="utf-8")
+    (root / "CHANGELOG.md").write_text(
+        "# CHANGELOG\n\nBriefPilot 版本记录使用 `MAJOR.MINOR.PATCH.MICRO`。\n\n每条记录按 `YYYY-MM-DD` 标注。\n\n## [0.1.0.0] - 2026-04-27\n### Added\n- 初始版本。\n",
+        encoding="utf-8",
+    )
     for relative in [
         "evals/evals.json",
         "companions/bp/SKILL.md",
@@ -231,7 +243,22 @@ def write_minimal_command_package(root):
         target.write_text((ROOT / relative).read_text(encoding="utf-8"), encoding="utf-8")
     (root / "scripts").mkdir()
     (root / "scripts" / "package_briefpilot_skills.py").write_text("# package\n", encoding="utf-8")
+    (root / "scripts" / "validate_release_metadata.py").write_text("# validate release\n", encoding="utf-8")
     (root / "scripts" / "validate_skill_commands.py").write_text("# validate\n", encoding="utf-8")
+
+
+def rewrite_zip_json_member(archive_path, member_name, update):
+    archive_path = Path(archive_path)
+    rewritten = archive_path.with_suffix(archive_path.suffix + ".tmp")
+    with zipfile.ZipFile(archive_path) as source, zipfile.ZipFile(rewritten, "w", zipfile.ZIP_DEFLATED) as target:
+        for info in source.infolist():
+            payload = source.read(info.filename)
+            if info.filename == member_name:
+                data = json.loads(payload.decode("utf-8"))
+                update(data)
+                payload = (json.dumps(data, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+            target.writestr(info, payload)
+    rewritten.replace(archive_path)
 
 
 def run_comparison_validator(root, demo):
@@ -1267,6 +1294,38 @@ class BriefPilotScriptTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
 
+    def test_release_metadata_validates_current_root(self):
+        result = subprocess.run(
+            [sys.executable, str(VALIDATE_RELEASE_METADATA)],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertIn("valid BriefPilot release metadata", result.stdout)
+        self.assertEqual(validate_release_metadata.compare_versions("0.10.0.0", "0.2.0.0"), 1)
+        self.assertEqual(validate_release_metadata.compare_versions("0.1.0.10", "0.1.0.2"), 1)
+        self.assertEqual(validate_release_metadata.compare_versions("0.1.0.0", "0.1.0.0"), 0)
+
+    def test_release_metadata_rejects_bad_version_and_empty_changelog_entry(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "VERSION").write_text("0.1.0\n", encoding="utf-8")
+            (root / "CHANGELOG.md").write_text(
+                "# CHANGELOG\n\nBriefPilot 版本记录使用 `MAJOR.MINOR.PATCH.MICRO`。\n\n每条记录按 `YYYY-MM-DD` 标注。\n\n## [0.1.0.0] - 2026-04-27\n### Added\n",
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [sys.executable, str(VALIDATE_RELEASE_METADATA), "--root", str(root)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("VERSION invalid", result.stdout)
+            self.assertIn("needs at least one bullet", result.stdout)
+
     def test_skill_command_package_validates_and_packages(self):
         result = run_skill_command_validator()
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
@@ -1295,13 +1354,18 @@ class BriefPilotScriptTests(unittest.TestCase):
             for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
                 self.assertTrue((out_dir / f"{command}.skill").exists())
                 self.assertTrue((install_dir / command / "SKILL.md").exists())
+                self.assertTrue((install_dir / command / "install-manifest.json").exists())
 
             with zipfile.ZipFile(out_dir / "briefpilot.skill") as archive:
                 names = set(archive.namelist())
+                manifest = json.loads(archive.read(("brief" + "pilot") + "/install-manifest.json"))
             main_root = "brief" + "pilot"
             self.assertIn(f"{main_root}/SKILL.md", names)
+            self.assertIn(f"{main_root}/VERSION", names)
+            self.assertIn(f"{main_root}/CHANGELOG.md", names)
             self.assertIn(f"{main_root}/references/workflow.md", names)
             self.assertIn(f"{main_root}/install-manifest.json", names)
+            self.assertEqual(manifest["package_version"], validate_release_metadata.read_version(ROOT))
             for forbidden in [
                 f"{main_root}/AGENTS.md",
                 f"{main_root}/docs/",
@@ -1311,7 +1375,9 @@ class BriefPilotScriptTests(unittest.TestCase):
 
             with zipfile.ZipFile(out_dir / "bp.skill") as archive:
                 names = set(archive.namelist())
-            self.assertEqual(names, {"bp/SKILL.md"})
+                manifest = json.loads(archive.read("bp/install-manifest.json"))
+            self.assertEqual(names, {"bp/SKILL.md", "bp/install-manifest.json"})
+            self.assertEqual(manifest["package_version"], validate_release_metadata.read_version(ROOT))
 
     def test_skill_command_packager_dry_run_does_not_write_artifacts(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1541,7 +1607,51 @@ class BriefPilotScriptTests(unittest.TestCase):
             with zipfile.ZipFile(out_dir / "briefpilot.skill") as archive:
                 manifest = json.loads(archive.read(("brief" + "pilot") + "/install-manifest.json"))
             self.assertEqual(manifest["source_remote"], "https://github.com/sdyckjq-lab/BriefPilot.git")
+            self.assertEqual(manifest["package_version"], validate_release_metadata.read_version(root))
             self.assertNotIn(fake_secret, json.dumps(manifest))
+
+    def test_skill_command_validator_rejects_stale_dist_manifest_version(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "dist"
+            package = subprocess.run(
+                [sys.executable, str(PACKAGE_BRIEFPILOT_SKILLS), "--out-dir", str(out_dir)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
+
+            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+                rewrite_zip_json_member(
+                    out_dir / f"{command}.skill",
+                    f"{command}/install-manifest.json",
+                    lambda manifest: manifest.__setitem__("package_version", "0.0.9.0"),
+                )
+
+            result = run_skill_command_validator("--dist-dir", out_dir)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("differs from root VERSION", result.stdout)
+
+    def test_skill_command_validator_rejects_nonofficial_manifest_source(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "dist"
+            package = subprocess.run(
+                [sys.executable, str(PACKAGE_BRIEFPILOT_SKILLS), "--out-dir", str(out_dir)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
+            rewrite_zip_json_member(
+                out_dir / "bp.skill",
+                "bp/install-manifest.json",
+                lambda manifest: manifest.__setitem__("source_remote", "https://github.com/example/private.git"),
+            )
+
+            result = run_skill_command_validator("--dist-dir", out_dir)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("source_remote must be https://github.com/sdyckjq-lab/BriefPilot.git", result.stdout)
+            self.assertIn("command manifests disagree on source_remote", result.stdout)
 
     def test_skill_command_validator_rejects_incomplete_dist_artifacts(self):
         with tempfile.TemporaryDirectory() as tmp:
