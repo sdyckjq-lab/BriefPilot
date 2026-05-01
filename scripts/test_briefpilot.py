@@ -228,9 +228,23 @@ def write_comparison_demo(root):
     root = Path(root)
     demo = root / "examples" / "comparison-demo"
     demo.mkdir(parents=True)
-    (root / "examples" / "ai-search-landing").mkdir(parents=True)
+    landing = root / "examples" / "ai-search-landing"
+    for directory in [landing, landing / "first-pass", landing / "reviews", landing / "second-pass"]:
+        directory.mkdir(parents=True, exist_ok=True)
+    for relative in [
+        "demo-evidence.md",
+        "first-pass/controlled-baseline.md",
+        "reviews/result-review-first-pass.md",
+        "second-pass/briefpilot-reviewed.md",
+    ]:
+        (landing / relative).write_text(f"# Evidence\n\n{relative}\n", encoding="utf-8")
     (root / "README.md").write_text(
-        "# BriefPilot\n\nOpen [comparison demo](examples/comparison-demo/index.html).\n",
+        "# BriefPilot\n\n"
+        "Open [comparison demo](examples/comparison-demo/index.html).\n"
+        "Evidence: [demo](examples/ai-search-landing/demo-evidence.md), "
+        "[first](examples/ai-search-landing/first-pass/controlled-baseline.md), "
+        "[review](examples/ai-search-landing/reviews/result-review-first-pass.md), "
+        "[second](examples/ai-search-landing/second-pass/briefpilot-reviewed.md).\n",
         encoding="utf-8",
     )
     manifest = {
@@ -257,6 +271,12 @@ def write_comparison_demo(root):
             "BriefPilot 补齐证据。",
             "BriefPilot 补齐评审标准。",
         ],
+        "evidence_paths": {
+            "demo_evidence": "examples/ai-search-landing/demo-evidence.md",
+            "first_pass": "examples/ai-search-landing/first-pass/controlled-baseline.md",
+            "review": "examples/ai-search-landing/reviews/result-review-first-pass.md",
+            "second_pass": "examples/ai-search-landing/second-pass/briefpilot-reviewed.md",
+        },
         "future_real_output_todo_path": "examples/comparison-demo/future-real-output-todo.md",
     }
     (demo / "comparison-demo.json").write_text(json.dumps(manifest), encoding="utf-8")
@@ -303,6 +323,8 @@ def write_minimal_command_package(root):
         "evals/evals.json",
         "companions/bp/SKILL.md",
         "companions/bp/evals/evals.json",
+        "companions/bp-review/SKILL.md",
+        "companions/bp-review/evals/evals.json",
         "companions/briefpilot-upgrade/SKILL.md",
         "companions/briefpilot-upgrade/evals/evals.json",
     ]:
@@ -991,6 +1013,125 @@ class BriefPilotScriptTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
         self.assertIn("valid", result.stdout.lower())
 
+    def test_golden_demo_rejects_invalid_first_pass_review_json(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            copied = Path(tmp) / "landing"
+            shutil.copytree(EXAMPLE_DIR, copied)
+            report = design_md_report.build_report((copied / "DESIGN.md").resolve(), requested_mode="fallback", official_command=None)
+            design_md_report.write_report(
+                report,
+                copied / "reviews" / "design-md-review.md",
+                copied / "reviews" / "design-md-review.json",
+            )
+            (copied / "reviews" / "result-review-first-pass.json").write_text("{}\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [sys.executable, str(ROOT / "scripts" / "validate_golden_demo.py"), str(copied)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("reviews/result-review-first-pass.json invalid", result.stdout + result.stderr)
+
+    def test_golden_demo_rejects_wrong_first_pass_review_evidence_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            copied = Path(tmp) / "landing"
+            shutil.copytree(EXAMPLE_DIR, copied)
+            report = design_md_report.build_report((copied / "DESIGN.md").resolve(), requested_mode="fallback", official_command=None)
+            design_md_report.write_report(
+                report,
+                copied / "reviews" / "design-md-review.md",
+                copied / "reviews" / "design-md-review.json",
+            )
+            review_path = copied / "reviews" / "result-review-first-pass.json"
+            review = json.loads(review_path.read_text(encoding="utf-8"))
+            review["evidence"]["path"] = "design-spec.md"
+            review_path.write_text(json.dumps(review, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [sys.executable, str(ROOT / "scripts" / "validate_golden_demo.py"), str(copied)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("evidence.path must resolve to first-pass/controlled-baseline.md", result.stdout + result.stderr)
+
+    def test_golden_demo_rejects_hollow_first_and_second_pass_evidence(self):
+        cases = [
+            (validate_golden_demo.FIRST_PASS_PATH, "first-pass/controlled-baseline.md missing evidence detail"),
+            (validate_golden_demo.SECOND_PASS_PATH, "second-pass/briefpilot-reviewed.md missing evidence detail"),
+        ]
+        for relative, expected_error in cases:
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as tmp:
+                copied = Path(tmp) / "landing"
+                shutil.copytree(EXAMPLE_DIR, copied)
+                report = design_md_report.build_report((copied / "DESIGN.md").resolve(), requested_mode="fallback", official_command=None)
+                design_md_report.write_report(
+                    report,
+                    copied / "reviews" / "design-md-review.md",
+                    copied / "reviews" / "design-md-review.json",
+                )
+                (copied / relative).write_text("x\n", encoding="utf-8")
+
+                result = subprocess.run(
+                    [sys.executable, str(ROOT / "scripts" / "validate_golden_demo.py"), str(copied)],
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                )
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(expected_error, result.stdout + result.stderr)
+
+    def test_golden_demo_rejects_stale_first_pass_next_copy_source(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            copied = Path(tmp) / "landing"
+            shutil.copytree(EXAMPLE_DIR, copied)
+            report = design_md_report.build_report((copied / "DESIGN.md").resolve(), requested_mode="fallback", official_command=None)
+            design_md_report.write_report(
+                report,
+                copied / "reviews" / "design-md-review.md",
+                copied / "reviews" / "design-md-review.json",
+            )
+            review_path = copied / "reviews" / "result-review-first-pass.json"
+            review = json.loads(review_path.read_text(encoding="utf-8"))
+            review["next_actions"]["next_copy_source"] = "prompts/huashu-design.txt"
+            for option in review["next_actions"]["options"]:
+                if option["action"] == "external_prompt":
+                    option["next_copy_source"] = "prompts/huashu-design.txt"
+            review_path.write_text(json.dumps(review, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [sys.executable, str(ROOT / "scripts" / "validate_golden_demo.py"), str(copied)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("next_copy_source must be prompts/generic-modification.txt", result.stdout + result.stderr)
+
+    def test_golden_demo_rejects_stale_first_pass_modification_prompt(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            copied = Path(tmp) / "landing"
+            shutil.copytree(EXAMPLE_DIR, copied)
+            report = design_md_report.build_report((copied / "DESIGN.md").resolve(), requested_mode="fallback", official_command=None)
+            design_md_report.write_report(
+                report,
+                copied / "reviews" / "design-md-review.md",
+                copied / "reviews" / "design-md-review.json",
+            )
+            (copied / validate_golden_demo.REVIEW_MODIFICATION_PROMPT_PATH).write_text("x\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [sys.executable, str(ROOT / "scripts" / "validate_golden_demo.py"), str(copied)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("prompts/generic-modification.txt missing modification prompt detail", result.stdout + result.stderr)
+
     def test_user_flow_package_validator_accepts_examples(self):
         for example_dir in [EXAMPLE_DIR, WORKSPACE_DIR]:
             result = subprocess.run(
@@ -1134,7 +1275,7 @@ class BriefPilotScriptTests(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn(expected_error, result.stdout + result.stderr)
 
-    def test_golden_demo_accepts_default_package_without_optional_prompt_files(self):
+    def test_golden_demo_accepts_default_package_without_base_generation_prompt_files(self):
         with tempfile.TemporaryDirectory() as tmp:
             copied = Path(tmp) / "landing"
             shutil.copytree(EXAMPLE_DIR, copied)
@@ -1144,7 +1285,8 @@ class BriefPilotScriptTests(unittest.TestCase):
                 copied / "reviews" / "design-md-review.md",
                 copied / "reviews" / "design-md-review.json",
             )
-            shutil.rmtree(copied / "prompts")
+            for relative in validate_golden_demo.PROMPTS:
+                (copied / relative).unlink()
 
             result = subprocess.run(
                 [sys.executable, str(ROOT / "scripts" / "validate_golden_demo.py"), str(copied)],
@@ -1679,7 +1821,7 @@ class BriefPilotScriptTests(unittest.TestCase):
 
             result = run_skill_command_validator("--root", root, "--dist-dir", out_dir, "--installed-dir", install_dir)
             self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
-            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+            for command in ["briefpilot", "bp", "bp-review", "briefpilot-upgrade"]:
                 self.assertTrue((out_dir / f"{command}.skill").exists())
                 self.assertTrue((install_dir / command / "SKILL.md").exists())
                 self.assertTrue((install_dir / command / "install-manifest.json").exists())
@@ -1706,6 +1848,12 @@ class BriefPilotScriptTests(unittest.TestCase):
                 names = set(archive.namelist())
                 manifest = json.loads(archive.read("bp/install-manifest.json"))
             self.assertEqual(names, {"bp/SKILL.md", "bp/install-manifest.json"})
+            self.assertEqual(manifest["package_version"], validate_release_metadata.read_version(root))
+
+            with zipfile.ZipFile(out_dir / "bp-review.skill") as archive:
+                names = set(archive.namelist())
+                manifest = json.loads(archive.read("bp-review/install-manifest.json"))
+            self.assertEqual(names, {"bp-review/SKILL.md", "bp-review/install-manifest.json"})
             self.assertEqual(manifest["package_version"], validate_release_metadata.read_version(root))
 
     def test_installed_command_validator_can_self_check_without_source_root(self):
@@ -1773,7 +1921,7 @@ class BriefPilotScriptTests(unittest.TestCase):
                 check=False,
             )
             self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
-            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+            for command in ["briefpilot", "bp", "bp-review", "briefpilot-upgrade"]:
                 rewrite_zip_json_member(
                     out_dir / f"{command}.skill",
                     f"{command}/install-manifest.json",
@@ -1806,7 +1954,7 @@ class BriefPilotScriptTests(unittest.TestCase):
                 source_without_git,
                 ignore=shutil.ignore_patterns(".git", "dist", "__pycache__"),
             )
-            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+            for command in ["briefpilot", "bp", "bp-review", "briefpilot-upgrade"]:
                 rewrite_zip_json_member(
                     out_dir / f"{command}.skill",
                     f"{command}/install-manifest.json",
@@ -1871,7 +2019,7 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertEqual(payload["artifacts"], [])
             self.assertEqual(
                 payload["planned_artifacts"],
-                [str((out_dir / f"{command}.skill").resolve()) for command in ["briefpilot", "bp", "briefpilot-upgrade"]],
+                [str((out_dir / f"{command}.skill").resolve()) for command in ["briefpilot", "bp", "bp-review", "briefpilot-upgrade"]],
             )
             self.assertFalse(out_dir.exists())
 
@@ -2001,7 +2149,7 @@ class BriefPilotScriptTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
             self.assertIn("generated .skill artifacts instead", result.stdout)
-            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+            for command in ["briefpilot", "bp", "bp-review", "briefpilot-upgrade"]:
                 self.assertTrue((out_dir / f"{command}.skill").exists())
 
     def test_skill_command_packager_json_reports_install_fallback(self):
@@ -2026,9 +2174,9 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertIn("generated .skill artifacts instead", payload["message"])
             self.assertEqual(
                 payload["artifacts"],
-                [str((out_dir / f"{command}.skill").resolve()) for command in ["briefpilot", "bp", "briefpilot-upgrade"]],
+                [str((out_dir / f"{command}.skill").resolve()) for command in ["briefpilot", "bp", "bp-review", "briefpilot-upgrade"]],
             )
-            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+            for command in ["briefpilot", "bp", "bp-review", "briefpilot-upgrade"]:
                 self.assertTrue((out_dir / f"{command}.skill").exists())
 
     def test_skill_command_packager_does_not_partially_replace_blocked_install(self):
@@ -2055,7 +2203,7 @@ class BriefPilotScriptTests(unittest.TestCase):
             self.assertEqual(blocked_bp.read_text(encoding="utf-8"), "file blocks bp directory\n")
             self.assertFalse((install_dir / ".bp.tmp").exists())
             self.assertFalse((install_dir / "briefpilot-upgrade").exists())
-            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+            for command in ["briefpilot", "bp", "bp-review", "briefpilot-upgrade"]:
                 self.assertTrue((out_dir / f"{command}.skill").exists())
 
     def test_skill_command_validator_rejects_non_lean_alias(self):
@@ -2087,6 +2235,7 @@ class BriefPilotScriptTests(unittest.TestCase):
         self.assertIn("0.10.0.0", upgrade_skill)
         self.assertIn("--format json", upgrade_skill)
         self.assertIn("findings", upgrade_skill)
+        self.assertIn("/bp-review", upgrade_skill)
         self.assertIn("--format json", readme)
         self.assertIn("默认仍是普通文本输出", readme)
         self.assertIn("没有 VERSION", eval_text)
@@ -2266,7 +2415,7 @@ class BriefPilotScriptTests(unittest.TestCase):
             )
             self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
 
-            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+            for command in ["briefpilot", "bp", "bp-review", "briefpilot-upgrade"]:
                 rewrite_zip_json_member(
                     out_dir / f"{command}.skill",
                     f"{command}/install-manifest.json",
@@ -2310,7 +2459,7 @@ class BriefPilotScriptTests(unittest.TestCase):
                 check=False,
             )
             self.assertEqual(package.returncode, 0, package.stderr + package.stdout)
-            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+            for command in ["briefpilot", "bp", "bp-review", "briefpilot-upgrade"]:
                 rewrite_zip_json_member(
                     out_dir / f"{command}.skill",
                     f"{command}/install-manifest.json",
@@ -2419,7 +2568,7 @@ class BriefPilotScriptTests(unittest.TestCase):
                     {
                         "schema_version": "1.0",
                         "package": "BriefPilot",
-                        "commands": ["briefpilot", "bp", "briefpilot-upgrade"],
+                        "commands": ["briefpilot", "bp", "bp-review", "briefpilot-upgrade"],
                         "package_version": "9.0.0.0",
                         "source_remote": "https://github.com/sdyckjq-lab/BriefPilot.git",
                         "source_commit": "1" * 40,
@@ -2485,7 +2634,7 @@ class BriefPilotScriptTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             dist = Path(tmp) / "dist"
             dist.mkdir()
-            for command in ["briefpilot", "bp", "briefpilot-upgrade"]:
+            for command in ["briefpilot", "bp", "bp-review", "briefpilot-upgrade"]:
                 with zipfile.ZipFile(dist / f"{command}.skill", "w") as archive:
                     archive.writestr(
                         f"{command}/SKILL.md",

@@ -11,6 +11,13 @@
 
 这个基线是第一个公开演示里的受控样例，不声称来自任何命名工具。以后如果加入真实工具输出，需要按 `future-real-output-todo.md` 记录证据。
 
+证据包：
+
+- `../ai-search-landing/demo-evidence.md`
+- `../ai-search-landing/first-pass/controlled-baseline.md`
+- `../ai-search-landing/reviews/result-review-first-pass.md`
+- `../ai-search-landing/second-pass/briefpilot-reviewed.md`
+
 ## Files
 
 - `index.html`: 可直接打开的视觉对比页面。

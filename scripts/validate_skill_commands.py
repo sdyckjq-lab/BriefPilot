@@ -12,7 +12,7 @@ import validate_release_metadata
 
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
-COMMANDS = ("briefpilot", "bp", "briefpilot-upgrade")
+COMMANDS = ("briefpilot", "bp", "bp-review", "briefpilot-upgrade")
 ALLOWED_FRONTMATTER = {"name", "description", "license", "allowed-tools", "metadata", "compatibility"}
 MAX_NAME_LENGTH = 64
 MAX_DESCRIPTION_LENGTH = 1024
@@ -173,7 +173,11 @@ def validate_briefpilot_flow_terms(root, findings):
     readme_text = readme_text or ""
     eval_text = json.dumps(load_json(root / "evals" / "evals.json", findings) or {}, ensure_ascii=False)
     bp_eval_text = json.dumps(load_json(root / "companions" / "bp" / "evals" / "evals.json", findings) or {}, ensure_ascii=False)
-    combined = "\n".join([skill_text, readme_text, eval_text, bp_eval_text])
+    bp_review_eval_text = json.dumps(
+        load_json(root / "companions" / "bp-review" / "evals" / "evals.json", findings) or {},
+        ensure_ascii=False,
+    )
+    combined = "\n".join([skill_text, readme_text, eval_text, bp_eval_text, bp_review_eval_text])
     for term in ["START_HERE.md", "design-spec.md", "review-next-actions.md"]:
         if term not in combined:
             findings.append(f"command workflow docs/evals missing new flow term: {term}")
@@ -192,6 +196,12 @@ def validate_source(root):
     validate_skill_file(root / "SKILL.md", "briefpilot", ["/briefpilot", "DESIGN.md"], findings)
     validate_skill_file(root / "companions" / "bp" / "SKILL.md", "bp", ["/bp", "briefpilot"], findings)
     validate_skill_file(
+        root / "companions" / "bp-review" / "SKILL.md",
+        "bp-review",
+        ["/bp-review", "briefpilot", "result-review"],
+        findings,
+    )
+    validate_skill_file(
         root / "companions" / "briefpilot-upgrade" / "SKILL.md",
         "briefpilot-upgrade",
         ["/briefpilot-upgrade", ".skill"],
@@ -201,6 +211,12 @@ def validate_source(root):
     validate_evals(root / "evals" / "evals.json", "briefpilot", 3, findings)
     validate_evals(root / "companions" / "bp" / "evals" / "evals.json", "bp", 2, findings)
     validate_evals(
+        root / "companions" / "bp-review" / "evals" / "evals.json",
+        "bp-review",
+        2,
+        findings,
+    )
+    validate_evals(
         root / "companions" / "briefpilot-upgrade" / "evals" / "evals.json",
         "briefpilot-upgrade",
         2,
@@ -208,6 +224,7 @@ def validate_source(root):
     )
 
     validate_companion_is_lean(root / "companions" / "bp", findings)
+    validate_companion_is_lean(root / "companions" / "bp-review", findings)
     validate_companion_is_lean(root / "companions" / "briefpilot-upgrade", findings)
     validate_briefpilot_flow_terms(root, findings)
 
@@ -271,7 +288,7 @@ def validate_installed(install_dir, expected_version=None, expected_source_commi
             except (OSError, UnicodeDecodeError) as error:
                 findings.append(f"installed briefpilot VERSION is not readable: {error}")
 
-    for command in ("bp", "briefpilot-upgrade"):
+    for command in ("bp", "bp-review", "briefpilot-upgrade"):
         skill_dir = install_dir / command
         if skill_dir.exists():
             validate_companion_is_lean(skill_dir, findings)

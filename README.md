@@ -43,6 +43,12 @@ BriefPilot 默认中文优先。技术文件名、命令、JSON keys 和工具�
 /bp 帮我做一个 AI 搜索产品官网
 ```
 
+生成第一版后，带结果回来评审：
+
+```text
+/bp-review 这里是第一版页面摘要或本地结果文件，请按之前 brief 评审
+```
+
 升级或修复安装：
 
 ```text
@@ -59,7 +65,7 @@ agent 会诊断需求、补充假设或提问、选择策略，并保存一套�
 
 不确定时不要选提示词，直接复制 `design-spec.md`。
 
-设计工具生成结果后，可以用同一套 brief 资产检查粘贴摘要、本地生成文件、截图说明或已有视觉评审。只说“评审”“看看”“检查”时，BriefPilot 默认只保存评审报告和下一步建议，不会改 brief、`design-spec.md`、生成结果文件或本地代码。
+设计工具生成结果后，用 `/bp-review` 带回来继续检查。它会用同一套 brief 资产检查粘贴摘要、本地生成文件、截图说明或已有视觉评审。只说“评审”“看看”“检查”时，BriefPilot 默认只保存评审报告和下一步建议，不会改 brief、`design-spec.md`、生成结果文件或本地代码。
 
 需要直接修本地文件时，BriefPilot 必须先列出准备修改的文件，并等用户明确确认。截图、图片、Figma 导出、外部平台草稿和纯粘贴摘要不能直接修复，只能评审、给外部工具修改提示，或修订 `design-spec.md` 后重新生成。
 
@@ -86,6 +92,13 @@ Google 官方 `diff`、`export` 和 `spec` 命令适合手动跟进；当前 Bri
 打开 [examples/comparison-demo/index.html](examples/comparison-demo/index.html)，可以看到同一个模糊需求的两种结果：直接生成的受控基线，以及基于已验证 AI 搜索官网样例的 BriefPilot 强化结果。
 
 这个基线是第一个演示里的受控样例，不声称来自任何命名下游工具。
+
+这条演示链路的证据在这里：
+
+- [demo-evidence.md](examples/ai-search-landing/demo-evidence.md)：原始输入、运行信息、是否人工修改和证据索引。
+- [first-pass/controlled-baseline.md](examples/ai-search-landing/first-pass/controlled-baseline.md)：第一版受控基线。
+- [reviews/result-review-first-pass.md](examples/ai-search-landing/reviews/result-review-first-pass.md)：BriefPilot 对第一版的评审。
+- [second-pass/briefpilot-reviewed.md](examples/ai-search-landing/second-pass/briefpilot-reviewed.md)：第二版应该补上的结构和证据。
 
 ## 快速示例
 
@@ -126,7 +139,7 @@ review-next-actions.md
 
 ## Skill 包
 
-仓库根目录是 BriefPilot 主 Skill 源码。当前命令包包含三个可安装 Skill：`briefpilot`、`bp` 和 `briefpilot-upgrade`。
+仓库根目录是 BriefPilot 主 Skill 源码。当前命令包包含四个可安装 Skill：`briefpilot`、`bp`、`bp-review` 和 `briefpilot-upgrade`。
 
 当前版本写在 `VERSION`，更新记录写在 `CHANGELOG.md`。发布前先确认这两个文件一致，再生成安装包。
 
@@ -153,6 +166,7 @@ JSON 输出会包含 `ok`、`kind`、`findings` 和 `message`。打包脚本还�
 ```text
 dist/briefpilot.skill
 dist/bp.skill
+dist/bp-review.skill
 dist/briefpilot-upgrade.skill
 ```
 

@@ -15,6 +15,12 @@ REQUIRED_FILES = [
     "briefpilot-enhanced.md",
     "future-real-output-todo.md",
 ]
+EVIDENCE_PATHS = [
+    "examples/ai-search-landing/demo-evidence.md",
+    "examples/ai-search-landing/first-pass/controlled-baseline.md",
+    "examples/ai-search-landing/reviews/result-review-first-pass.md",
+    "examples/ai-search-landing/second-pass/briefpilot-reviewed.md",
+]
 CONTROLLED_SOURCE_TYPES = {"controlled", "simulated", "controlled_baseline"}
 NAMED_TOOL_TOKENS = ["v0", "Lovable", "Bolt", "Figma Make", "Claude Design", "huashu-design"]
 MATURITY_TERMS = ["受众", "结构", "证据", "评审"]
@@ -174,6 +180,21 @@ def check_manifest(manifest, root, demo_dir, findings):
     if not invalid_todo_path and (not resolved_todo or resolved_todo != expected_todo):
         findings.append("future_real_output_todo_path must resolve to future-real-output-todo.md")
 
+    evidence = manifest.get("evidence_paths")
+    if not isinstance(evidence, dict):
+        findings.append("comparison-demo.json evidence_paths must be an object")
+    else:
+        for key, expected in {
+            "demo_evidence": "examples/ai-search-landing/demo-evidence.md",
+            "first_pass": "examples/ai-search-landing/first-pass/controlled-baseline.md",
+            "review": "examples/ai-search-landing/reviews/result-review-first-pass.md",
+            "second_pass": "examples/ai-search-landing/second-pass/briefpilot-reviewed.md",
+        }.items():
+            raw_path = evidence.get(key)
+            resolved, invalid = resolve_repo_relative_path(raw_path, root, findings, f"evidence_paths.{key}")
+            if not invalid and (not resolved or resolved != (root / expected).resolve()):
+                findings.append(f"evidence_paths.{key} must resolve to {expected}")
+
 
 def check_html(html, manifest, findings):
     html_lower = html.lower()
@@ -236,12 +257,11 @@ def check_future_todo(text, findings):
 
 def check_readme(root, findings):
     readme = read_text(root / "README.md", findings, "root README.md")
-    link_targets = [
-        "(examples/comparison-demo/index.html)",
-        "(./examples/comparison-demo/index.html)",
-    ]
-    if not any(target in readme for target in link_targets):
-        findings.append("README.md must link to examples/comparison-demo/index.html")
+    required_links = ["examples/comparison-demo/index.html", *EVIDENCE_PATHS]
+    for link in required_links:
+        markdown_targets = [f"({link})", f"(./{link})"]
+        if not any(target in readme for target in markdown_targets):
+            findings.append(f"README.md must link to {link}")
 
 
 def validate(root, demo_dir):

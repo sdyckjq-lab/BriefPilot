@@ -12,7 +12,7 @@ VERSION_PATTERN = re.compile(r"^\d+\.\d+\.\d+\.\d+$")
 COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 CHANGELOG_ENTRY_PATTERN = re.compile(r"^## \[(\d+\.\d+\.\d+\.\d+)\] - (\d{4}-\d{2}-\d{2})\s*$")
 ALLOWED_CHANGELOG_SECTIONS = {"Added", "Changed", "Fixed", "Removed"}
-COMMANDS = ("briefpilot", "bp", "briefpilot-upgrade")
+COMMANDS = ("briefpilot", "bp", "bp-review", "briefpilot-upgrade")
 OFFICIAL_SOURCE_REMOTE = "https://github.com/sdyckjq-lab/BriefPilot.git"
 
 

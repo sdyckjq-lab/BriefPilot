@@ -9,7 +9,7 @@ BriefPilot 用在设计生成之前，也用在生成之后。它先把用户的
 
 ## 命令入口
 
-当用户调用 `/briefpilot` 时，直接执行本 Skill。短命令 `/bp` 是同一流程的别名，应该读取并沿用本 Skill。升级命令 `/briefpilot-upgrade` 只负责刷新或修复已安装的 BriefPilot Skill 包。
+当用户调用 `/briefpilot` 时，直接执行本 Skill。短命令 `/bp` 是同一流程的别名，应该读取并沿用本 Skill。`/bp-review` 是生成后评审入口，应该直接进入本 Skill 的生成后评审模式。升级命令 `/briefpilot-upgrade` 只负责刷新或修复已安装的 BriefPilot Skill 包。
 
 ## 核心规则
 
