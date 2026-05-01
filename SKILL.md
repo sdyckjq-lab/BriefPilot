@@ -11,6 +11,15 @@ BriefPilot 用在设计生成之前，也用在生成之后。它先把用户的
 
 当用户调用 `/briefpilot` 时，直接执行本 Skill。短命令 `/bp` 是同一流程的别名，应该读取并沿用本 Skill。`/bp-review` 是生成后评审入口，应该直接进入本 Skill 的生成后评审模式。升级命令 `/briefpilot-upgrade` 只负责刷新或修复已安装的 BriefPilot Skill 包。
 
+## 新手默认路径
+
+面向第一次使用的用户，默认引导这条 4 步路径：
+
+1. 用 `/bp` 输入一句话需求。
+2. 输出后先让用户打开 `START_HERE.md`，再复制整个 `design-spec.md`。
+3. 让用户把 `design-spec.md` 交给目标设计生成工具，生成第一版。
+4. 结果回来时，用 `/bp-review` 做评审，并给出下一轮修改建议或提示词。
+
 ## 核心规则
 
 不要直接生成最终设计，除非用户明确要求。先把用户请求整理成可复用 brief，并让普通用户优先复制 `design-spec.md`。平台提示词只是可选导出，不是默认第一步。
@@ -30,7 +39,7 @@ BriefPilot 是中文优先。公开示例、brief 内容、提示词正文、评
 5. 先给出三个设计策略，再选择最终方向。
 6. 创建新 `DESIGN.md` 前，先从 `references/design-style-index.json` 匹配本地参考方向。
 7. 生成 `START_HERE.md`、`design-spec.md`、`design-brief.md`、`design-brief.json`、必要的 `DESIGN.md` 和 `review-checklist.md`。
-8. `START_HERE.md` 必须给一个首选下一步，并说明普通用户复制整个 `design-spec.md`。
+8. `START_HERE.md` 必须给一个首选下一步，并说明普通用户复制整个 `design-spec.md`，再用 `/bp-review` 把生成结果带回来评审。
 9. 只有用户明确要某个平台时，才导出平台提示词：v0 用于 React/Next.js 界面代码，huashu-design 用于高保真 HTML 原型，Claude Design 用于视觉探索和多版迭代。不把 `generic` 当成首轮平台提示词。
 10. 默认把输出保存到 `.briefpilot/`；用户要求可见目录时再改到指定目录。
 
