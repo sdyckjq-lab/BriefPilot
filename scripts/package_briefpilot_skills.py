@@ -16,7 +16,7 @@ import validate_release_metadata
 
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
-COMMANDS = ("briefpilot", "bp", "briefpilot-upgrade")
+COMMANDS = ("briefpilot", "bp", "bp-review", "briefpilot-upgrade")
 OFFICIAL_SOURCE_REMOTE = "https://github.com/sdyckjq-lab/BriefPilot.git"
 MAIN_FILES = ("SKILL.md", "LICENSE", "VERSION", "CHANGELOG.md")
 MAIN_DIRS = ("agents", "references", "templates", "scripts", "examples")
@@ -173,6 +173,7 @@ def stage_skills(root, staging_root):
     staging_root.mkdir(parents=True, exist_ok=True)
     stage_main_skill(root, staging_root)
     stage_companion(root, staging_root, "bp")
+    stage_companion(root, staging_root, "bp-review")
     stage_companion(root, staging_root, "briefpilot-upgrade")
     return staging_root
 

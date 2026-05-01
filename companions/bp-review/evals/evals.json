@@ -1,0 +1,31 @@
+{
+  "skill_name": "bp-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "/bp-review 我把第一版页面摘要贴给你：首屏像普通 SaaS 官网，来源证据和可信度不明显。按之前 brief 看看，先不要改文件。",
+      "expected_output": "The agent treats /bp-review as BriefPilot's generated-result review entry and keeps the request review-only until the source brief package and result evidence are grounded.",
+      "files": [],
+      "expectations": [
+        "The response routes into BriefPilot's result-review workflow rather than starting a new design brief.",
+        "The response asks for or uses design-brief.json, linked DESIGN.md, selected strategy, and review-checklist.md before a formal report.",
+        "The response mentions result-review.md, result-review.json, and review-next-actions.md as expected saved outputs.",
+        "The response does not edit local files or source package files without explicit confirmation.",
+        "The user-facing guidance remains Chinese-first."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "/bp-review 这里有本地生成文件 examples/demo/first-pass/index.html，帮我评审并告诉我下一轮怎么改。",
+      "expected_output": "The agent recognizes local-file review evidence, checks the BriefPilot source package first, and produces safe next-action guidance without automatically repairing the file.",
+      "files": [],
+      "expectations": [
+        "The response recognizes this as a generated-result review with local_file evidence.",
+        "The response requires the source brief package before judging whether the output matches the selected strategy.",
+        "The response keeps direct repair gated behind a concrete file list and explicit user confirmation.",
+        "The response distinguishes external modification prompt, spec revision, and direct repair as possible next actions.",
+        "The user-facing guidance remains Chinese-first."
+      ]
+    }
+  ]
+}

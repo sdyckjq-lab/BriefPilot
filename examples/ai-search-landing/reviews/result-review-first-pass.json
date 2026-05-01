@@ -1,0 +1,100 @@
+{
+  "schema_version": "1.0",
+  "source": {
+    "brief_path": "design-brief.json",
+    "design_md_path": "DESIGN.md"
+  },
+  "target_tool": "generic",
+  "evidence": {
+    "kind": "local_file",
+    "summary": "第一版受控基线像普通 SaaS 官网，受众、来源证据、可信度和状态要求不明显。",
+    "path": "first-pass/controlled-baseline.md"
+  },
+  "decision": "tweak",
+  "selected_strategy": "企业信任型",
+  "strategy_preserved": true,
+  "strategy_change_reason": "",
+  "strengths": [
+    "第一版仍然保持官网方向，没有误变成复杂工作台。",
+    "第一版保留了产品营销页的基本结构，可以在同一策略上继续修改。"
+  ],
+  "findings": [
+    {
+      "severity": "medium",
+      "brief_reference": "audience.primary_user: 知识工作者和小团队",
+      "issue": "首屏没有明确面向知识工作者和小团队。",
+      "evidence": "first-pass/controlled-baseline.md 记录第一版标题和内容都是泛化 AI 官网话术。",
+      "recommended_change": "把首屏文案改成围绕知识工作、团队搜索和可信来源组织。"
+    },
+    {
+      "severity": "medium",
+      "brief_reference": "structure.sections: Hero with sourced answer product proof",
+      "issue": "第一版没有展示带来源答案的产品界面。",
+      "evidence": "第一版结果摘要说明页面只有泛化功能卡片，没有来源标签和引用界面。",
+      "recommended_change": "在首屏或紧随首屏位置加入带来源答案、引用标签和可信度标记的产品界面。"
+    },
+    {
+      "severity": "medium",
+      "brief_reference": "structure.interaction_contract and review-checklist.md",
+      "issue": "加载、错误、空状态、移动端和键盘焦点没有体现。",
+      "evidence": "第一版结果摘要明确缺少这些交互状态。",
+      "recommended_change": "补齐 loading、success、error、empty、low-confidence、mobile 和 focus 状态说明。"
+    }
+  ],
+  "visual_review": {
+    "status": "unavailable",
+    "source": "",
+    "notes": "本次官方证据包使用文本化受控基线，没有截图，因此使用本地 Markdown 结果和 BriefPilot brief 包作为后备证据。"
+  },
+  "brief_revision_path": "",
+  "design_spec_revision_path": "",
+  "prompt_intent": "targeted_modification",
+  "prompt": {
+    "keep": [
+      "保留企业信任型策略。",
+      "保留官网结构和主次 CTA 层级。",
+      "保留克制、产品驱动的视觉方向。"
+    ],
+    "change": [
+      "让首屏明确表达带来源的 AI 搜索。",
+      "加入带来源答案、引用标签和可信度标记的产品界面。",
+      "补齐加载、错误、空状态、低可信度、移动端和键盘焦点要求。"
+    ],
+    "do_not_change": [
+      "不要改成普通 AI 发光背景。",
+      "不要虚构客户 Logo、指标或真实评价。",
+      "不要把官网变成复杂工作台。"
+    ],
+    "acceptance_checks": [
+      "首屏能看出产品是带来源的 AI 搜索。",
+      "主 CTA 是试用注册，次 CTA 是预约演示。",
+      "来源标签、可信度和状态说明都出现在结果里。",
+      "整体仍然符合 DESIGN.md 的企业信任型视觉方向。"
+    ]
+  },
+  "next_actions": {
+    "recommended_next_action": "external_prompt",
+    "reason": "第一版是受控基线，不是可直接修改的真实下游项目；公开演示里最安全的下一步是复制完整生成提示并按评审要求生成第二版。",
+    "next_copy_source": "prompts/generic-modification.txt",
+    "options": [
+      {
+        "action": "direct_repair",
+        "enabled": false,
+        "disabled_reason": "第一版是公开演示用受控基线，不是用户确认可编辑的真实生成项目。",
+        "next_copy_source": ""
+      },
+      {
+        "action": "external_prompt",
+        "enabled": true,
+        "disabled_reason": "",
+        "next_copy_source": "prompts/generic-modification.txt"
+      },
+      {
+        "action": "revise_spec",
+        "enabled": false,
+        "disabled_reason": "问题来自第一版执行偏差，原始 design-spec.md 不需要先修订。",
+        "next_copy_source": ""
+      }
+    ]
+  }
+}

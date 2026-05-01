@@ -8,6 +8,13 @@
 
 强化结果基于已经验证过的 `examples/ai-search-landing` 样例包。
 
+完整证据见：
+
+- `examples/ai-search-landing/demo-evidence.md`
+- `examples/ai-search-landing/first-pass/controlled-baseline.md`
+- `examples/ai-search-landing/reviews/result-review-first-pass.md`
+- `examples/ai-search-landing/second-pass/briefpilot-reviewed.md`
+
 ## BriefPilot 补齐了什么
 
 - 受众：需要跨工作资料搜索的知识工作者和小团队。

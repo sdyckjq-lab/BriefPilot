@@ -4,6 +4,16 @@ BriefPilot 版本记录使用 `MAJOR.MINOR.PATCH.MICRO`。
 
 每条记录按 `YYYY-MM-DD` 标注，并优先说明用户能获得什么。
 
+## [0.3.0.0] - 2026-05-01
+### Added
+- 新增 `/bp-review` 入口，让用户生成第一版后能用一个清楚命令回到 BriefPilot 做结果评审。
+- 新增 AI 搜索官网官方 demo 证据包，记录原始输入、第一版、评审、第二版和是否人工修改。
+- README 增加证据链接，直接指向对比演示、demo 证据、第一版、评审和第二版结果。
+
+### Changed
+- 命令包现在包含 `/briefpilot`、`/bp`、`/bp-review` 和 `/briefpilot-upgrade` 四个入口。
+- 官方 demo 校验会检查证据包完整性和公开前脱敏要求。
+
 ## [0.2.0.0] - 2026-04-27
 ### Added
 - 新增 `START_HERE.md` 和可直接复制的 `design-spec.md`，普通用户可以先按一个清楚入口完成设计工具交接。

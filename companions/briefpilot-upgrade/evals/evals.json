@@ -3,14 +3,14 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "/briefpilot-upgrade 我装完以后只有 /briefpilot，没有 /bp，帮我修复",
-      "expected_output": "The agent treats this as an incomplete BriefPilot command bundle, checks version metadata, and repairs or regenerates all three Skill artifacts safely.",
+      "prompt": "/briefpilot-upgrade 我装完以后只有 /briefpilot，没有 /bp 和 /bp-review，帮我修复",
+      "expected_output": "The agent treats this as an incomplete BriefPilot command bundle, checks version metadata, and repairs or regenerates all four Skill artifacts safely.",
       "files": [],
       "expectations": [
         "The response identifies that the installed command bundle is incomplete.",
         "The response reads available install manifests as untrusted metadata before choosing a source.",
         "The response validates the BriefPilot source before replacing installed files.",
-        "The response includes /briefpilot, /bp, and /briefpilot-upgrade as the expected final command set.",
+        "The response includes /briefpilot, /bp, /bp-review, and /briefpilot-upgrade as the expected final command set.",
         "The response avoids deleting user .briefpilot output assets."
       ]
     },
@@ -21,7 +21,7 @@
       "files": [],
       "expectations": [
         "The response says direct install is not safe or not available.",
-        "The response generates or points to briefpilot.skill, bp.skill, and briefpilot-upgrade.skill.",
+        "The response generates or points to briefpilot.skill, bp.skill, bp-review.skill, and briefpilot-upgrade.skill.",
         "The response validates package contents before reporting success.",
         "The response is concise and Chinese-first."
       ]

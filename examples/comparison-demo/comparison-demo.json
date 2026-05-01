@@ -39,5 +39,11 @@
     "BriefPilot 加入产品证据，而不是依赖泛化 AI 说法。",
     "BriefPilot 把评审标准和状态要求带进下一轮提示。"
   ],
+  "evidence_paths": {
+    "demo_evidence": "examples/ai-search-landing/demo-evidence.md",
+    "first_pass": "examples/ai-search-landing/first-pass/controlled-baseline.md",
+    "review": "examples/ai-search-landing/reviews/result-review-first-pass.md",
+    "second_pass": "examples/ai-search-landing/second-pass/briefpilot-reviewed.md"
+  },
   "future_real_output_todo_path": "examples/comparison-demo/future-real-output-todo.md"
 }
